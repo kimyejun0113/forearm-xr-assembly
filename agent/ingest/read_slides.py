@@ -91,14 +91,30 @@ def pick_frames(paths):
     with ThreadPoolExecutor(max_workers=8) as ex:
         res = list(ex.map(one, paths))
     key = lambda t: "".join(ch for ch in t if ch.isalnum())
-    groups = {}
+    same = lambda x, y: x == y or (min(len(x), len(y)) >= 2 and (x in y or y in x))   # 화면 왼쪽이 잘려 '어암 조립'으로 읽힌 것도 같은 묶음
+    groups = []   # [{"keys": [...], "items": [(sharp, i)]}]
     for i, (title, sharp) in enumerate(res):
-        if key(title):
-            groups.setdefault(key(title), []).append((sharp, i))
+        k = key(title)
+        if not k:
+            continue
+        g = next((g for g in groups if any(same(k, x) for x in g["keys"])), None)
+        if g is None:
+            groups.append({"keys": [k], "items": [(sharp, i)]})
+        else:
+            g["keys"].append(k); g["items"].append((sharp, i))
+    pick_frames.last = [(t, round(sh)) for t, sh in res]   # 확인용
+    # 한 장만 다르게 읽혔는데 바로 앞뒤 사진이 같은 슬라이드면 잘못 읽은 것 (작은 부제목을 제목으로 읽는 등) → 그 슬라이드에 넣는다
+    gid = {i: n for n, g in enumerate(groups) for _, i in g["items"]}
+    seq = sorted(gid)
+    for k, i in enumerate(seq):
+        g = groups[gid[i]]
+        if len(g["items"]) == 1 and 0 < k < len(seq) - 1 and gid[seq[k - 1]] == gid[seq[k + 1]] != gid[i]:
+            groups[gid[seq[k - 1]]]["items"].append(g["items"].pop())
+    groups = [g for g in groups if g["items"]]
     if not groups:
         return None
     out = []
-    for g in groups.values():
+    for g in (g["items"] for g in groups):
         order = [i for _, i in sorted(g, reverse=True)]
         out.append({"best": order[0], "first": min(i for _, i in g), "rest": order[1:]})
     return sorted(out, key=lambda x: x["first"])

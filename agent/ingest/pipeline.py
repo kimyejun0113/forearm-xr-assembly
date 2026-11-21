@@ -43,9 +43,22 @@ def _norm(t):
     return "".join(ch for ch in (t or "") if ch.isalnum())
 
 
-def _same_slide(a, b):
-    """같은 슬라이드인가: 제목이 같고 단계 표시가 같거나 한쪽이 못 읽음"""
-    return _norm(a.get("title")) == _norm(b.get("title"))   # 단계 표시는 멀리서 잘못 읽히기도 해서 제목만 본다
+def _same_title(x, y):
+    """제목이 같은가. 고개를 돌려 화면 왼쪽이 잘리면 '포어암 조립'이 '어암 조립'·'암 조립'으로 읽히므로
+    한쪽이 다른 쪽에 들어 있으면 같은 것으로 본다 (두 글자 이상)."""
+    x, y = _norm(x), _norm(y)
+    if not x or not y:
+        return False
+    return x == y or (min(len(x), len(y)) >= 2 and (x in y or y in x))
+
+
+def _same_slide(m, s):
+    """같은 슬라이드인가: 이 묶음에서 읽힌 제목 중 하나와 같으면 (단계 표시는 멀리서 잘못 읽히기도 해서 제목만 본다).
+    단계 표시가 둘 다 있는데 다르면 다른 슬라이드."""
+    la, lb = _norm(m["s"].get("step_label")), _norm(s.get("step_label"))
+    if la and lb and la != lb and m["s"].get("clarity") == "high" and s.get("clarity") == "high":
+        return False
+    return any(_same_title(t, s.get("title")) for t in m["titles"])
 
 
 def _score(s):
@@ -94,11 +107,12 @@ def run(d: Path):
             for f, s in zip(frames, read):
                 if not s.get("is_slide", True) or not s.get("title") or s.get("clarity") == "low":
                     continue
-                m = next((m for m in merged if _same_slide(m["s"], s)), None)
+                m = next((m for m in merged if _same_slide(m, s)), None)
                 if m is None:
-                    merged.append({"s": s, "t": f["t"], "dup": 0})
+                    merged.append({"s": s, "t": f["t"], "dup": 0, "titles": [s.get("title")]})
                     continue
                 m["dup"] += 1
+                m["titles"].append(s.get("title"))
                 if _score(s) > _score(m["s"]):
                     m["s"] = s
             if not meta.get("doc"):

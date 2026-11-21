@@ -858,6 +858,7 @@ function capShot(why = 'auto') {
   const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
   c.getContext('2d').drawImage(v, 0, 0);
   const t = (performance.now() - CAP.t0) / 1000;
+  CAP.lastT = t;   // 사진 저장(toBlob)은 헤드셋에서 0.5초 넘게 걸리기도 해서, 찍은 시각을 바로 적어 둬야 겹쳐 찍지 않는다
   c.toBlob((b) => { CAP.frames.push({ b, t }); CAP.last = capGray(); capStatus(); }, 'image/jpeg', 0.9);
   if (why === 'manual') { agentToast('📸 찍었어요'); xrInputs.forEach((s) => buzz(s, 0.3, 30)); }
 }
@@ -867,7 +868,7 @@ function capWatch() {
   if (!CAP.last || !CAP.video.videoWidth) return;
   const g = capGray(), dif = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0) / a.length;
   const settle = CAP.prev ? dif(g, CAP.prev) : 99, same = dif(g, CAP.last) < 2; CAP.prev = g;
-  const since = (performance.now() - CAP.t0) / 1000 - (CAP.frames.at(-1)?.t ?? 0);
+  const since = (performance.now() - CAP.t0) / 1000 - (CAP.lastT ?? 0);
   if (settle < 10 && since >= 3 && !(same && since < 8)) capShot();   // 완전히 같은 장면이면 8초에 한 번만
 }
 function capStatus() { agent.status = `● 설명 녹화 중 · 사진 ${CAP.frames.length}장 · "찍어" "녹화 끝"`; drawInfo(); drawPanel(); }
@@ -891,7 +892,7 @@ async function capStart() {
     CAP.rec.start(1000);
   } catch (e) { CAP.mic?.getTracks().forEach((t) => t.stop()); CAP.mic = null; CAP.rec = null; agentToast('마이크 녹음은 못 해요 · 사진만 찍어요'); }
   const sm = document.createElement('canvas'); sm.width = 48; sm.height = 36; CAP.sctx = sm.getContext('2d', { willReadFrequently: true });
-  Object.assign(CAP, { on: true, frames: [], last: null, prev: null, pend: 0, t0: performance.now(), status0: agent.status });
+  Object.assign(CAP, { on: true, frames: [], last: null, prev: null, pend: 0, lastT: 0, t0: performance.now(), status0: agent.status });
   setTimeout(() => capShot(), 1500);
   CAP.timer = setInterval(capWatch, 500);
   capStatus(); agentToast(CAP.rec ? '설명 녹화 시작 · 말하면서 PPT를 넘기세요' : '설명 녹화 시작 · PPT를 보면서 넘기세요');
