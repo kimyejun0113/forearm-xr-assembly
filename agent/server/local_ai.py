@@ -56,9 +56,26 @@ def stt(audio: bytes, filename: str = "q.webm") -> str:
 
 
 def stt_segments(path) -> list[dict]:
-    """긴 설명 녹음 → 문장마다 시작 시간"""
-    segs, _ = _model().transcribe(str(path), language="ko", vad_filter=True, initial_prompt=STT_HINT)
-    return [{"start": round(s.start, 1), "text": s.text.strip()} for s in segs if s.text.strip()]
+    """긴 설명 녹음 → 문장마다 시작 시간.
+    쉬지 않고 말하면 Whisper가 몇십 초를 한 덩어리로 주므로, 단어 시각을 받아 문장 끝(. ? !)에서 나눈다
+    (그래야 문장마다 그때 보던 슬라이드가 붙는다)."""
+    segs, _ = _model().transcribe(str(path), language="ko", vad_filter=True, initial_prompt=STT_HINT, word_timestamps=True)
+    out = []
+    for s in segs:
+        cur, t0 = "", None
+        for w in (s.words or []):
+            if t0 is None:
+                t0 = w.start
+            cur += w.word
+            if w.word.strip().endswith((".", "?", "!", "。")):
+                if cur.strip():
+                    out.append({"start": round(float(t0), 1), "text": cur.strip()})
+                cur, t0 = "", None
+        if cur.strip():
+            out.append({"start": round(float(t0 if t0 is not None else s.start), 1), "text": cur.strip()})
+        elif not s.words and s.text.strip():
+            out.append({"start": round(float(s.start), 1), "text": s.text.strip()})
+    return out
 
 
 # ---------- 음성 합성 ----------

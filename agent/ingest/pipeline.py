@@ -8,7 +8,7 @@
   3. 기존 지식 파일을 data/kb/history/에 백업하고 새 slides_read.json·speech.json을 쓴 뒤 build_kb
 상태는 status.json에 단계별로 남긴다.
 """
-import json, shutil, time, traceback
+import json, re, shutil, time, traceback
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -117,6 +117,9 @@ def run(d: Path):
         if meta.get("audio"):
             job.step("speech", "녹음 글자로 바꾸는 중")
             segs = transcribe.transcribe_file(d / meta["audio"], flips)
+            # 헤드셋 녹화는 음성 명령("찍어", "녹화 끝")도 같이 녹음된다 → 설계자 말에서 뺀다
+            cmd = re.compile(r"^\s*((설명\s*)?녹화\s*(끝|종료|그만|꺼|멈춰)\w*|(사진\s*)?찍어\w*|캡처)[\s.!?]*$")
+            segs = [g for g in segs if g.get("text", "").strip() and not cmd.match(g["text"])]
         elif any(notes):
             job.step("speech", "녹음이 없어 발표자 노트를 설계자 말로 사용")
             t = 0

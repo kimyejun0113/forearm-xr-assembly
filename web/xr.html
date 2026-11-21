@@ -846,7 +846,7 @@ function agentReconnect() {
 // 선배가 헤드셋을 쓰고 PPT(다른 노트북·모니터)를 보며 넘기면, 화면이 바뀌고 멈출 때마다 사진을 찍는다.
 // 끝내면 사진만 서버로 → 비전이 슬라이드를 읽어 지식을 다시 만든다. 설계자 말(지금 지식)은 그대로 둔다.
 // Quest 브라우저: facingMode 'ideal'이면 앞쪽 아바타 카메라(가짜 배경)를 주므로 뒤쪽(패스스루) 카메라를 꼭 집어 요청.
-const CAP = { on: false, busy: false, stream: null, video: null, frames: [], t0: 0, timer: null, sctx: null, last: null, prev: null, pend: 0, max: 120 };
+const CAP = { on: false, busy: false, stream: null, video: null, frames: [], t0: 0, timer: null, sctx: null, last: null, prev: null, pend: 0, max: 240, mic: null, rec: null, chunks: [] };   // 말로 설명하면 길어져서 최대 240장(약 12분)
 function capGray() {
   CAP.sctx.drawImage(CAP.video, 0, 0, 48, 36);
   const d = CAP.sctx.getImageData(0, 0, 48, 36).data, g = new Uint8Array(48 * 36);
@@ -868,7 +868,7 @@ function capWatch() {
   const g = capGray(), dif = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0) / a.length;
   const settle = CAP.prev ? dif(g, CAP.prev) : 99, same = dif(g, CAP.last) < 2; CAP.prev = g;
   const since = (performance.now() - CAP.t0) / 1000 - (CAP.frames.at(-1)?.t ?? 0);
-  if (settle < 10 && since >= 2.5 && !(same && since < 8)) capShot();   // 완전히 같은 장면이면 8초에 한 번만
+  if (settle < 10 && since >= 3 && !(same && since < 8)) capShot();   // 완전히 같은 장면이면 8초에 한 번만
 }
 function capStatus() { agent.status = `● 설명 녹화 중 · 사진 ${CAP.frames.length}장 · "찍어" "녹화 끝"`; drawInfo(); drawPanel(); }
 async function capStart() {
@@ -881,16 +881,33 @@ async function capStart() {
   } catch (e) { agentToast(`카메라를 열 수 없어요 (${e.name})`); return; }
   CAP.video = Object.assign(document.createElement('video'), { muted: true, playsInline: true, srcObject: CAP.stream });
   await CAP.video.play().catch(() => {});
+  // 설계자 말 녹음: 사진과 같은 시각(t0)부터. 서버가 글자로 바꾸고 사진 시각으로 슬라이드와 잇는다
+  CAP.rec = null; CAP.chunks = [];
+  try {
+    CAP.mic = await navigator.mediaDevices.getUserMedia({ audio: VOICE_AUDIO });
+    const mt = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find((m) => window.MediaRecorder?.isTypeSupported?.(m)) || '';
+    CAP.rec = new MediaRecorder(CAP.mic, mt ? { mimeType: mt, audioBitsPerSecond: 48000 } : undefined);
+    CAP.rec.ondataavailable = (e) => { if (e.data.size) CAP.chunks.push(e.data); };
+    CAP.rec.start(1000);
+  } catch (e) { CAP.mic?.getTracks().forEach((t) => t.stop()); CAP.mic = null; CAP.rec = null; agentToast('마이크 녹음은 못 해요 · 사진만 찍어요'); }
   const sm = document.createElement('canvas'); sm.width = 48; sm.height = 36; CAP.sctx = sm.getContext('2d', { willReadFrequently: true });
   Object.assign(CAP, { on: true, frames: [], last: null, prev: null, pend: 0, t0: performance.now(), status0: agent.status });
   setTimeout(() => capShot(), 1500);
   CAP.timer = setInterval(capWatch, 500);
-  capStatus(); agentToast('설명 녹화 시작 · PPT를 보면서 넘기세요');
+  capStatus(); agentToast(CAP.rec ? '설명 녹화 시작 · 말하면서 PPT를 넘기세요' : '설명 녹화 시작 · PPT를 보면서 넘기세요');
 }
 async function capStop() {
   if (!CAP.on) return;
   clearInterval(CAP.timer); CAP.on = false;
   CAP.stream.getTracks().forEach((t) => t.stop());
+  let audio = null;
+  if (CAP.rec) {
+    const rec = CAP.rec;
+    await new Promise((r) => { rec.onstop = r; try { rec.stop(); } catch { r(); } setTimeout(r, 3000); });
+    if (CAP.chunks.length) audio = new Blob(CAP.chunks, { type: rec.mimeType || 'audio/webm' });
+    CAP.mic.getTracks().forEach((t) => t.stop());
+    CAP.rec = null; CAP.mic = null; CAP.chunks = [];
+  }
   agent.status = CAP.status0;
   if (!CAP.frames.length) { agentToast('찍힌 슬라이드가 없어요'); drawPanel(); return; }
   CAP.busy = true; drawPanel();
@@ -898,6 +915,7 @@ async function capStop() {
   const fd = new FormData();
   CAP.frames.forEach((f, i) => fd.append('frames', f.b, `f_${i + 1}.jpg`));
   fd.append('frame_times', JSON.stringify(CAP.frames.map((f) => f.t)));
+  if (audio) fd.append('audio', audio, /mp4/.test(audio.type) ? 'talk.m4a' : 'talk.webm');
   try {
     const j = await fetch('/api/briefing', { method: 'POST', body: fd }).then((r) => r.json());
     let st;
@@ -911,7 +929,7 @@ async function capStop() {
       agent.kb = await fetch('/api/kb', { cache: 'no-store' }).then((r) => r.json());
       if (shown >= 0) agentStep(shown);                       // 지금 단계 카드를 새 지식으로
       agentToast(`설명 반영 완료 · 슬라이드 ${st.slides}장, 설계자 말 ${st.segments}문장`);
-      agent.reply = { kind: 'answer', q: '설명 녹화', text: `슬라이드 ${st.slides}장을 읽어 단계 안내를 다시 만들었어요. 설계자 말 ${st.segments}문장은 그대로예요.`, src: [] };
+      agent.reply = { kind: 'answer', q: '설명 녹화', text: `슬라이드 ${st.slides}장을 읽어 단계 안내를 다시 만들었어요. 설계자 말 ${st.segments}문장은 ${audio ? '이번 녹음에서 새로 받았어요' : '그대로예요'}.`, src: [] };
     } else agentToast('분석 실패: ' + ((st.log || []).slice(-1)[0] || ''));
   } catch (e) { agentToast('업로드 실패: ' + e.message); }
   CAP.busy = false; drawPanel(); drawInfo();
@@ -1086,6 +1104,12 @@ function onHeard(raw) {
   const t = raw.trim().replace(/[.?!。]+$/, '');
   if (!t) return;
   const compact = t.replace(/[\s,.]/g, '');
+  if (CAP.on) {   // 녹화 중엔 설계자가 설명하는 말이 계속 들린다 → 녹화 명령만 받고 나머지(단계 이동·완료·질문)는 무시
+    const c = compact.length > 10 ? null : /^(설명)?녹화(끝|종료|그만|꺼|멈춰)/.test(compact) ? ['설명 녹화 끝', capStop]
+      : /^(사진)?찍어|^캡처/.test(compact) ? ['사진 찍기', () => capShot('manual')] : null;
+    if (c) { VOICE.heard = t; c[1](); agentToast(`🎤 ${c[0]}`); }
+    return;
+  }
   if (runCommand(t, compact)) return;                                         // 단계·화면 명령은 호출어 없이도 바로
   if (agent.phase === 'comment' && agent.commentT > 0) {                       // 완료 뒤 25초: 호출어 없이 한마디
     if (/^(없어|없음|없습니다|괜찮)/.test(compact)) { VOICE.heard = t; nextWorker(); return; }
