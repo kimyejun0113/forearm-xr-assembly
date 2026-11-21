@@ -1,6 +1,6 @@
 {
   "project": "forearm v1",
-  "reader": "manual-vision v2 (Claude가 캡처 이미지를 보고 읽음; 팀원 3D 14단계 순서 반영 PPT)",
+  "reader": "doc:20261121-212836-2b39",
   "steps": [
     {
       "step_id": "S01",
@@ -12,10 +12,10 @@
       "tools": [],
       "bolts": [],
       "instructions": [
-        "액추에이터 1을 모듈 통째로 놓기"
+        "액추에이터 1을 모듈 통째로 놓기 (커넥터 바깥)"
       ],
       "warnings": [
-        "XT30·USB-C 커넥터가 바깥을 향하게. 반대면 배선이 안 됩니다."
+        "XT30·USB-C 커넥터가 바깥을 향하게"
       ],
       "slides": [
         2
@@ -34,7 +34,7 @@
       "tools": [],
       "bolts": [],
       "instructions": [
-        "튜브 클램프(Part19) 놓기"
+        "튜브 클램프 Part19 놓기"
       ],
       "warnings": [],
       "slides": [
@@ -54,10 +54,10 @@
       "tools": [],
       "bolts": [],
       "instructions": [
-        "브래킷(Part18)을 맞춰 얹기"
+        "브래킷 Part18을 홈에 맞춰 얹기"
       ],
       "warnings": [
-        "Part18과 Part19 사이는 약 1 mm 틈. 닿으면 클램프를 옮기세요."
+        "Part18과 Part19 사이 약 1 mm 틈"
       ],
       "slides": [
         2
@@ -81,15 +81,21 @@
         "M3 약 10 mm × 6"
       ],
       "instructions": [
-        "M3 약 10 mm × 6 · 브래킷 ↔ 아래 하우징"
+        "M3 10 mm × 6 · 브래킷 ↔ 아래 하우징"
       ],
       "warnings": [
-        "10 mm와 12.5 mm 볼트를 섞지 마세요. 대각선 순서로 조금씩."
+        "10 mm와 12.5 mm 섞지 말기, 대각선으로 반 바퀴씩",
+        "셀프탭 구멍: 처음엔 끝까지 넣었다 빼서 길 내기"
       ],
       "slides": [
         2
       ],
-      "flags": {},
+      "flags": {
+        "irreversible": [
+          "셀프탭 구멍: 처음엔 끝까지 넣었다 빼서 길 내기",
+          "출력물 구멍이라 셀프탭이거든, 처음 한 번은 끝까지 넣었다가 빼서 길을 내고, 두 번째 조일 때는 닿았다 싶으면 멈춰."
+        ]
+      },
       "check": null,
       "baseline_sec": 210
     },
@@ -108,15 +114,20 @@
         "M3 약 12.5 mm × 6"
       ],
       "instructions": [
-        "M3 약 12.5 mm × 6 · 브래킷 ↔ 위 하우징"
+        "M3 12.5 mm × 6 · 브래킷 ↔ 위 하우징"
       ],
       "warnings": [
-        "10 mm와 12.5 mm 볼트를 섞지 마세요. 대각선 순서로 조금씩."
+        "10 mm와 12.5 mm 섞지 말기, 대각선으로 반 바퀴씩",
+        "셀프탭 구멍: 처음엔 끝까지 넣었다 빼서 길 내기"
       ],
       "slides": [
         2
       ],
-      "flags": {},
+      "flags": {
+        "irreversible": [
+          "셀프탭 구멍: 처음엔 끝까지 넣었다 빼서 길 내기"
+        ]
+      },
       "check": null,
       "baseline_sec": 210
     },
@@ -130,11 +141,9 @@
       "tools": [],
       "bolts": [],
       "instructions": [
-        "액추에이터 2를 모듈 통째로 놓기"
+        "액추에이터 2를 모듈 통째로 놓기 (커넥터 바깥)"
       ],
-      "warnings": [
-        "커넥터는 액추에이터 1과 같은 방향, 바깥쪽."
-      ],
+      "warnings": [],
       "slides": [
         3
       ],
@@ -152,7 +161,7 @@
       "tools": [],
       "bolts": [],
       "instructions": [
-        "손목 쪽 클램프(Part19 두 번째) 놓기"
+        "손목 쪽 클램프 Part19 두 번째 놓기"
       ],
       "warnings": [],
       "slides": [
@@ -175,10 +184,10 @@
       ],
       "bolts": [],
       "instructions": [
-        "두 번째 카본 튜브를 길이 방향으로 끼우기"
+        "두 번째 카본 튜브 끼우기"
       ],
       "warnings": [
-        "카본 절단면은 사포로 정리하고 장갑을 끼세요. 끝까지 밀어 넣기만."
+        "튜브 절단면이 거칠면 사포로 정리, 장갑 끼기"
       ],
       "slides": [
         3
@@ -197,7 +206,7 @@
       "tools": [],
       "bolts": [],
       "instructions": [
-        "이두 쪽 마운트(actmount_bicep) 얹기"
+        "이두 쪽 액추에이터 마운트 끼우기"
       ],
       "warnings": [],
       "slides": [
@@ -224,10 +233,10 @@
         "M5 약 11 mm × 1"
       ],
       "instructions": [
-        "M4 약 11 mm × 6 + M5 × 1 · 마운트 ↔ 아래 하우징"
+        "M4 11 mm × 6 + M5 × 1 · 마운트 ↔ 아래 하우징"
       ],
       "warnings": [
-        "7개 중 1개는 M5, 구멍이 큰 자리입니다. 대각선 순서로 조금씩."
+        "7개 중 1개는 M5, 구멍이 큰 자리"
       ],
       "slides": [
         3
@@ -249,7 +258,7 @@
       ],
       "bolts": [],
       "instructions": [
-        "메인 카본 튜브를 길이 방향으로 끼우기"
+        "메인 카본 튜브 끼우기"
       ],
       "warnings": [],
       "slides": [
@@ -274,12 +283,16 @@
         "구동 링크 2를 핀으로 연결"
       ],
       "warnings": [
-        "링크는 4 mm 판입니다. 휜 채로 핀을 끼우지 마세요."
+        "링크 2를 먼저, 링크 1을 나중에"
       ],
       "slides": [
         4
       ],
-      "flags": {},
+      "flags": {
+        "prereq": [
+          "링크 2를 먼저, 링크 1을 나중에"
+        ]
+      },
       "check": null,
       "baseline_sec": 65
     },
@@ -298,12 +311,16 @@
         "구동 링크 1을 핀으로 연결"
       ],
       "warnings": [
-        "링크는 4 mm 판입니다. 휜 채로 핀을 끼우지 마세요."
+        "링크 2를 먼저, 링크 1을 나중에"
       ],
       "slides": [
         4
       ],
-      "flags": {},
+      "flags": {
+        "prereq": [
+          "링크 2를 먼저, 링크 1을 나중에"
+        ]
+      },
       "check": null,
       "baseline_sec": 65
     },
@@ -320,20 +337,20 @@
       ],
       "bolts": [],
       "instructions": [
-        "끝단(Part21) 결합 · 링크 구멍이 아래로"
+        "끝단 Part21 달기 (링크 구멍 아래)"
       ],
       "warnings": [
-        "손으로 끝까지 돌려 걸림 확인. 비비면 03의 1 mm 틈부터.",
-        "XT30 극성 확인, 처음엔 전류 제한 전원. USB-C로 두 액추에이터 ID가 다른지 확인."
+        "XT30 극성 확인, 처음엔 전류 제한 전원",
+        "USB-C로 두 액추에이터 ID가 다른지 확인"
       ],
       "slides": [
         4
       ],
       "flags": {
         "danger": [
-          "XT30 극성 확인, 처음엔 전류 제한 전원. USB-C로 두 액추에이터 ID가 다른지 확인.",
-          "14번 끝단 Part21은 링크 구멍이 아래로 가게. 다 끝나면 전원 넣기 전에 손으로 끝까지 돌려 보고, 비비는 소리 나면 3번의 1밀리 틈부터 보세요.",
-          "전원은 전류 제한 걸어서, 그리고 USB로 ID 확인. 둘이 같은 ID면 같이 움직여요."
+          "XT30 극성 확인, 처음엔 전류 제한 전원",
+          "전원 넣기 전에 XT30 극성 꼭 보고, 처음엔 전류 제한 전원으로 1암페어 정도만 줘.",
+          "바로 일반 전원 넣었다가 드라이버 보드 태운 적 있어."
         ]
       },
       "check": null,
@@ -436,13 +453,13 @@
   "slides": [
     {
       "slide_no": 1,
-      "image": "data/captures/01_cover.jpg",
-      "title": "포어암 조립",
+      "image": null,
+      "title": "포어암(전완) 조립 방법",
       "step_ids": []
     },
     {
       "slide_no": 2,
-      "image": "data/captures/02_g1.jpg",
+      "image": null,
       "title": "액추에이터 1과 브래킷",
       "step_ids": [
         "S01",
@@ -454,7 +471,7 @@
     },
     {
       "slide_no": 3,
-      "image": "data/captures/03_g2.jpg",
+      "image": null,
       "title": "액추에이터 2와 이두 마운트",
       "step_ids": [
         "S06",
@@ -466,8 +483,8 @@
     },
     {
       "slide_no": 4,
-      "image": "data/captures/04_g3.jpg",
-      "title": "메인 튜브, 링크, 끝단",
+      "image": null,
+      "title": "메인 튜브, 구동 링크, 끝단",
       "step_ids": [
         "S11",
         "S12",
@@ -480,7 +497,7 @@
     {
       "id": "c0",
       "kind": "slide_title",
-      "text": "포어암 조립 ()",
+      "text": "포어암(전완) 조립 방법 ()",
       "step_id": null,
       "source": "슬라이드 1",
       "slide_no": 1
@@ -488,15 +505,15 @@
     {
       "id": "c1",
       "kind": "slide_text",
-      "text": "액추에이터는 모듈 통째로 받습니다. 14단계를 세 묶음으로 나눠 조립합니다.",
+      "text": "14단계를 세 묶음으로 조립합니다",
       "step_id": null,
       "source": "슬라이드 1",
       "slide_no": 1
     },
     {
       "id": "c2",
-      "kind": "table_row",
-      "text": "액추에이터 (모듈) · 액추에이터 1 · 2 · 2",
+      "kind": "slide_text",
+      "text": "01–05 액추에이터 1과 브래킷 · 06–10 액추에이터 2와 이두 마운트 · 11–14 튜브·링크·끝단",
       "step_id": null,
       "source": "슬라이드 1",
       "slide_no": 1
@@ -504,137 +521,89 @@
     {
       "id": "c3",
       "kind": "table_row",
-      "text": "액추에이터 1 브래킷 · Part18 · 1",
+      "text": "공구 · 2.5 / 3 / 4 mm 육각 렌치, 사포, 장갑, 전류 제한 전원",
       "step_id": null,
       "source": "슬라이드 1",
       "slide_no": 1
     },
     {
       "id": "c4",
-      "kind": "table_row",
-      "text": "튜브 클램프 · Part19 (허브 쪽 · 손목 쪽) · 2",
-      "step_id": null,
-      "source": "슬라이드 1",
-      "slide_no": 1
+      "kind": "slide_title",
+      "text": "액추에이터 1과 브래킷 (STEP 01–05)",
+      "step_id": "S01",
+      "source": "슬라이드 2",
+      "slide_no": 2
     },
     {
       "id": "c5",
-      "kind": "table_row",
-      "text": "이두 쪽 마운트 · actmount_bicep · 1",
-      "step_id": null,
-      "source": "슬라이드 1",
-      "slide_no": 1
+      "kind": "slide_text",
+      "text": "액추에이터 1과 브래킷",
+      "step_id": "S01",
+      "source": "슬라이드 2",
+      "slide_no": 2
     },
     {
       "id": "c6",
-      "kind": "table_row",
-      "text": "카본 튜브 · 메인 · 두 번째 · 2",
-      "step_id": null,
-      "source": "슬라이드 1",
-      "slide_no": 1
+      "kind": "instruction",
+      "text": "액추에이터 1을 모듈 통째로 놓기 (커넥터 바깥)",
+      "step_id": "S01",
+      "source": "슬라이드 2",
+      "slide_no": 2
     },
     {
       "id": "c7",
-      "kind": "table_row",
-      "text": "구동 링크 · drivenlink, drivenlink2 · 각 1",
-      "step_id": null,
-      "source": "슬라이드 1",
-      "slide_no": 1
-    },
-    {
-      "id": "c8",
-      "kind": "table_row",
-      "text": "끝단 · Part21 · 1",
-      "step_id": null,
-      "source": "슬라이드 1",
-      "slide_no": 1
-    },
-    {
-      "id": "c9",
-      "kind": "table_row",
-      "text": "볼트 · M3 ×12 · M4 ×6 · M5 ×1 · 19",
-      "step_id": null,
-      "source": "슬라이드 1",
-      "slide_no": 1
-    },
-    {
-      "id": "c10",
-      "kind": "figure",
-      "text": "포어암 전체 3D 그림. 왼쪽 위 파란 액추에이터가 주황 마운트에 달려 있고, 검은 카본 튜브가 가운데 주황 브래킷으로, 다른 튜브가 오른쪽 아래 끝단으로 이어진다. 초록 링크 두 개가 바깥쪽에 있다.",
-      "step_id": null,
-      "source": "슬라이드 1",
-      "slide_no": 1
-    },
-    {
-      "id": "c11",
-      "kind": "slide_title",
-      "text": "액추에이터 1과 브래킷 (STEP 01–05 · 액추에이터 1 묶음)",
-      "step_id": "S01",
-      "source": "슬라이드 2",
-      "slide_no": 2
-    },
-    {
-      "id": "c12",
       "kind": "instruction",
-      "text": "액추에이터 1을 모듈 통째로 놓기",
-      "step_id": "S01",
-      "source": "슬라이드 2",
-      "slide_no": 2
-    },
-    {
-      "id": "c13",
-      "kind": "instruction",
-      "text": "튜브 클램프(Part19) 놓기",
+      "text": "튜브 클램프 Part19 놓기",
       "step_id": "S02",
       "source": "슬라이드 2",
       "slide_no": 2
     },
     {
-      "id": "c14",
+      "id": "c8",
       "kind": "instruction",
-      "text": "브래킷(Part18)을 맞춰 얹기",
+      "text": "브래킷 Part18을 홈에 맞춰 얹기",
       "step_id": "S03",
       "source": "슬라이드 2",
       "slide_no": 2
     },
     {
-      "id": "c15",
+      "id": "c9",
       "kind": "instruction",
-      "text": "M3 약 10 mm × 6 · 브래킷 ↔ 아래 하우징",
+      "text": "M3 10 mm × 6 · 브래킷 ↔ 아래 하우징",
       "step_id": "S04",
       "source": "슬라이드 2",
       "slide_no": 2
     },
     {
-      "id": "c16",
+      "id": "c10",
       "kind": "instruction",
-      "text": "M3 약 12.5 mm × 6 · 브래킷 ↔ 위 하우징",
+      "text": "M3 12.5 mm × 6 · 브래킷 ↔ 위 하우징",
       "step_id": "S05",
       "source": "슬라이드 2",
       "slide_no": 2
     },
     {
-      "id": "c17",
+      "id": "c11",
       "kind": "warning",
-      "text": "XT30·USB-C 커넥터가 바깥을 향하게. 반대면 배선이 안 됩니다.",
+      "text": "XT30·USB-C 커넥터가 바깥을 향하게",
       "step_id": "S01",
       "source": "슬라이드 2",
       "slide_no": 2,
       "also": []
     },
     {
-      "id": "c18",
+      "id": "c12",
       "kind": "warning",
-      "text": "Part18과 Part19 사이는 약 1 mm 틈. 닿으면 클램프를 옮기세요.",
+      "text": "Part18과 Part19 사이 약 1 mm 틈",
       "step_id": "S03",
       "source": "슬라이드 2",
       "slide_no": 2,
       "also": []
     },
     {
-      "id": "c19",
+      "id": "c13",
       "kind": "warning",
-      "text": "10 mm와 12.5 mm 볼트를 섞지 마세요. 대각선 순서로 조금씩.",
+      "text": "10 mm와 12.5 mm 섞지 말기, 대각선으로 반 바퀴씩",
       "step_id": "S04",
       "source": "슬라이드 2",
       "slide_no": 2,
@@ -643,114 +612,116 @@
       ]
     },
     {
-      "id": "c20",
-      "kind": "figure",
-      "text": "가운데 주황 브래킷과 그 안의 파란 액추에이터, 노란 튜브 클램프만 색으로 강조되고 나머지는 회색 반투명.",
-      "step_id": "S01",
+      "id": "c14",
+      "kind": "warning",
+      "text": "셀프탭 구멍: 처음엔 끝까지 넣었다 빼서 길 내기",
+      "step_id": "S04",
       "source": "슬라이드 2",
-      "slide_no": 2
+      "slide_no": 2,
+      "also": [
+        "S05"
+      ]
     },
     {
-      "id": "c21",
+      "id": "c15",
       "kind": "slide_title",
-      "text": "액추에이터 2와 이두 마운트 (STEP 06–10 · 액추에이터 2 묶음)",
+      "text": "액추에이터 2와 이두 마운트 (STEP 06–10)",
       "step_id": "S06",
       "source": "슬라이드 3",
       "slide_no": 3
     },
     {
-      "id": "c22",
-      "kind": "instruction",
-      "text": "액추에이터 2를 모듈 통째로 놓기",
+      "id": "c16",
+      "kind": "slide_text",
+      "text": "액추에이터 2와 이두 마운트",
       "step_id": "S06",
       "source": "슬라이드 3",
       "slide_no": 3
     },
     {
-      "id": "c23",
+      "id": "c17",
       "kind": "instruction",
-      "text": "손목 쪽 클램프(Part19 두 번째) 놓기",
+      "text": "액추에이터 2를 모듈 통째로 놓기 (커넥터 바깥)",
+      "step_id": "S06",
+      "source": "슬라이드 3",
+      "slide_no": 3
+    },
+    {
+      "id": "c18",
+      "kind": "instruction",
+      "text": "손목 쪽 클램프 Part19 두 번째 놓기",
       "step_id": "S07",
       "source": "슬라이드 3",
       "slide_no": 3
     },
     {
-      "id": "c24",
+      "id": "c19",
       "kind": "instruction",
-      "text": "두 번째 카본 튜브를 길이 방향으로 끼우기",
+      "text": "두 번째 카본 튜브 끼우기",
       "step_id": "S08",
       "source": "슬라이드 3",
       "slide_no": 3
     },
     {
-      "id": "c25",
+      "id": "c20",
       "kind": "instruction",
-      "text": "이두 쪽 마운트(actmount_bicep) 얹기",
+      "text": "이두 쪽 액추에이터 마운트 끼우기",
       "step_id": "S09",
       "source": "슬라이드 3",
       "slide_no": 3
     },
     {
-      "id": "c26",
+      "id": "c21",
       "kind": "instruction",
-      "text": "M4 약 11 mm × 6 + M5 × 1 · 마운트 ↔ 아래 하우징",
+      "text": "M4 11 mm × 6 + M5 × 1 · 마운트 ↔ 아래 하우징",
       "step_id": "S10",
       "source": "슬라이드 3",
       "slide_no": 3
     },
     {
-      "id": "c27",
+      "id": "c22",
       "kind": "warning",
-      "text": "커넥터는 액추에이터 1과 같은 방향, 바깥쪽.",
-      "step_id": "S06",
-      "source": "슬라이드 3",
-      "slide_no": 3,
-      "also": []
-    },
-    {
-      "id": "c28",
-      "kind": "warning",
-      "text": "카본 절단면은 사포로 정리하고 장갑을 끼세요. 끝까지 밀어 넣기만.",
+      "text": "튜브 절단면이 거칠면 사포로 정리, 장갑 끼기",
       "step_id": "S08",
       "source": "슬라이드 3",
       "slide_no": 3,
       "also": []
     },
     {
-      "id": "c29",
+      "id": "c23",
       "kind": "warning",
-      "text": "7개 중 1개는 M5, 구멍이 큰 자리입니다. 대각선 순서로 조금씩.",
+      "text": "7개 중 1개는 M5, 구멍이 큰 자리",
       "step_id": "S10",
       "source": "슬라이드 3",
       "slide_no": 3,
       "also": []
     },
     {
-      "id": "c30",
-      "kind": "figure",
-      "text": "왼쪽 위 파란 액추에이터와 주황 이두 마운트, 아래쪽 검은 두 번째 카본 튜브와 노란 손목 쪽 클램프가 색으로 강조된다.",
-      "step_id": "S06",
-      "source": "슬라이드 3",
-      "slide_no": 3
-    },
-    {
-      "id": "c31",
+      "id": "c24",
       "kind": "slide_title",
-      "text": "메인 튜브, 링크, 끝단 (STEP 11–14 · 마무리)",
+      "text": "메인 튜브, 구동 링크, 끝단 (STEP 11–14)",
       "step_id": "S11",
       "source": "슬라이드 4",
       "slide_no": 4
     },
     {
-      "id": "c32",
+      "id": "c25",
+      "kind": "slide_text",
+      "text": "메인 튜브, 구동 링크, 끝단",
+      "step_id": "S11",
+      "source": "슬라이드 4",
+      "slide_no": 4
+    },
+    {
+      "id": "c26",
       "kind": "instruction",
-      "text": "메인 카본 튜브를 길이 방향으로 끼우기",
+      "text": "메인 카본 튜브 끼우기",
       "step_id": "S11",
       "source": "슬라이드 4",
       "slide_no": 4
     },
     {
-      "id": "c33",
+      "id": "c27",
       "kind": "instruction",
       "text": "구동 링크 2를 핀으로 연결",
       "step_id": "S12",
@@ -758,7 +729,7 @@
       "slide_no": 4
     },
     {
-      "id": "c34",
+      "id": "c28",
       "kind": "instruction",
       "text": "구동 링크 1을 핀으로 연결",
       "step_id": "S13",
@@ -766,17 +737,17 @@
       "slide_no": 4
     },
     {
-      "id": "c35",
+      "id": "c29",
       "kind": "instruction",
-      "text": "끝단(Part21) 결합 · 링크 구멍이 아래로",
+      "text": "끝단 Part21 달기 (링크 구멍 아래)",
       "step_id": "S14",
       "source": "슬라이드 4",
       "slide_no": 4
     },
     {
-      "id": "c36",
+      "id": "c30",
       "kind": "warning",
-      "text": "링크는 4 mm 판입니다. 휜 채로 핀을 끼우지 마세요.",
+      "text": "링크 2를 먼저, 링크 1을 나중에",
       "step_id": "S12",
       "source": "슬라이드 4",
       "slide_no": 4,
@@ -785,35 +756,27 @@
       ]
     },
     {
-      "id": "c37",
+      "id": "c31",
       "kind": "warning",
-      "text": "손으로 끝까지 돌려 걸림 확인. 비비면 03의 1 mm 틈부터.",
+      "text": "XT30 극성 확인, 처음엔 전류 제한 전원",
       "step_id": "S14",
       "source": "슬라이드 4",
       "slide_no": 4,
       "also": []
     },
     {
-      "id": "c38",
+      "id": "c32",
       "kind": "warning",
-      "text": "XT30 극성 확인, 처음엔 전류 제한 전원. USB-C로 두 액추에이터 ID가 다른지 확인.",
+      "text": "USB-C로 두 액추에이터 ID가 다른지 확인",
       "step_id": "S14",
       "source": "슬라이드 4",
       "slide_no": 4,
       "also": []
     },
     {
-      "id": "c39",
-      "kind": "figure",
-      "text": "검은 메인 카본 튜브, 초록 구동 링크 두 개, 주황 끝단만 색으로 강조되고 나머지는 회색 반투명.",
-      "step_id": "S11",
-      "source": "슬라이드 4",
-      "slide_no": 4
-    },
-    {
-      "id": "c40",
+      "id": "c33",
       "kind": "speech",
-      "text": "오늘은 포어암 조립입니다. 액추에이터 두 개는 모듈 통째로 받아요.",
+      "text": "오늘은 전완 조립하는 방법을 설명할게.",
       "step_id": null,
       "source": "설계자 설명 0:00",
       "slide_no": 1,
@@ -821,29 +784,49 @@
       "also": []
     },
     {
-      "id": "c41",
+      "id": "c34",
       "kind": "speech",
-      "text": "단계는 14개인데 세 묶음이에요. 1번부터 5번은 액추에이터 1이랑 브래킷, 6번부터 10번은 액추에이터 2랑 이두 쪽 마운트, 11번부터 14번은 메인 튜브랑 링크, 끝단이에요.",
+      "text": "전체 14단계고 세 묶음으로 나눠서 하면 돼.",
       "step_id": null,
-      "source": "설계자 설명 0:07",
+      "source": "설계자 설명 0:06",
       "slide_no": 1,
-      "t": 7,
+      "t": 6,
       "also": []
     },
     {
-      "id": "c42",
+      "id": "c35",
       "kind": "speech",
-      "text": "볼트는 M3 열두 개, M4 여섯 개, M5 한 개고 핀은 키트 봉지에 있어요.",
+      "text": "볼트는 M3가 열두 개인데 10밀리 여섯 개, 12.5밀리 여섯 개라서 봉지를 꼭 따로 둬.",
       "step_id": null,
-      "source": "설계자 설명 0:20",
+      "source": "설계자 설명 0:12",
       "slide_no": 1,
-      "t": 20,
+      "t": 12,
       "also": []
     },
     {
-      "id": "c43",
+      "id": "c36",
       "kind": "speech",
-      "text": "액추에이터 1은 모듈 통째로 놓는데 커넥터가 바깥쪽을 봐야 해요. 안쪽으로 놓으면 나중에 선을 못 꽂아요.",
+      "text": "섞이면 제일 골치 아파.",
+      "step_id": null,
+      "source": "설계자 설명 0:18",
+      "slide_no": 1,
+      "t": 18,
+      "also": []
+    },
+    {
+      "id": "c37",
+      "kind": "speech",
+      "text": "시작하기 전에 렌치 세 개랑 사포, 장갑은 책상에 미리 꺼내 놔.",
+      "step_id": null,
+      "source": "설계자 설명 0:24",
+      "slide_no": 1,
+      "t": 24,
+      "also": []
+    },
+    {
+      "id": "c38",
+      "kind": "speech",
+      "text": "1번은 액추에이터 1을 통째로 놓는 건데, 커넥터가 꼭 바깥을 보게 놔.",
       "step_id": "S01",
       "source": "설계자 설명 0:30",
       "slide_no": 2,
@@ -851,107 +834,359 @@
       "also": []
     },
     {
+      "id": "c39",
+      "kind": "speech",
+      "text": "안쪽 보게 놓으면 나중에 선을 못 꽂아서 처음부터 다 풀어야 돼.",
+      "step_id": "S01",
+      "source": "설계자 설명 0:36",
+      "slide_no": 2,
+      "t": 36,
+      "also": []
+    },
+    {
+      "id": "c40",
+      "kind": "speech",
+      "text": "2번 클램프는 그냥 튜브 쪽에 걸쳐 두면 돼.",
+      "step_id": "S02",
+      "source": "설계자 설명 0:42",
+      "slide_no": 2,
+      "t": 42,
+      "also": []
+    },
+    {
+      "id": "c41",
+      "kind": "speech",
+      "text": "3번 브래킷은 액추에이터 위 홈에 맞춰서 살짝 눌러 앉히면 딸깍 하는 느낌이 와.",
+      "step_id": "S03",
+      "source": "설계자 설명 0:48",
+      "slide_no": 2,
+      "t": 48,
+      "also": []
+    },
+    {
+      "id": "c42",
+      "kind": "speech",
+      "text": "안 들어간다고 억지로 누르면 하우징 모서리가 깨져.",
+      "step_id": "S03",
+      "source": "설계자 설명 0:54",
+      "slide_no": 2,
+      "t": 54,
+      "also": []
+    },
+    {
+      "id": "c43",
+      "kind": "speech",
+      "text": "3번에서 브래킷이랑 클램프는 1밀리 정도 떠 있어야 해.",
+      "step_id": "S03",
+      "source": "설계자 설명 1:00",
+      "slide_no": 2,
+      "t": 60,
+      "also": []
+    },
+    {
       "id": "c44",
       "kind": "speech",
-      "text": "2번에 튜브 클램프 놓고, 3번에 브래킷 Part18 얹는데, 브래킷이랑 클램프가 딱 붙으면 안 되고 1밀리 정도 떠 있어야 해요. 붙으면 팔꿈치 돌릴 때 비벼요.",
-      "step_id": "S02",
-      "source": "설계자 설명 0:39",
+      "text": "붙어 있으면 나중에 팔꿈치 돌릴 때 비벼서 소리 나고 힘을 먹어.",
+      "step_id": "S03",
+      "source": "설계자 설명 1:06",
       "slide_no": 2,
-      "t": 39,
-      "also": [
-        "S03"
-      ]
+      "t": 66,
+      "also": []
     },
     {
       "id": "c45",
       "kind": "speech",
-      "text": "4번 5번은 M3 볼트인데 아래 하우징은 10밀리, 위 하우징은 12.5밀리예요. 길이가 비슷해서 섞이기 쉬우니까 봉지 따로 두세요. 대각선으로 반 바퀴씩 조이세요.",
+      "text": "4번은 아래쪽 10밀리 볼트 여섯 개야.",
       "step_id": "S04",
-      "source": "설계자 설명 0:52",
+      "source": "설계자 설명 1:12",
       "slide_no": 2,
-      "t": 52,
-      "also": [
-        "S05"
-      ]
+      "t": 72,
+      "also": []
     },
     {
       "id": "c46",
       "kind": "speech",
-      "text": "액추에이터 2도 모듈 통째로, 커넥터는 1번이랑 같은 방향 바깥쪽.",
-      "step_id": "S06",
-      "source": "설계자 설명 1:06",
-      "slide_no": 3,
-      "t": 66,
+      "text": "출력물 구멍이라 셀프탭이거든, 처음 한 번은 끝까지 넣었다가 빼서 길을 내고, 두 번째 조일 때는 닿았다 싶으면 멈춰.",
+      "step_id": "S04",
+      "source": "설계자 설명 1:18",
+      "slide_no": 2,
+      "t": 78,
       "also": []
     },
     {
       "id": "c47",
       "kind": "speech",
-      "text": "7번 손목 쪽 클램프 놓고, 8번 두 번째 카본 튜브는 길이 방향으로 쭉 밀어 넣어요. 카본 자른 면은 가시가 박히니까 장갑 끼고 사포로 한 번 정리하세요.",
-      "step_id": "S07",
-      "source": "설계자 설명 1:12",
-      "slide_no": 3,
-      "t": 72,
-      "also": [
-        "S08"
-      ]
+      "text": "세게 돌리면 나사산이 뭉개져서 못 써.",
+      "step_id": "S04",
+      "source": "설계자 설명 1:24",
+      "slide_no": 2,
+      "t": 84,
+      "also": []
     },
     {
       "id": "c48",
       "kind": "speech",
-      "text": "9번에 이두 쪽 마운트 얹고, 10번 볼트는 일곱 개인데 여섯 개는 M4, 하나만 M5예요. 구멍이 하나만 커요. 거기에 M5 넣으면 돼요.",
-      "step_id": "S09",
-      "source": "설계자 설명 1:24",
-      "slide_no": 3,
-      "t": 84,
-      "also": [
-        "S10"
-      ]
+      "text": "5번은 위쪽 12.5밀리 여섯 개.",
+      "step_id": "S05",
+      "source": "설계자 설명 1:30",
+      "slide_no": 2,
+      "t": 90,
+      "also": []
     },
     {
       "id": "c49",
       "kind": "speech",
-      "text": "11번 메인 카본 튜브도 길이 방향으로 끝까지.",
-      "step_id": "S11",
+      "text": "4번이랑 섞여서 위에 짧은 게 들어가면 덜 잡혀서 덜렁거려.",
+      "step_id": "S04",
       "source": "설계자 설명 1:36",
-      "slide_no": 4,
+      "slide_no": 2,
       "t": 96,
       "also": []
     },
     {
       "id": "c50",
       "kind": "speech",
-      "text": "12번 13번은 초록 링크인데 링크 2를 먼저 걸고 링크 1을 걸어요. 핀은 키트 봉지에 있어요. 링크가 4밀리 판이라 휘기 쉬운데 휜 상태로 핀 넣으면 움직일 때 뻑뻑해요.",
-      "step_id": "S12",
-      "source": "설계자 설명 1:41",
-      "slide_no": 4,
-      "t": 101,
-      "also": [
-        "S13"
-      ]
+      "text": "볼트는 다 대각선 순서로 반 바퀴씩 돌려.",
+      "step_id": "S04",
+      "source": "설계자 설명 1:42",
+      "slide_no": 2,
+      "t": 102,
+      "also": []
     },
     {
       "id": "c51",
       "kind": "speech",
-      "text": "14번 끝단 Part21은 링크 구멍이 아래로 가게. 다 끝나면 전원 넣기 전에 손으로 끝까지 돌려 보고, 비비는 소리 나면 3번의 1밀리 틈부터 보세요.",
-      "step_id": "S14",
-      "source": "설계자 설명 1:54",
-      "slide_no": 4,
-      "t": 114,
+      "text": "한쪽부터 끝까지 조이면 하우징이 기울어.",
+      "step_id": "S04",
+      "source": "설계자 설명 1:48",
+      "slide_no": 2,
+      "t": 108,
       "also": []
     },
     {
       "id": "c52",
       "kind": "speech",
-      "text": "전원은 전류 제한 걸어서, 그리고 USB로 ID 확인. 둘이 같은 ID면 같이 움직여요.",
-      "step_id": "S14",
-      "source": "설계자 설명 2:05",
-      "slide_no": 4,
-      "t": 125,
+      "text": "6번 액추에이터 2도 1번처럼 커넥터가 바깥이야.",
+      "step_id": "S06",
+      "source": "설계자 설명 1:54",
+      "slide_no": 3,
+      "t": 114,
       "also": []
     },
     {
       "id": "c53",
+      "kind": "speech",
+      "text": "8번 카본 튜브는 손목 쪽 거.",
+      "step_id": "S08",
+      "source": "설계자 설명 2:00",
+      "slide_no": 3,
+      "t": 120,
+      "also": []
+    },
+    {
+      "id": "c54",
+      "kind": "speech",
+      "text": "안 들어가면 억지로 밀지 말고 살짝 돌리면서 넣어.",
+      "step_id": "S08",
+      "source": "설계자 설명 2:06",
+      "slide_no": 3,
+      "t": 126,
+      "also": []
+    },
+    {
+      "id": "c55",
+      "kind": "speech",
+      "text": "그래도 안 들어가면 끝을 사포로 한 바퀴만 갈아 줘, 많이 갈면 헐거워져.",
+      "step_id": "S08",
+      "source": "설계자 설명 2:12",
+      "slide_no": 3,
+      "t": 132,
+      "also": []
+    },
+    {
+      "id": "c56",
+      "kind": "speech",
+      "text": "9번 마운트는 튜브에 끼운 다음에 액추에이터 2 쪽으로 끝까지 밀어 붙여.",
+      "step_id": "S09",
+      "source": "설계자 설명 2:18",
+      "slide_no": 3,
+      "t": 138,
+      "also": []
+    },
+    {
+      "id": "c57",
+      "kind": "speech",
+      "text": "틈이 있으면 10번 볼트 구멍이 안 맞아.",
+      "step_id": "S10",
+      "source": "설계자 설명 2:24",
+      "slide_no": 3,
+      "t": 144,
+      "also": []
+    },
+    {
+      "id": "c58",
+      "kind": "speech",
+      "text": "10번은 M4 여섯 개랑 M5 하나야.",
+      "step_id": "S10",
+      "source": "설계자 설명 2:30",
+      "slide_no": 3,
+      "t": 150,
+      "also": []
+    },
+    {
+      "id": "c59",
+      "kind": "speech",
+      "text": "M5 자리는 구멍이 커서 보면 바로 알아.",
+      "step_id": "S10",
+      "source": "설계자 설명 2:36",
+      "slide_no": 3,
+      "t": 156,
+      "also": []
+    },
+    {
+      "id": "c60",
+      "kind": "speech",
+      "text": "M5부터 먼저 살짝 걸어 두면 나머지 자리가 잘 맞아.",
+      "step_id": "S10",
+      "source": "설계자 설명 2:42",
+      "slide_no": 3,
+      "t": 162,
+      "also": []
+    },
+    {
+      "id": "c61",
+      "kind": "speech",
+      "text": "렌치는 M4는 3밀리, M5는 4밀리 써.",
+      "step_id": "S10",
+      "source": "설계자 설명 2:48",
+      "slide_no": 3,
+      "t": 168,
+      "also": []
+    },
+    {
+      "id": "c62",
+      "kind": "speech",
+      "text": "11번 메인 튜브도 8번처럼 돌리면서 넣으면 돼.",
+      "step_id": "S11",
+      "source": "설계자 설명 2:54",
+      "slide_no": 4,
+      "t": 174,
+      "also": []
+    },
+    {
+      "id": "c63",
+      "kind": "speech",
+      "text": "12번하고 13번은 순서가 중요해.",
+      "step_id": "S12",
+      "source": "설계자 설명 3:00",
+      "slide_no": 4,
+      "t": 180,
+      "also": [
+        "S13"
+      ]
+    },
+    {
+      "id": "c64",
+      "kind": "speech",
+      "text": "링크 2를 먼저 걸고 링크 1을 나중에 걸어.",
+      "step_id": "S13",
+      "source": "설계자 설명 3:06",
+      "slide_no": 4,
+      "t": 186,
+      "also": []
+    },
+    {
+      "id": "c65",
+      "kind": "speech",
+      "text": "1번을 먼저 걸면 2번 핀이 안 들어가서 다시 풀어야 돼.",
+      "step_id": "S13",
+      "source": "설계자 설명 3:12",
+      "slide_no": 4,
+      "t": 192,
+      "also": []
+    },
+    {
+      "id": "c66",
+      "kind": "speech",
+      "text": "링크는 4밀리 판이라 잘 휘어.",
+      "step_id": "S13",
+      "source": "설계자 설명 3:18",
+      "slide_no": 4,
+      "t": 198,
+      "also": []
+    },
+    {
+      "id": "c67",
+      "kind": "speech",
+      "text": "핀 넣기 전에 휘었으면 손으로 펴고 넣어.",
+      "step_id": "S13",
+      "source": "설계자 설명 3:24",
+      "slide_no": 4,
+      "t": 204,
+      "also": []
+    },
+    {
+      "id": "c68",
+      "kind": "speech",
+      "text": "14번 끝단 Part21은 링크 구멍이 아래로 가게 달아.",
+      "step_id": "S14",
+      "source": "설계자 설명 3:30",
+      "slide_no": 4,
+      "t": 210,
+      "also": []
+    },
+    {
+      "id": "c69",
+      "kind": "speech",
+      "text": "전원 넣기 전에 XT30 극성 꼭 보고, 처음엔 전류 제한 전원으로 1암페어 정도만 줘.",
+      "step_id": "S14",
+      "source": "설계자 설명 3:36",
+      "slide_no": 4,
+      "t": 216,
+      "also": []
+    },
+    {
+      "id": "c70",
+      "kind": "speech",
+      "text": "바로 일반 전원 넣었다가 드라이버 보드 태운 적 있어.",
+      "step_id": "S14",
+      "source": "설계자 설명 3:42",
+      "slide_no": 4,
+      "t": 222,
+      "also": []
+    },
+    {
+      "id": "c71",
+      "kind": "speech",
+      "text": "두 액추에이터 ID가 같으면 명령 하나에 둘이 같이 움직이니까 USB-C로 연결해서 ID가 다른지 확인해.",
+      "step_id": "S14",
+      "source": "설계자 설명 3:48",
+      "slide_no": 4,
+      "t": 228,
+      "also": []
+    },
+    {
+      "id": "c72",
+      "kind": "speech",
+      "text": "마지막으로 손으로 팔을 끝까지 돌려 봐서 걸리는 데 없으면 끝이야.",
+      "step_id": "S14",
+      "source": "설계자 설명 3:54",
+      "slide_no": 4,
+      "t": 234,
+      "also": []
+    },
+    {
+      "id": "c73",
+      "kind": "speech",
+      "text": "비비는 소리 나면 3번의 1밀리 틈부터 다시 봐.",
+      "step_id": "S14",
+      "source": "설계자 설명 4:00",
+      "slide_no": 4,
+      "t": 240,
+      "also": []
+    },
+    {
+      "id": "c74",
       "kind": "part",
       "text": "액추에이터 1 (허브 쪽, 모듈 통째로) — 다른 이름: 액추에이터 1, 1번 액추에이터, 허브 쪽 액추에이터",
       "step_id": "S01",
@@ -959,7 +1194,7 @@
       "part_id": "actuator_1"
     },
     {
-      "id": "c54",
+      "id": "c75",
       "kind": "part",
       "text": "액추에이터 2 (이두 쪽, 모듈 통째로) — 다른 이름: 액추에이터 2, 2번 액추에이터, 이두 쪽 액추에이터, 팔꿈치 쪽 액추에이터",
       "step_id": "S06",
@@ -967,7 +1202,7 @@
       "part_id": "actuator_2"
     },
     {
-      "id": "c55",
+      "id": "c76",
       "kind": "part",
       "text": "액추에이터 1 브래킷 — 다른 이름: Part18, 브래킷, 허브",
       "step_id": "S03",
@@ -975,7 +1210,7 @@
       "part_id": "Part18"
     },
     {
-      "id": "c56",
+      "id": "c77",
       "kind": "part",
       "text": "튜브 클램프 (허브 쪽) — 다른 이름: Part19, 튜브 클램프, 클램프",
       "step_id": "S02",
@@ -983,7 +1218,7 @@
       "part_id": "Part19"
     },
     {
-      "id": "c57",
+      "id": "c78",
       "kind": "part",
       "text": "손목 쪽 클램프 — 다른 이름: 손목 쪽 클램프, 두 번째 클램프, Part19 두 번째",
       "step_id": "S07",
@@ -991,7 +1226,7 @@
       "part_id": "Part19_2"
     },
     {
-      "id": "c58",
+      "id": "c79",
       "kind": "part",
       "text": "두 번째 카본 튜브 (손목 쪽) — 다른 이름: 두 번째 카본 튜브, 두 번째 튜브, 손목 쪽 튜브, 카본 튜브",
       "step_id": "S08",
@@ -999,7 +1234,7 @@
       "part_id": "carbontube_2"
     },
     {
-      "id": "c59",
+      "id": "c80",
       "kind": "part",
       "text": "메인 카본 튜브 (이두 쪽) — 다른 이름: 메인 카본 튜브, 메인 튜브, 카본 튜브",
       "step_id": "S11",
@@ -1007,7 +1242,7 @@
       "part_id": "carbontube_main"
     },
     {
-      "id": "c60",
+      "id": "c81",
       "kind": "part",
       "text": "이두 쪽 액추에이터 마운트 — 다른 이름: actmount_bicep, 이두 쪽 마운트, 마운트, 이두 마운트",
       "step_id": "S09",
@@ -1015,7 +1250,7 @@
       "part_id": "actmount_bicep"
     },
     {
-      "id": "c61",
+      "id": "c82",
       "kind": "part",
       "text": "구동 링크 1 — 다른 이름: drivenlink, 구동 링크 1, 링크 1",
       "step_id": "S13",
@@ -1023,7 +1258,7 @@
       "part_id": "drivenlink"
     },
     {
-      "id": "c62",
+      "id": "c83",
       "kind": "part",
       "text": "구동 링크 2 — 다른 이름: drivenlink2, 구동 링크 2, 링크 2",
       "step_id": "S12",
@@ -1031,7 +1266,7 @@
       "part_id": "drivenlink2"
     },
     {
-      "id": "c63",
+      "id": "c84",
       "kind": "part",
       "text": "끝단 — 다른 이름: Part21, 끝단, 손목 끝",
       "step_id": "S14",

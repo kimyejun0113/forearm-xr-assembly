@@ -11,3 +11,4 @@ agent/data/sessions/
 agent/data/briefings/
 agent/data/kb/history/
 agent/data/kb/aggregate.json
+agent/data/sessions_backup/

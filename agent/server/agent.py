@@ -13,7 +13,13 @@ CLOSE = re.compile(r"^(닫아|닫기|창 닫아|보관함 닫아|됐어)")
 STUCK = re.compile(r"아 뭐지|왜 안 (들어|돼|맞)|모르겠|헷갈")
 
 SYSTEM = """너는 로봇 조립을 돕는 안경 속 조수다. 작업자는 손이 바쁘다.
-주어진 근거(설계자 슬라이드, 설계자 말, 이전 작업자 기록)만 써서 답한다. 근거에 없으면 지어내지 말고 부드럽게 모른다고 말한다.
+주어진 근거(현재 단계 카드, 설계자 슬라이드, 설계자 말, 이전 작업자 기록)만 써서 답한다. 근거에 없으면 지어내지 말고 부드럽게 모른다고 말한다.
+작업자는 지금 '현재 단계'를 하고 있다. "이거", "이것", "여기"는 현재 단계의 부품을 뜻한다.
+개수·볼트·공구·주의처럼 단계에 딸린 질문은 현재 단계 카드([step])를 먼저 보고 그 단계 값으로 답한다 (전체 합계가 아니라).
+"다음 단계", "지금 몇 단계"는 카드의 단계 번호와 다음 단계를 그대로 말한다. 카드에 "확인 필요"가 있으면 함께 알려 준다.
+"왜", "~하면 어떻게 돼", "~해도 돼?", "주의할 거", "요령", "안 될 때"처럼 이유·결과·요령을 묻는 질문은
+설계자 말(speech)에 있는 이유와 결과(예: "나사산이 뭉개진다", "다 풀어야 한다", "보드를 태운 적 있다")를 반드시 그대로 담아 답한다.
+카드의 지시만 되풀이하지 않는다. 질문과 관계없는 다른 단계 이야기는 섞지 않는다.
 JSON으로만 답한다:
 {"speech": "소리로 읽을 답. 두 문장 이내, 존댓말, 출처는 말하지 않는다",
  "text": "화면에 보일 조금 더 자세한 설명 (세 줄 이내)",
@@ -84,23 +90,47 @@ class Agent:
 
         if intent == "prior":
             return self._prior(step_id)
-        if llm.available() and hits:
+        # 키가 있으면 검색 조각이 없어도 현재 단계 카드만으로 답할 수 있다 (예: "어떤 렌치 써?")
+        if llm.available() and (hits or step):
             try:
                 return self._llm_answer(q, step, hits, intent, parts_q)
             except Exception as e:  # 네트워크 등 실패 → 규칙 답으로
                 print("llm error:", e)
         return self._extractive(q, hits, intent, parts_q)
 
+    def _step_card_text(self, step) -> str:
+        """현재 단계 카드와 앞뒤 단계를 근거 한 덩어리로 ([step])."""
+        if not step:
+            return ""
+        order, parts = self.kn.order, self.kn.kb["parts"]
+        i = order.index(step["step_id"]) if step["step_id"] in order else -1
+        name = lambda sid: f"{self.kn.steps[sid]['order']}단계 {self.kn.steps[sid]['name']}"
+        lines = [f"현재 단계: {step['order']} / {len(order)}단계 · {step['name']}",
+                 "부품: " + ", ".join(f"{p}({parts.get(p, {}).get('name', p)})" for p in step["parts"])]
+        if step.get("instructions"): lines.append("할 일: " + " / ".join(step["instructions"]))
+        if step.get("bolts"): lines.append("이 단계 볼트: " + " / ".join(step["bolts"]))
+        if step.get("tools"): lines.append("공구: " + ", ".join(step["tools"]))
+        if step.get("warnings"): lines.append("주의: " + " / ".join(step["warnings"]))
+        if step.get("check"): lines.append("확인 필요: " + step["check"])
+        if i > 0: lines.append("이전 단계: " + name(order[i - 1]))
+        lines.append("다음 단계: " + (name(order[i + 1]) if 0 <= i < len(order) - 1 else "없음 (마지막 단계)"))
+        return "\n".join(lines)
+
     def _llm_answer(self, q, step, hits, intent, parts_q):
+        card = self._step_card_text(step)
         ctx = "\n".join(f"[{c['id']}] ({c['kind']}, {c['source']}) {c['text']}" for _, c in hits)
-        user = (f"현재 단계: {step['name'] if step else '모름'}\n부품 목록: {', '.join(self.kn.kb['parts'])}\n"
-                f"근거:\n{ctx}\n\n작업자 질문: {q}")
+        user = (f"[step] (현재 단계 카드)\n{card or '현재 단계 모름'}\n\n부품 목록: {', '.join(self.kn.kb['parts'])}\n"
+                f"근거:\n{ctx or '(검색된 조각 없음)'}\n\n작업자 질문: {q}")
         r = llm.chat_json(SYSTEM, user)
-        used = [c for _, c in hits if c["id"] in r.get("used", [])] or [hits[0][1]]
+        ids = r.get("used", [])
+        used = [c for _, c in hits if c["id"] in ids]
+        sources = {c["source"] for c in used}
+        if "step" in ids or not used:
+            sources.add(f"단계 카드 {step['order']}단계" if step else "단계 카드")
         hl = [p for p in r.get("highlight", []) if p in self.kn.kb["parts"]] or parts_q
         return {"speech": r.get("speech", ""), "text": r.get("text", ""),
                 "visual": [{"type": "highlight", "part_ids": hl}] if hl else [],
-                "sources": sorted({c["source"] for c in used}), "intent": intent,
+                "sources": sorted(sources), "intent": intent,
                 "confident": bool(r.get("confident", True))}
 
     def _prior(self, step_id):
