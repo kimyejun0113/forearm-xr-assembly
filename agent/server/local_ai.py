@@ -70,11 +70,8 @@ def _level(path):
     return out
 
 
-def stt_segments(path) -> list[dict]:
-    """긴 설명 녹음 → 문장마다 시작 시간.
-    쉬지 않고 말하면 Whisper가 몇십 초를 한 덩어리로 주므로, 단어 시각을 받아 문장 끝(. ? !)에서 나눈다
-    (그래야 문장마다 그때 보던 슬라이드가 붙는다)."""
-    segs, _ = _model().transcribe(_level(path), language="ko", vad_filter=True, initial_prompt=STT_HINT, word_timestamps=True)
+def _sentences(segs) -> list[dict]:
+    """Whisper 조각 → 문장마다 시작 시간. 쉬지 않고 말하면 몇십 초를 한 덩어리로 주므로 단어 시각으로 문장 끝(. ? !)에서 나눈다."""
     out = []
     for s in segs:
         cur, t0 = "", None
@@ -91,6 +88,33 @@ def stt_segments(path) -> list[dict]:
         elif not s.words and s.text.strip():
             out.append({"start": round(float(s.start), 1), "text": s.text.strip()})
     return out
+
+
+def _looping(sents) -> bool:
+    """같은 말 되풀이(힌트 단어 '하우징, 하우징, 하우징' 같은 환각)"""
+    import re
+    for x in sents:
+        words = re.findall(r"\w+", x["text"])
+        if len(words) >= 3 and max(words.count(w) for w in set(words)) / len(words) >= 0.5:
+            return True
+    texts = [x["text"] for x in sents]
+    return len(texts) >= 3 and len(set(texts)) <= len(texts) / 2
+
+
+def stt_segments(path) -> list[dict]:
+    """긴 설명 녹음 → 문장마다 시작 시간 (그래야 문장마다 그때 보던 슬라이드가 붙는다).
+    작은 소리를 키운 녹음은 Whisper가 실행할 때마다 다르게, 가끔은 힌트 단어만 되풀이하는 엉터리로 듣는다.
+    그래서 두 번 듣는다: 늘 같은 결과가 나오는 설정(힌트 없음·온도 0)과 부품 이름 힌트를 준 설정.
+    힌트 쪽이 되풀이 없이 비슷한 양 이상을 들었으면 그걸(부품 이름이 더 정확), 아니면 고정 설정 쪽을 쓴다.
+    남은 글자 오류는 합칠 때 LLM이 문맥으로 고친다."""
+    w, m = _level(path), _model()
+    base = _sentences(m.transcribe(w, language="ko", vad_filter=True, word_timestamps=True,
+                                   condition_on_previous_text=False, temperature=0.0, beam_size=5)[0])
+    hint = _sentences(m.transcribe(w, language="ko", vad_filter=True, word_timestamps=True, initial_prompt=STT_HINT)[0])
+    size = lambda xs: sum(len(x["text"]) for x in xs)
+    pick = hint if hint and not _looping(hint) and size(hint) >= 0.8 * size(base) else base
+    print(f"[전사] 고정 {len(base)}문장 {size(base)}자 · 힌트 {len(hint)}문장 {size(hint)}자 → {'힌트' if pick is hint else '고정'}", flush=True)
+    return pick
 
 
 # ---------- 음성 합성 ----------
