@@ -1,0 +1,1855 @@
+{
+  "project": "leg_L v2",
+  "robot": "leg_L",
+  "reader": "guide:S08 다리 조립 안내서.html",
+  "steps": [
+    {
+      "step_id": "L01",
+      "order": 1,
+      "name": "허벅지 무릎 고리에 베어링",
+      "parts": [
+        "thigh",
+        "brg_K1",
+        "brg_K2",
+        "sleeve_knee"
+      ],
+      "tools": [
+        "바이스 또는 클램프"
+      ],
+      "bolts": [
+        "608ZZ 베어링 × 2"
+      ],
+      "instructions": [
+        "허벅지 아래쪽 무릎 고리에 608 베어링을 양쪽 면에서 하나씩 끼웁니다. 가운데 턱(6 mm)에 닿을 때까지 평평하게 눌러 넣습니다.",
+        "무릎 슬리브(길이 20 mm)를 두 베어링 안쪽 링에 끼웁니다."
+      ],
+      "warnings": [
+        "베어링은 바이스나 클램프로 천천히, 똑바로. 비스듬히 들어가면 고리가 갈라질 수 있습니다."
+      ],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 140
+    },
+    {
+      "step_id": "L02",
+      "order": 2,
+      "name": "허벅지를 고관절 모터에",
+      "parts": [
+        "hip"
+      ],
+      "tools": [
+        "M4·M3 육각 볼렌치"
+      ],
+      "bolts": [
+        "M4 12 mm × 3"
+      ],
+      "instructions": [
+        "허벅지의 넓고 평평한 면(출력 바닥면)을 고관절 pitch 모터 출력면에 댑니다.",
+        "M4×12 세 개로 조입니다."
+      ],
+      "warnings": [
+        "반드시 무릎 모터보다 먼저 하세요. 이 나사 머리는 무릎 모터 덮개 자리 안에 들어가서, 무릎 모터를 얹고 나면 손이 닿지 않습니다."
+      ],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 120
+    },
+    {
+      "step_id": "L03",
+      "order": 3,
+      "name": "무릎 모터 얹기",
+      "parts": [
+        "knee_gim"
+      ],
+      "tools": [],
+      "bolts": [],
+      "instructions": [
+        "무릎 모터(GIM8115)를 허벅지 받침에 얹습니다. 덮개가 자리에 끼워지면서 중심이 맞습니다.",
+        "무릎 모터는 고관절과 같은 축 위에 있고, 링크로 무릎을 돌립니다."
+      ],
+      "warnings": [],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 60
+    },
+    {
+      "step_id": "L04",
+      "order": 4,
+      "name": "허벅지 앞 링",
+      "parts": [
+        "thigh_front"
+      ],
+      "tools": [
+        "M4·M3 육각 볼렌치"
+      ],
+      "bolts": [
+        "M4 8 mm × 8",
+        "M3 25~30 mm × 2"
+      ],
+      "instructions": [
+        "앞 링을 무릎 모터 앞면에 대고 M4×8 여덟 개로 조입니다.",
+        "앞 링 아래로 내려온 다리 끝을 허벅지 보에 M3 두 개로 고정합니다."
+      ],
+      "warnings": [
+        "M4는 8 mm보다 길면 안 됩니다. 모터 나사 구멍 깊이가 3.5 mm라서 긴 나사는 모터 안쪽에 닿습니다."
+      ],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 260
+    },
+    {
+      "step_id": "L05",
+      "order": 5,
+      "name": "입력 크랭크",
+      "parts": [
+        "input_crank"
+      ],
+      "tools": [
+        "M4·M3 육각 볼렌치"
+      ],
+      "bolts": [
+        "M4 10 mm × 3"
+      ],
+      "instructions": [
+        "앞 링 가운데 구멍 안으로 입력 크랭크를 넣어 무릎 모터 출력에 대고 M4×10 세 개로 조입니다."
+      ],
+      "warnings": [],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 120
+    },
+    {
+      "step_id": "L06",
+      "order": 6,
+      "name": "정강이 바깥 판에 발목 모터",
+      "parts": [
+        "shin_outer",
+        "ankle_rs"
+      ],
+      "tools": [
+        "M4·M3 육각 볼렌치"
+      ],
+      "bolts": [
+        "M3 12 mm × 9"
+      ],
+      "instructions": [
+        "여기서부터는 정강이 묶음을 허벅지와 따로 만듭니다 (화면에서 아래로 떨어져 있는 묶음).",
+        "발목 모터(RobStride02)를 정강이 바깥 판 바깥면에 대고, 판 안쪽에서 M3×12 아홉 개로 조입니다."
+      ],
+      "warnings": [],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 240
+    },
+    {
+      "step_id": "L07",
+      "order": 7,
+      "name": "모터 크랭크와 볼 D",
+      "parts": [
+        "motor_crank",
+        "cheek_D",
+        "screwD"
+      ],
+      "tools": [
+        "M4·M3 육각 볼렌치"
+      ],
+      "bolts": [
+        "M4 16 mm × 3",
+        "M4 30 mm × 1"
+      ],
+      "instructions": [
+        "모터 크랭크를 발목 모터 출력에 대고 M4×16 세 개로 조입니다.",
+        "볼 D를 모터 크랭크 가운데에 얹고 M4×30으로 고정합니다."
+      ],
+      "warnings": [
+        "볼 D 나사는 안쪽 판을 붙이기 전에 조이세요. 붙인 뒤에는 안쪽 판의 지름 8 mm 공구 구멍으로만 닿습니다."
+      ],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 140
+    },
+    {
+      "step_id": "L08",
+      "order": 8,
+      "name": "정강이 기둥과 안쪽 판",
+      "parts": [
+        "shin_posts",
+        "shin_inner"
+      ],
+      "tools": [
+        "M4·M3 육각 볼렌치"
+      ],
+      "bolts": [
+        "M3 10~12 mm × 4"
+      ],
+      "instructions": [
+        "기둥 2개를 바깥 판에 세우고, 안쪽 판을 덮어 양쪽 끝을 M3로 고정합니다.",
+        "안쪽 판의 지름 8 mm 공구 구멍이 볼 D 나사 바로 위에 오는지 보세요."
+      ],
+      "warnings": [],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 140
+    },
+    {
+      "step_id": "L09",
+      "order": 9,
+      "name": "발 묶음",
+      "parts": [
+        "foot",
+        "ankle_spacer",
+        "foot_outer_new",
+        "brg_A1",
+        "brg_A2",
+        "sleeve_ankle"
+      ],
+      "tools": [
+        "바이스 또는 클램프"
+      ],
+      "bolts": [
+        "688ZZ (원래 발에서) × 2",
+        "발 바깥 판 관통볼트 (원래 것보다 6 mm 긴 것) × 3"
+      ],
+      "instructions": [
+        "원래 발에서 688 베어링 2개를 빼서 새 발 바깥 판에 옮겨 끼웁니다.",
+        "예전 발목 풀리 자리에 발목 스페이서를 넣고 풀리 볼트 3개로 원래 순서대로 발을 조립합니다.",
+        "발목 슬리브(20.4 mm)를 두 베어링 안쪽 링에 끼웁니다."
+      ],
+      "warnings": [
+        "발 바깥 판은 발목 힘을 받는 크랭크입니다. 걷기·넘어짐 시험 전에는 채움 100 % 출력본으로 바꾸세요."
+      ],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 140
+    },
+    {
+      "step_id": "L10",
+      "order": 10,
+      "name": "무릎 축으로 허벅지와 정강이 잇기",
+      "parts": [
+        "ring_knee_in",
+        "cheek_B",
+        "knee_axle"
+      ],
+      "tools": [
+        "M6 십자 드라이버 (축이 긴 것)"
+      ],
+      "bolts": [
+        "M6 90 mm × 1 (무릎 축)"
+      ],
+      "instructions": [
+        "허벅지 무릎 고리(베어링 + 슬리브)를 정강이 두 판 사이에 넣습니다.",
+        "순서: 안쪽 판 ← 링 2 mm ← 허벅지 무릎 고리 ← 정강이 허브.",
+        "바깥에 볼 B를 얹고, M6×90을 볼 B 위에서 끼워 안쪽 판 돌기에 박습니다 (셀프탭 16 mm)."
+      ],
+      "warnings": [
+        "볼트는 베어링 안쪽 링을 잡을 만큼만 조입니다. 무릎이 뻑뻑해지면 링이 긴 것이니 사포로 조금 갈아 내세요."
+      ],
+      "slides": [],
+      "flags": {
+        "irreversible": [
+          "출력물 구멍에 나사가 직접 나사산을 내며 들어갑니다. 처음 한 번은 끝까지 넣었다 빼서 길을 내고, 두 번째 조일 때는 “닿았다” 싶으면 멈추세요. 세게 돌리면 나사산이 뭉개집니다."
+        ]
+      },
+      "check": null,
+      "baseline_sec": 80
+    },
+    {
+      "step_id": "L11",
+      "order": 11,
+      "name": "발목 축",
+      "parts": [
+        "ring_ankle_in",
+        "ankle_axle"
+      ],
+      "tools": [
+        "M6 십자 드라이버 (축이 긴 것)"
+      ],
+      "bolts": [
+        "M6 65 mm × 1 (발목 축)"
+      ],
+      "instructions": [
+        "발 묶음을 정강이 두 판 사이에 넣습니다.",
+        "순서: 안쪽 판 ← 링 2.1 mm ← 발 ← 정강이 허브.",
+        "M6×65를 바깥 판 쪽에서 끼워 안쪽 판에 박습니다 (셀프탭 10 mm)."
+      ],
+      "warnings": [],
+      "slides": [],
+      "flags": {
+        "irreversible": [
+          "출력물 구멍에 나사가 직접 나사산을 내며 들어갑니다. 처음 한 번은 끝까지 넣었다 빼서 길을 내고, 두 번째 조일 때는 “닿았다” 싶으면 멈추세요. 세게 돌리면 나사산이 뭉개집니다."
+        ]
+      },
+      "check": null,
+      "baseline_sec": 80
+    },
+    {
+      "step_id": "L12",
+      "order": 12,
+      "name": "커플러 (무릎 링크)",
+      "parts": [
+        "coupler",
+        "brg_AIN",
+        "brg_B",
+        "ring_B",
+        "sleeve_A",
+        "sleeve_B",
+        "cheek_A",
+        "screwA",
+        "pinA",
+        "pinB"
+      ],
+      "tools": [
+        "M6 십자 드라이버 (축이 긴 것)",
+        "M4·M3 육각 볼렌치",
+        "바이스 또는 클램프"
+      ],
+      "bolts": [
+        "608ZZ × 2",
+        "M6 35 mm × 2",
+        "M4 30 mm × 1"
+      ],
+      "instructions": [
+        "커플러 양끝에 608을 끼웁니다. 큰 구멍(22 mm)이 있는 면, 즉 크랭크 쪽 면에서 넣습니다. 슬리브 A·B(7 mm)를 베어링 안쪽 링에.",
+        "핀 A: 크랭크 돌기 ← 608 ← 볼 A 돌기. 볼 A를 M4×30으로 크랭크에 고정하고, M6×35를 볼 A 위에서.",
+        "핀 B: 링 1 mm ← 608 ← 볼 B 돌기, M6×35."
+      ],
+      "warnings": [],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 200
+    },
+    {
+      "step_id": "L13",
+      "order": 13,
+      "name": "푸시로드 (발목 링크)",
+      "parts": [
+        "pushrod",
+        "brg_D",
+        "brg_C",
+        "ring_D",
+        "sleeve_D",
+        "sleeve_C",
+        "spacer_D_head",
+        "pinD",
+        "cheek_C",
+        "screwC",
+        "pinC"
+      ],
+      "tools": [
+        "M6 십자 드라이버 (축이 긴 것)",
+        "M4·M3 육각 볼렌치",
+        "바이스 또는 클램프"
+      ],
+      "bolts": [
+        "608ZZ × 2",
+        "M6 35 mm × 2",
+        "M4 20 mm × 1"
+      ],
+      "instructions": [
+        "푸시로드 양끝에 608을 끼웁니다. D 끝(위)은 안쪽 면에서, C 끝(아래)은 바깥 면에서 넣고 슬리브 C·D(7 mm)를 끼웁니다.",
+        "푸시로드 D 끝을 볼 D와 모터 크랭크 사이 틈에 앞에서 밀어 넣습니다 (링 4 mm는 모터 크랭크 쪽).",
+        "핀 D: 볼 D 돌기 ← 608 ← 링 4 mm ← 모터 크랭크. M6×35를 머리 받침(6 mm) 위에서, 안쪽에서 끼웁니다.",
+        "핀 C: 발 판 돌기 ← 608 ← 볼 C 돌기. 볼 C를 M4×20으로 발 판 기둥에 고정하고, M6×35를 볼 C 위에서 (머리 1 mm 묻힘).",
+        "확인: 무릎을 −37°에서 +42°까지, 발목을 −40°에서 +20°까지 천천히 끝까지 돌려 봅니다.",
+        "확인: 걸리는 곳이 없는지, 핀에서 덜컥거림(유격)이 없는지 봅니다.",
+        "확인: 강조된 부품이 무릎·발목 링크입니다. 이 부품들이 부드럽게 같이 움직여야 합니다."
+      ],
+      "warnings": [
+        "유격 목표는 관절마다 1° 이하(핀마다 틈 0.1 mm 이하)입니다. 시뮬레이션에서 2°부터 밀렸을 때 넘어짐이 크게 늘었습니다."
+      ],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 200
+    },
+    {
+      "step_id": "L14",
+      "order": 14,
+      "name": "무릎 바깥 덮개",
+      "parts": [
+        "knee_shield"
+      ],
+      "tools": [
+        "M4·M3 육각 볼렌치"
+      ],
+      "bolts": [
+        "M3 40 mm × 3"
+      ],
+      "instructions": [
+        "덮개의 기둥 3개를 허벅지 앞 링에 대고, 판 위에서 M3×40 세 개로 고정합니다 (머리 6 mm 묻힘)."
+      ],
+      "warnings": [],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 120
+    },
+    {
+      "step_id": "L15",
+      "order": 15,
+      "name": "발판",
+      "parts": [
+        "foot_plate_crown_upper",
+        "foot_plate_crown_sole"
+      ],
+      "tools": [
+        "M4·M3 육각 볼렌치"
+      ],
+      "bolts": [
+        "M3 25 mm × 6 렌치볼트"
+      ],
+      "instructions": [
+        "신발 바닥의 나사 6개를 뺍니다 (안쪽 줄 3, 바깥쪽 줄 3).",
+        "윗판의 돌기 6개를 신발 바닥 나사 머리 자리에 끼웁니다.",
+        "밑창을 아래에서 대고 M3×25 여섯 개를 대각선 순서로, 밑창이 살짝 눌릴 만큼만 조입니다."
+      ],
+      "warnings": [],
+      "slides": [],
+      "flags": {},
+      "check": null,
+      "baseline_sec": 180
+    }
+  ],
+  "parts": {
+    "sleeve_knee": {
+      "name": "무릎 슬리브 20 mm",
+      "aliases": [
+        "무릎 슬리브 20 mm",
+        "M6 슬리브 Ø8/6.0 x 20.0 mm",
+        "sleeve_knee"
+      ]
+    },
+    "ring_D": {
+      "name": "링 D 4 mm",
+      "aliases": [
+        "링 D 4 mm",
+        "핀 D 608 안쪽 링 받침 4 mm",
+        "ring_D"
+      ]
+    },
+    "knee_gim": {
+      "name": "무릎 모터 GIM8115 (그대로)",
+      "aliases": [
+        "무릎 모터 GIM8115 (그대로)",
+        "knee_gim"
+      ]
+    },
+    "motor_crank": {
+      "name": "모터 크랭크",
+      "aliases": [
+        "모터 크랭크",
+        "RS02 출력 허브 + 모터 크랭크",
+        "motor_crank"
+      ]
+    },
+    "ankle_spacer": {
+      "name": "발목 스페이서",
+      "aliases": [
+        "발목 스페이서",
+        "발 안 예전 풀리 자리 채움",
+        "ankle_spacer"
+      ]
+    },
+    "thigh_front": {
+      "name": "허벅지 앞 링",
+      "aliases": [
+        "허벅지 앞 링",
+        "무릎 GIM 앞면 링 + 보로 내려가는 다리",
+        "thigh_front"
+      ]
+    },
+    "knee_axle": {
+      "name": "무릎 축 M6×90",
+      "aliases": [
+        "무릎 축 M6×90",
+        "M6 x 90 십자 둥근머리",
+        "knee_axle"
+      ]
+    },
+    "pushrod": {
+      "name": "푸시로드",
+      "aliases": [
+        "푸시로드",
+        "발목 푸시로드 98 mm, 10 mm, 608 x 2",
+        "pushrod"
+      ]
+    },
+    "knee_shield": {
+      "name": "무릎 바깥 덮개",
+      "aliases": [
+        "무릎 바깥 덮개",
+        "무릎 바깥 덮개 (4 절 링크 위) — 기둥 3 개, M3 x 40 x 3 → 허벅지 앞 링",
+        "knee_shield"
+      ]
+    },
+    "ring_ankle_in": {
+      "name": "발목 링 2.1 mm",
+      "aliases": [
+        "발목 링 2.1 mm",
+        "발목 688 안쪽 링 받침 2.1 mm",
+        "ring_ankle_in"
+      ]
+    },
+    "shin_outer": {
+      "name": "정강이 바깥 판",
+      "aliases": [
+        "정강이 바깥 판",
+        "정강이 바깥 판 + 출력 크랭크 + RS02 고정 + 무릎·발목 허브",
+        "shin_outer"
+      ]
+    },
+    "thigh": {
+      "name": "허벅지",
+      "aliases": [
+        "허벅지",
+        "허벅지 본체 (판·GIM 뒷받침·보·무릎 고리 608 x 2)",
+        "thigh"
+      ]
+    },
+    "screwA": {
+      "name": "볼 A 나사 M4×30",
+      "aliases": [
+        "볼 A 나사 M4×30",
+        "M4 x 30 육각 렌치",
+        "screwA"
+      ]
+    },
+    "ankle_axle": {
+      "name": "발목 축 M6×65",
+      "aliases": [
+        "발목 축 M6×65",
+        "M6 x 65 십자 둥근머리",
+        "ankle_axle"
+      ]
+    },
+    "brg_AIN": {
+      "name": "608 베어링 (커플러 핀 A 쪽)",
+      "aliases": [
+        "608 베어링 (커플러 핀 A 쪽)",
+        "brg_AIN"
+      ]
+    },
+    "shin_posts": {
+      "name": "정강이 기둥",
+      "aliases": [
+        "정강이 기둥",
+        "정강이 연결 기둥 x 2",
+        "shin_posts"
+      ]
+    },
+    "hip": {
+      "name": "고관절 모터 묶음 (그대로)",
+      "aliases": [
+        "고관절 모터 묶음 (그대로)",
+        "hip"
+      ]
+    },
+    "pinD": {
+      "name": "핀 D M6×35",
+      "aliases": [
+        "핀 D M6×35",
+        "M6 x 35 십자 둥근머리",
+        "pinD"
+      ]
+    },
+    "screwC": {
+      "name": "볼 C 나사 M4×20",
+      "aliases": [
+        "볼 C 나사 M4×20",
+        "M4 x 20 육각 렌치",
+        "screwC"
+      ]
+    },
+    "shin_inner": {
+      "name": "정강이 안쪽 판",
+      "aliases": [
+        "정강이 안쪽 판",
+        "정강이 안쪽 판 10 mm (+ 무릎 나사 돌기 + 무릎 멈춤 돌기 2)",
+        "shin_inner"
+      ]
+    },
+    "brg_D": {
+      "name": "608 베어링 (푸시로드 핀 D 쪽)",
+      "aliases": [
+        "608 베어링 (푸시로드 핀 D 쪽)",
+        "brg_D"
+      ]
+    },
+    "pinA": {
+      "name": "핀 A M6×35",
+      "aliases": [
+        "핀 A M6×35",
+        "M6 x 35 십자 둥근머리",
+        "pinA"
+      ]
+    },
+    "sleeve_ankle": {
+      "name": "발목 슬리브 20.4 mm",
+      "aliases": [
+        "발목 슬리브 20.4 mm",
+        "M6 슬리브 Ø8/6.0 x 20.4 mm",
+        "sleeve_ankle"
+      ]
+    },
+    "foot": {
+      "name": "발과 신발 (그대로)",
+      "aliases": [
+        "발과 신발 (그대로)",
+        "foot"
+      ]
+    },
+    "cheek_C": {
+      "name": "볼 C",
+      "aliases": [
+        "볼 C",
+        "볼 C (핀 C 반대편 받침)",
+        "cheek_C"
+      ]
+    },
+    "ring_knee_in": {
+      "name": "무릎 링 2 mm",
+      "aliases": [
+        "무릎 링 2 mm",
+        "무릎 608 안쪽 링 받침 2 mm",
+        "ring_knee_in"
+      ]
+    },
+    "pinC": {
+      "name": "핀 C M6×35",
+      "aliases": [
+        "핀 C M6×35",
+        "M6 x 35 십자 둥근머리",
+        "pinC"
+      ]
+    },
+    "ankle_rs": {
+      "name": "발목 모터 RobStride02 (그대로)",
+      "aliases": [
+        "발목 모터 RobStride02 (그대로)",
+        "ankle_rs"
+      ]
+    },
+    "ring_B": {
+      "name": "링 B 1 mm",
+      "aliases": [
+        "링 B 1 mm",
+        "핀 B 608 안쪽 링 받침 1 mm",
+        "ring_B"
+      ]
+    },
+    "input_crank": {
+      "name": "입력 크랭크",
+      "aliases": [
+        "입력 크랭크",
+        "무릎 입력 크랭크 15.5 mm (+ 볼 A 자리)",
+        "input_crank"
+      ]
+    },
+    "cheek_A": {
+      "name": "볼 A",
+      "aliases": [
+        "볼 A",
+        "볼 A (핀 A 반대편 받침 + 기둥)",
+        "cheek_A"
+      ]
+    },
+    "coupler": {
+      "name": "커플러",
+      "aliases": [
+        "커플러",
+        "무릎 커플러 130 mm, 9 x 22 mm, 608 x 2",
+        "coupler"
+      ]
+    },
+    "sleeve_B": {
+      "name": "슬리브 B 7 mm",
+      "aliases": [
+        "슬리브 B 7 mm",
+        "M6 슬리브 Ø8/6.0 x 7.0 mm",
+        "sleeve_B"
+      ]
+    },
+    "brg_C": {
+      "name": "608 베어링 (푸시로드 핀 C 쪽)",
+      "aliases": [
+        "608 베어링 (푸시로드 핀 C 쪽)",
+        "brg_C"
+      ]
+    },
+    "cheek_D": {
+      "name": "볼 D",
+      "aliases": [
+        "볼 D",
+        "볼 D (핀 D 반대편 받침 + 가운데 기둥)",
+        "cheek_D"
+      ]
+    },
+    "brg_K2": {
+      "name": "608 베어링 (무릎 고리 바깥)",
+      "aliases": [
+        "608 베어링 (무릎 고리 바깥)",
+        "brg_K2"
+      ]
+    },
+    "spacer_D_head": {
+      "name": "핀 D 머리 받침 6 mm",
+      "aliases": [
+        "핀 D 머리 받침 6 mm",
+        "핀 D 머리 받침 6 mm (M6 x 35 끝이 정강이 판에 안 닿게)",
+        "spacer_D_head"
+      ]
+    },
+    "foot_outer_new": {
+      "name": "발 바깥 판 (발목 크랭크)",
+      "aliases": [
+        "발 바깥 판 (발목 크랭크)",
+        "발 바깥 판 #59 + 발목 크랭크 + 볼 C 기둥 (새로 출력)",
+        "foot_outer_new"
+      ]
+    },
+    "brg_K1": {
+      "name": "608 베어링 (무릎 고리 안쪽)",
+      "aliases": [
+        "608 베어링 (무릎 고리 안쪽)",
+        "brg_K1"
+      ]
+    },
+    "foot_plate_crown_sole": {
+      "name": "발판 밑창",
+      "aliases": [
+        "발판 밑창",
+        "foot_plate_crown_sole"
+      ]
+    },
+    "cheek_B": {
+      "name": "볼 B",
+      "aliases": [
+        "볼 B",
+        "볼 B (핀 B 반대편 받침 + 무릎 축 기둥)",
+        "cheek_B"
+      ]
+    },
+    "brg_B": {
+      "name": "608 베어링 (커플러 핀 B 쪽)",
+      "aliases": [
+        "608 베어링 (커플러 핀 B 쪽)",
+        "brg_B"
+      ]
+    },
+    "foot_plate_crown_upper": {
+      "name": "발판 윗판",
+      "aliases": [
+        "발판 윗판",
+        "foot_plate_crown_upper"
+      ]
+    },
+    "pinB": {
+      "name": "핀 B M6×35",
+      "aliases": [
+        "핀 B M6×35",
+        "M6 x 35 십자 둥근머리",
+        "pinB"
+      ]
+    },
+    "screwD": {
+      "name": "볼 D 나사 M4×30",
+      "aliases": [
+        "볼 D 나사 M4×30",
+        "M4 x 30 육각 렌치",
+        "screwD"
+      ]
+    },
+    "brg_A2": {
+      "name": "688 베어링 (발목 바깥)",
+      "aliases": [
+        "688 베어링 (발목 바깥)",
+        "brg_A2"
+      ]
+    },
+    "sleeve_C": {
+      "name": "슬리브 C 7 mm",
+      "aliases": [
+        "슬리브 C 7 mm",
+        "M6 슬리브 Ø8/6.0 x 7.0 mm",
+        "sleeve_C"
+      ]
+    },
+    "sleeve_A": {
+      "name": "슬리브 A 7 mm",
+      "aliases": [
+        "슬리브 A 7 mm",
+        "M6 슬리브 Ø8/6.0 x 7.0 mm",
+        "sleeve_A"
+      ]
+    },
+    "sleeve_D": {
+      "name": "슬리브 D 7 mm",
+      "aliases": [
+        "슬리브 D 7 mm",
+        "M6 슬리브 Ø8/6.0 x 7.0 mm",
+        "sleeve_D"
+      ]
+    },
+    "brg_A1": {
+      "name": "688 베어링 (발목 안쪽)",
+      "aliases": [
+        "688 베어링 (발목 안쪽)",
+        "brg_A1"
+      ]
+    }
+  },
+  "slides": [],
+  "chunks": [
+    {
+      "id": "c0",
+      "kind": "instruction",
+      "text": "허벅지 아래쪽 무릎 고리에 608 베어링을 양쪽 면에서 하나씩 끼웁니다. 가운데 턱(6 mm)에 닿을 때까지 평평하게 눌러 넣습니다.",
+      "step_id": "L01",
+      "source": "S08 안내서 1단계"
+    },
+    {
+      "id": "c1",
+      "kind": "instruction",
+      "text": "무릎 슬리브(길이 20 mm)를 두 베어링 안쪽 링에 끼웁니다.",
+      "step_id": "L01",
+      "source": "S08 안내서 1단계"
+    },
+    {
+      "id": "c2",
+      "kind": "warning",
+      "text": "베어링은 바이스나 클램프로 천천히, 똑바로. 비스듬히 들어가면 고리가 갈라질 수 있습니다.",
+      "step_id": "L01",
+      "source": "S08 안내서 1단계",
+      "also": []
+    },
+    {
+      "id": "c3",
+      "kind": "table_row",
+      "text": "허벅지 무릎 고리에 베어링 · 608ZZ 베어링 · 2개",
+      "step_id": "L01",
+      "source": "S08 안내서 1단계"
+    },
+    {
+      "id": "c4",
+      "kind": "instruction",
+      "text": "허벅지의 넓고 평평한 면(출력 바닥면)을 고관절 pitch 모터 출력면에 댑니다.",
+      "step_id": "L02",
+      "source": "S08 안내서 2단계"
+    },
+    {
+      "id": "c5",
+      "kind": "instruction",
+      "text": "M4×12 세 개로 조입니다.",
+      "step_id": "L02",
+      "source": "S08 안내서 2단계"
+    },
+    {
+      "id": "c6",
+      "kind": "warning",
+      "text": "반드시 무릎 모터보다 먼저 하세요. 이 나사 머리는 무릎 모터 덮개 자리 안에 들어가서, 무릎 모터를 얹고 나면 손이 닿지 않습니다.",
+      "step_id": "L02",
+      "source": "S08 안내서 2단계",
+      "also": []
+    },
+    {
+      "id": "c7",
+      "kind": "table_row",
+      "text": "허벅지를 고관절 모터에 · M4×12 · 3개",
+      "step_id": "L02",
+      "source": "S08 안내서 2단계"
+    },
+    {
+      "id": "c8",
+      "kind": "instruction",
+      "text": "무릎 모터(GIM8115)를 허벅지 받침에 얹습니다. 덮개가 자리에 끼워지면서 중심이 맞습니다.",
+      "step_id": "L03",
+      "source": "S08 안내서 3단계"
+    },
+    {
+      "id": "c9",
+      "kind": "instruction",
+      "text": "무릎 모터는 고관절과 같은 축 위에 있고, 링크로 무릎을 돌립니다.",
+      "step_id": "L03",
+      "source": "S08 안내서 3단계"
+    },
+    {
+      "id": "c10",
+      "kind": "instruction",
+      "text": "앞 링을 무릎 모터 앞면에 대고 M4×8 여덟 개로 조입니다.",
+      "step_id": "L04",
+      "source": "S08 안내서 4단계"
+    },
+    {
+      "id": "c11",
+      "kind": "instruction",
+      "text": "앞 링 아래로 내려온 다리 끝을 허벅지 보에 M3 두 개로 고정합니다.",
+      "step_id": "L04",
+      "source": "S08 안내서 4단계"
+    },
+    {
+      "id": "c12",
+      "kind": "warning",
+      "text": "M4는 8 mm보다 길면 안 됩니다. 모터 나사 구멍 깊이가 3.5 mm라서 긴 나사는 모터 안쪽에 닿습니다.",
+      "step_id": "L04",
+      "source": "S08 안내서 4단계",
+      "also": []
+    },
+    {
+      "id": "c13",
+      "kind": "table_row",
+      "text": "허벅지 앞 링 · M4×8 · 8개",
+      "step_id": "L04",
+      "source": "S08 안내서 4단계"
+    },
+    {
+      "id": "c14",
+      "kind": "table_row",
+      "text": "허벅지 앞 링 · M3×25~30 · 2개",
+      "step_id": "L04",
+      "source": "S08 안내서 4단계"
+    },
+    {
+      "id": "c15",
+      "kind": "instruction",
+      "text": "앞 링 가운데 구멍 안으로 입력 크랭크를 넣어 무릎 모터 출력에 대고 M4×10 세 개로 조입니다.",
+      "step_id": "L05",
+      "source": "S08 안내서 5단계"
+    },
+    {
+      "id": "c16",
+      "kind": "speech",
+      "text": "입력 크랭크는 왼·오가 다른 부품입니다. 넣기 전에 L/R 표시를 확인하세요.",
+      "step_id": "L05",
+      "source": "S08 안내서 5단계 팁",
+      "slide_no": "tip-L05",
+      "t": 0,
+      "also": []
+    },
+    {
+      "id": "c17",
+      "kind": "table_row",
+      "text": "입력 크랭크 · M4×10 · 3개",
+      "step_id": "L05",
+      "source": "S08 안내서 5단계"
+    },
+    {
+      "id": "c18",
+      "kind": "instruction",
+      "text": "여기서부터는 정강이 묶음을 허벅지와 따로 만듭니다 (화면에서 아래로 떨어져 있는 묶음).",
+      "step_id": "L06",
+      "source": "S08 안내서 6단계"
+    },
+    {
+      "id": "c19",
+      "kind": "instruction",
+      "text": "발목 모터(RobStride02)를 정강이 바깥 판 바깥면에 대고, 판 안쪽에서 M3×12 아홉 개로 조입니다.",
+      "step_id": "L06",
+      "source": "S08 안내서 6단계"
+    },
+    {
+      "id": "c20",
+      "kind": "table_row",
+      "text": "정강이 바깥 판에 발목 모터 · M3×12 · 9개",
+      "step_id": "L06",
+      "source": "S08 안내서 6단계"
+    },
+    {
+      "id": "c21",
+      "kind": "instruction",
+      "text": "모터 크랭크를 발목 모터 출력에 대고 M4×16 세 개로 조입니다.",
+      "step_id": "L07",
+      "source": "S08 안내서 7단계"
+    },
+    {
+      "id": "c22",
+      "kind": "instruction",
+      "text": "볼 D를 모터 크랭크 가운데에 얹고 M4×30으로 고정합니다.",
+      "step_id": "L07",
+      "source": "S08 안내서 7단계"
+    },
+    {
+      "id": "c23",
+      "kind": "warning",
+      "text": "볼 D 나사는 안쪽 판을 붙이기 전에 조이세요. 붙인 뒤에는 안쪽 판의 지름 8 mm 공구 구멍으로만 닿습니다.",
+      "step_id": "L07",
+      "source": "S08 안내서 7단계",
+      "also": []
+    },
+    {
+      "id": "c24",
+      "kind": "table_row",
+      "text": "모터 크랭크와 볼 D · M4×16 · 3개",
+      "step_id": "L07",
+      "source": "S08 안내서 7단계"
+    },
+    {
+      "id": "c25",
+      "kind": "table_row",
+      "text": "모터 크랭크와 볼 D · M4×30 · 1개",
+      "step_id": "L07",
+      "source": "S08 안내서 7단계"
+    },
+    {
+      "id": "c26",
+      "kind": "instruction",
+      "text": "기둥 2개를 바깥 판에 세우고, 안쪽 판을 덮어 양쪽 끝을 M3로 고정합니다.",
+      "step_id": "L08",
+      "source": "S08 안내서 8단계"
+    },
+    {
+      "id": "c27",
+      "kind": "instruction",
+      "text": "안쪽 판의 지름 8 mm 공구 구멍이 볼 D 나사 바로 위에 오는지 보세요.",
+      "step_id": "L08",
+      "source": "S08 안내서 8단계"
+    },
+    {
+      "id": "c28",
+      "kind": "speech",
+      "text": "안쪽 판의 멈춤 돌기 2개(높이 12 mm)는 바깥 판 쪽을 향합니다. 무릎이 너무 꺾이지 않게 막아 주는 돌기입니다.",
+      "step_id": "L08",
+      "source": "S08 안내서 8단계 팁",
+      "slide_no": "tip-L08",
+      "t": 0,
+      "also": []
+    },
+    {
+      "id": "c29",
+      "kind": "table_row",
+      "text": "정강이 기둥과 안쪽 판 · M3×10~12 · 4개",
+      "step_id": "L08",
+      "source": "S08 안내서 8단계"
+    },
+    {
+      "id": "c30",
+      "kind": "instruction",
+      "text": "원래 발에서 688 베어링 2개를 빼서 새 발 바깥 판에 옮겨 끼웁니다.",
+      "step_id": "L09",
+      "source": "S08 안내서 9단계"
+    },
+    {
+      "id": "c31",
+      "kind": "instruction",
+      "text": "예전 발목 풀리 자리에 발목 스페이서를 넣고 풀리 볼트 3개로 원래 순서대로 발을 조립합니다.",
+      "step_id": "L09",
+      "source": "S08 안내서 9단계"
+    },
+    {
+      "id": "c32",
+      "kind": "instruction",
+      "text": "발목 슬리브(20.4 mm)를 두 베어링 안쪽 링에 끼웁니다.",
+      "step_id": "L09",
+      "source": "S08 안내서 9단계"
+    },
+    {
+      "id": "c33",
+      "kind": "warning",
+      "text": "발 바깥 판은 발목 힘을 받는 크랭크입니다. 걷기·넘어짐 시험 전에는 채움 100 % 출력본으로 바꾸세요.",
+      "step_id": "L09",
+      "source": "S08 안내서 9단계",
+      "also": []
+    },
+    {
+      "id": "c34",
+      "kind": "table_row",
+      "text": "발 묶음 · 688ZZ (원래 발에서) · 2개",
+      "step_id": "L09",
+      "source": "S08 안내서 9단계"
+    },
+    {
+      "id": "c35",
+      "kind": "table_row",
+      "text": "발 묶음 · 발 바깥 판 관통볼트 (원래 것보다 6 mm 긴 것) · 3개",
+      "step_id": "L09",
+      "source": "S08 안내서 9단계"
+    },
+    {
+      "id": "c36",
+      "kind": "instruction",
+      "text": "허벅지 무릎 고리(베어링 + 슬리브)를 정강이 두 판 사이에 넣습니다.",
+      "step_id": "L10",
+      "source": "S08 안내서 10단계"
+    },
+    {
+      "id": "c37",
+      "kind": "instruction",
+      "text": "순서: 안쪽 판 ← 링 2 mm ← 허벅지 무릎 고리 ← 정강이 허브.",
+      "step_id": "L10",
+      "source": "S08 안내서 10단계"
+    },
+    {
+      "id": "c38",
+      "kind": "instruction",
+      "text": "바깥에 볼 B를 얹고, M6×90을 볼 B 위에서 끼워 안쪽 판 돌기에 박습니다 (셀프탭 16 mm).",
+      "step_id": "L10",
+      "source": "S08 안내서 10단계"
+    },
+    {
+      "id": "c39",
+      "kind": "warning",
+      "text": "볼트는 베어링 안쪽 링을 잡을 만큼만 조입니다. 무릎이 뻑뻑해지면 링이 긴 것이니 사포로 조금 갈아 내세요.",
+      "step_id": "L10",
+      "source": "S08 안내서 10단계",
+      "also": []
+    },
+    {
+      "id": "c40",
+      "kind": "table_row",
+      "text": "무릎 축으로 허벅지와 정강이 잇기 · M6×90 (무릎 축) · 1개",
+      "step_id": "L10",
+      "source": "S08 안내서 10단계"
+    },
+    {
+      "id": "c41",
+      "kind": "instruction",
+      "text": "발 묶음을 정강이 두 판 사이에 넣습니다.",
+      "step_id": "L11",
+      "source": "S08 안내서 11단계"
+    },
+    {
+      "id": "c42",
+      "kind": "instruction",
+      "text": "순서: 안쪽 판 ← 링 2.1 mm ← 발 ← 정강이 허브.",
+      "step_id": "L11",
+      "source": "S08 안내서 11단계"
+    },
+    {
+      "id": "c43",
+      "kind": "instruction",
+      "text": "M6×65를 바깥 판 쪽에서 끼워 안쪽 판에 박습니다 (셀프탭 10 mm).",
+      "step_id": "L11",
+      "source": "S08 안내서 11단계"
+    },
+    {
+      "id": "c44",
+      "kind": "table_row",
+      "text": "발목 축 · M6×65 (발목 축) · 1개",
+      "step_id": "L11",
+      "source": "S08 안내서 11단계"
+    },
+    {
+      "id": "c45",
+      "kind": "instruction",
+      "text": "커플러 양끝에 608을 끼웁니다. 큰 구멍(22 mm)이 있는 면, 즉 크랭크 쪽 면에서 넣습니다. 슬리브 A·B(7 mm)를 베어링 안쪽 링에.",
+      "step_id": "L12",
+      "source": "S08 안내서 12단계"
+    },
+    {
+      "id": "c46",
+      "kind": "instruction",
+      "text": "핀 A: 크랭크 돌기 ← 608 ← 볼 A 돌기. 볼 A를 M4×30으로 크랭크에 고정하고, M6×35를 볼 A 위에서.",
+      "step_id": "L12",
+      "source": "S08 안내서 12단계"
+    },
+    {
+      "id": "c47",
+      "kind": "instruction",
+      "text": "핀 B: 링 1 mm ← 608 ← 볼 B 돌기, M6×35.",
+      "step_id": "L12",
+      "source": "S08 안내서 12단계"
+    },
+    {
+      "id": "c48",
+      "kind": "speech",
+      "text": "커플러는 왼·오가 같은 부품입니다. 아무거나 써도 됩니다.",
+      "step_id": "L12",
+      "source": "S08 안내서 12단계 팁",
+      "slide_no": "tip-L12",
+      "t": 0,
+      "also": []
+    },
+    {
+      "id": "c49",
+      "kind": "table_row",
+      "text": "커플러 (무릎 링크) · 608ZZ · 2개",
+      "step_id": "L12",
+      "source": "S08 안내서 12단계"
+    },
+    {
+      "id": "c50",
+      "kind": "table_row",
+      "text": "커플러 (무릎 링크) · M6×35 · 2개",
+      "step_id": "L12",
+      "source": "S08 안내서 12단계"
+    },
+    {
+      "id": "c51",
+      "kind": "table_row",
+      "text": "커플러 (무릎 링크) · M4×30 · 1개",
+      "step_id": "L12",
+      "source": "S08 안내서 12단계"
+    },
+    {
+      "id": "c52",
+      "kind": "instruction",
+      "text": "푸시로드 양끝에 608을 끼웁니다. D 끝(위)은 안쪽 면에서, C 끝(아래)은 바깥 면에서 넣고 슬리브 C·D(7 mm)를 끼웁니다.",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계"
+    },
+    {
+      "id": "c53",
+      "kind": "instruction",
+      "text": "푸시로드 D 끝을 볼 D와 모터 크랭크 사이 틈에 앞에서 밀어 넣습니다 (링 4 mm는 모터 크랭크 쪽).",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계"
+    },
+    {
+      "id": "c54",
+      "kind": "instruction",
+      "text": "핀 D: 볼 D 돌기 ← 608 ← 링 4 mm ← 모터 크랭크. M6×35를 머리 받침(6 mm) 위에서, 안쪽에서 끼웁니다.",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계"
+    },
+    {
+      "id": "c55",
+      "kind": "instruction",
+      "text": "핀 C: 발 판 돌기 ← 608 ← 볼 C 돌기. 볼 C를 M4×20으로 발 판 기둥에 고정하고, M6×35를 볼 C 위에서 (머리 1 mm 묻힘).",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계"
+    },
+    {
+      "id": "c56",
+      "kind": "instruction",
+      "text": "확인: 무릎을 −37°에서 +42°까지, 발목을 −40°에서 +20°까지 천천히 끝까지 돌려 봅니다.",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계"
+    },
+    {
+      "id": "c57",
+      "kind": "instruction",
+      "text": "확인: 걸리는 곳이 없는지, 핀에서 덜컥거림(유격)이 없는지 봅니다.",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계"
+    },
+    {
+      "id": "c58",
+      "kind": "instruction",
+      "text": "확인: 강조된 부품이 무릎·발목 링크입니다. 이 부품들이 부드럽게 같이 움직여야 합니다.",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계"
+    },
+    {
+      "id": "c59",
+      "kind": "warning",
+      "text": "유격 목표는 관절마다 1° 이하(핀마다 틈 0.1 mm 이하)입니다. 시뮬레이션에서 2°부터 밀렸을 때 넘어짐이 크게 늘었습니다.",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계",
+      "also": []
+    },
+    {
+      "id": "c60",
+      "kind": "speech",
+      "text": "푸시로드와 볼 C는 왼·오가 같은 부품입니다.",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계 팁",
+      "slide_no": "tip-L13",
+      "t": 0,
+      "also": []
+    },
+    {
+      "id": "c61",
+      "kind": "table_row",
+      "text": "푸시로드 (발목 링크) · 608ZZ · 2개",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계"
+    },
+    {
+      "id": "c62",
+      "kind": "table_row",
+      "text": "푸시로드 (발목 링크) · M6×35 · 2개",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계"
+    },
+    {
+      "id": "c63",
+      "kind": "table_row",
+      "text": "푸시로드 (발목 링크) · M4×20 · 1개",
+      "step_id": "L13",
+      "source": "S08 안내서 13단계"
+    },
+    {
+      "id": "c64",
+      "kind": "instruction",
+      "text": "덮개의 기둥 3개를 허벅지 앞 링에 대고, 판 위에서 M3×40 세 개로 고정합니다 (머리 6 mm 묻힘).",
+      "step_id": "L14",
+      "source": "S08 안내서 15단계"
+    },
+    {
+      "id": "c65",
+      "kind": "speech",
+      "text": "무릎 축이나 핀 A·B를 만져야 할 때는 이 덮개부터 뗍니다.",
+      "step_id": "L14",
+      "source": "S08 안내서 15단계 팁",
+      "slide_no": "tip-L14",
+      "t": 0,
+      "also": []
+    },
+    {
+      "id": "c66",
+      "kind": "table_row",
+      "text": "무릎 바깥 덮개 · M3×40 · 3개",
+      "step_id": "L14",
+      "source": "S08 안내서 15단계"
+    },
+    {
+      "id": "c67",
+      "kind": "instruction",
+      "text": "신발 바닥의 나사 6개를 뺍니다 (안쪽 줄 3, 바깥쪽 줄 3).",
+      "step_id": "L15",
+      "source": "S08 안내서 16단계"
+    },
+    {
+      "id": "c68",
+      "kind": "instruction",
+      "text": "윗판의 돌기 6개를 신발 바닥 나사 머리 자리에 끼웁니다.",
+      "step_id": "L15",
+      "source": "S08 안내서 16단계"
+    },
+    {
+      "id": "c69",
+      "kind": "instruction",
+      "text": "밑창을 아래에서 대고 M3×25 여섯 개를 대각선 순서로, 밑창이 살짝 눌릴 만큼만 조입니다.",
+      "step_id": "L15",
+      "source": "S08 안내서 16단계"
+    },
+    {
+      "id": "c70",
+      "kind": "speech",
+      "text": "PLA로 뽑은 밑창이면 미끄럼 방지 고무 시트를 조립 전에 붙여 두세요. 둥근 면이라 가장자리를 1~2 mm 감싸 붙이면 잘 안 떨어집니다.",
+      "step_id": "L15",
+      "source": "S08 안내서 16단계 팁",
+      "slide_no": "tip-L15",
+      "t": 0,
+      "also": []
+    },
+    {
+      "id": "c71",
+      "kind": "table_row",
+      "text": "발판 · M3×25 렌치볼트 · 6개",
+      "step_id": "L15",
+      "source": "S08 안내서 16단계"
+    },
+    {
+      "id": "c72",
+      "kind": "instruction",
+      "text": "조립은 허벅지 묶음 → 정강이 묶음 → 발 묶음을 따로 만든 뒤, 무릎 축·발목 축으로 잇고, 마지막에 링크(커플러·푸시로드)를 겁니다.",
+      "step_id": null,
+      "source": "S08 안내서 0단계 (시작 전에)"
+    },
+    {
+      "id": "c73",
+      "kind": "speech",
+      "text": "608 베어링 구멍이 너무 빡빡하면 구멍을 사포로 아주 조금, 헐거우면 순간접착제 한 방울. 망치로 치지 마세요.",
+      "step_id": null,
+      "source": "S08 안내서 0단계 팁",
+      "slide_no": "tip-x0",
+      "t": 0,
+      "also": []
+    },
+    {
+      "id": "c74",
+      "kind": "instruction",
+      "text": "왼·오가 다른 10개 부품만 R로 표시한 것을 쓰고, 나머지는 같은 부품입니다.",
+      "step_id": null,
+      "source": "S08 안내서 17단계 (오른다리)"
+    },
+    {
+      "id": "c75",
+      "kind": "instruction",
+      "text": "다 조립하면 영점 받침대로 영점을 잡습니다 (docs/ZERO_JIG.md). 영점 오차는 시뮬레이션에서 실패 원인 2위였습니다.",
+      "step_id": null,
+      "source": "S08 안내서 17단계 (오른다리)"
+    },
+    {
+      "id": "c76",
+      "kind": "speech",
+      "text": "오른쪽 부품은 모두 왼쪽 부품의 정확한 거울상입니다(CAD로 겹쳐 확인). 그중 10개만 실제로 모양이 달라서 꼭 구분해야 하고, 나머지는 돌려 놓으면 똑같은 모양이라 섞여도 됩니다 .",
+      "step_id": null,
+      "source": "S08 안내서 첫 화면",
+      "slide_no": "intro",
+      "t": 76,
+      "also": []
+    },
+    {
+      "id": "c77",
+      "kind": "speech",
+      "text": "구분한 부품에는 바로 네임펜으로 L / R 을 적어 두세요. 링·슬리브처럼 작은 것은 왼·오가 같으니 한 봉지에 모아도 됩니다.",
+      "step_id": null,
+      "source": "S08 안내서 첫 화면",
+      "slide_no": "intro",
+      "t": 77,
+      "also": []
+    },
+    {
+      "id": "c78",
+      "kind": "speech",
+      "text": "M6 십자 드라이버 (축이 긴 것, 손잡이 지름 32 mm 이하)",
+      "step_id": null,
+      "source": "S08 안내서 첫 화면",
+      "slide_no": "intro",
+      "t": 78,
+      "also": []
+    },
+    {
+      "id": "c79",
+      "kind": "speech",
+      "text": "M4·M3 육각 볼렌치 (축 60 mm 이상)",
+      "step_id": null,
+      "source": "S08 안내서 첫 화면",
+      "slide_no": "intro",
+      "t": 79,
+      "also": []
+    },
+    {
+      "id": "c80",
+      "kind": "speech",
+      "text": "바이스 또는 클램프 (베어링 눌러 넣기), 순간접착제 조금, 네임펜",
+      "step_id": null,
+      "source": "S08 안내서 첫 화면",
+      "slide_no": "intro",
+      "t": 80,
+      "also": []
+    },
+    {
+      "id": "c81",
+      "kind": "speech",
+      "text": "셀프탭 구멍. 출력물 구멍에 나사가 직접 나사산을 내며 들어갑니다. 처음 한 번은 끝까지 넣었다 빼서 길을 내고, 두 번째 조일 때는 “닿았다” 싶으면 멈추세요. 세게 돌리면 나사산이 뭉개집니다.",
+      "step_id": null,
+      "source": "S08 안내서 첫 화면",
+      "slide_no": "intro",
+      "t": 81,
+      "also": []
+    },
+    {
+      "id": "c82",
+      "kind": "part",
+      "text": "무릎 슬리브 20 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 20.0 mm, sleeve_knee · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
+      "step_id": "L01",
+      "source": "부품 목록",
+      "part_id": "sleeve_knee"
+    },
+    {
+      "id": "c83",
+      "kind": "part",
+      "text": "링 D 4 mm — 다른 이름: 핀 D 608 안쪽 링 받침 4 mm, ring_D · 출력: 채움 100 % · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "ring_D"
+    },
+    {
+      "id": "c84",
+      "kind": "part",
+      "text": "무릎 모터 GIM8115 (그대로) — 다른 이름: knee_gim",
+      "step_id": "L03",
+      "source": "부품 목록",
+      "part_id": "knee_gim"
+    },
+    {
+      "id": "c85",
+      "kind": "part",
+      "text": "모터 크랭크 — 다른 이름: RS02 출력 허브 + 모터 크랭크, motor_crank · 출력: 채움 100 %, PETG, X 152.5 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L07",
+      "source": "부품 목록",
+      "part_id": "motor_crank"
+    },
+    {
+      "id": "c86",
+      "kind": "part",
+      "text": "발목 스페이서 — 다른 이름: 발 안 예전 풀리 자리 채움, ankle_spacer · 출력: 벽 3, 채움 40 % · 왼·오 같은 부품",
+      "step_id": "L09",
+      "source": "부품 목록",
+      "part_id": "ankle_spacer"
+    },
+    {
+      "id": "c87",
+      "kind": "part",
+      "text": "허벅지 앞 링 — 다른 이름: 무릎 GIM 앞면 링 + 보로 내려가는 다리, thigh_front · 출력: 벽 6, 채움 50 %, X 159 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L04",
+      "source": "부품 목록",
+      "part_id": "thigh_front"
+    },
+    {
+      "id": "c88",
+      "kind": "part",
+      "text": "무릎 축 M6×90 — 다른 이름: M6 x 90 십자 둥근머리, knee_axle",
+      "step_id": "L10",
+      "source": "부품 목록",
+      "part_id": "knee_axle"
+    },
+    {
+      "id": "c89",
+      "kind": "part",
+      "text": "푸시로드 — 다른 이름: 발목 푸시로드 98 mm, 10 mm, 608 x 2, pushrod · 출력: 채움 100 %, PETG · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "pushrod"
+    },
+    {
+      "id": "c90",
+      "kind": "part",
+      "text": "무릎 바깥 덮개 — 다른 이름: 무릎 바깥 덮개 (4 절 링크 위) — 기둥 3 개, M3 x 40 x 3 → 허벅지 앞 링, knee_shield · 출력: 벽 3, 채움 20 %, 판(바깥면) 바닥, 기둥 위로 · 왼·오 다른 부품",
+      "step_id": "L14",
+      "source": "부품 목록",
+      "part_id": "knee_shield"
+    },
+    {
+      "id": "c91",
+      "kind": "part",
+      "text": "발목 링 2.1 mm — 다른 이름: 발목 688 안쪽 링 받침 2.1 mm, ring_ankle_in · 출력: 채움 100 % · 왼·오 같은 부품",
+      "step_id": "L11",
+      "source": "부품 목록",
+      "part_id": "ring_ankle_in"
+    },
+    {
+      "id": "c92",
+      "kind": "part",
+      "text": "정강이 바깥 판 — 다른 이름: 정강이 바깥 판 + 출력 크랭크 + RS02 고정 + 무릎·발목 허브, shin_outer · 출력: 벽 6, 채움 50 %, X 170.5 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L06",
+      "source": "부품 목록",
+      "part_id": "shin_outer"
+    },
+    {
+      "id": "c93",
+      "kind": "part",
+      "text": "허벅지 — 다른 이름: 허벅지 본체 (판·GIM 뒷받침·보·무릎 고리 608 x 2), thigh · 출력: 벽 6, 채움 50 % 자이로이드 (무릎 고리 쪽 1/3 은 수정자 100 %), X 93 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L01",
+      "source": "부품 목록",
+      "part_id": "thigh"
+    },
+    {
+      "id": "c94",
+      "kind": "part",
+      "text": "볼 A 나사 M4×30 — 다른 이름: M4 x 30 육각 렌치, screwA",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "screwA"
+    },
+    {
+      "id": "c95",
+      "kind": "part",
+      "text": "발목 축 M6×65 — 다른 이름: M6 x 65 십자 둥근머리, ankle_axle",
+      "step_id": "L11",
+      "source": "부품 목록",
+      "part_id": "ankle_axle"
+    },
+    {
+      "id": "c96",
+      "kind": "part",
+      "text": "608 베어링 (커플러 핀 A 쪽) — 다른 이름: brg_AIN",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "brg_AIN"
+    },
+    {
+      "id": "c97",
+      "kind": "part",
+      "text": "정강이 기둥 — 다른 이름: 정강이 연결 기둥 x 2, shin_posts · 출력: 벽 5, 채움 50 %, 세워서 · 왼·오 같은 부품",
+      "step_id": "L08",
+      "source": "부품 목록",
+      "part_id": "shin_posts"
+    },
+    {
+      "id": "c98",
+      "kind": "part",
+      "text": "고관절 모터 묶음 (그대로) — 다른 이름: hip",
+      "step_id": "L02",
+      "source": "부품 목록",
+      "part_id": "hip"
+    },
+    {
+      "id": "c99",
+      "kind": "part",
+      "text": "핀 D M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinD",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "pinD"
+    },
+    {
+      "id": "c100",
+      "kind": "part",
+      "text": "볼 C 나사 M4×20 — 다른 이름: M4 x 20 육각 렌치, screwC",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "screwC"
+    },
+    {
+      "id": "c101",
+      "kind": "part",
+      "text": "정강이 안쪽 판 — 다른 이름: 정강이 안쪽 판 10 mm (+ 무릎 나사 돌기 + 무릎 멈춤 돌기 2), shin_inner · 출력: 벽 6, 채움 60 % (멈춤 돌기 둘레 수정자 100 %), 116 면 바닥 (돌기는 위로 12 mm) · 왼·오 다른 부품",
+      "step_id": "L08",
+      "source": "부품 목록",
+      "part_id": "shin_inner"
+    },
+    {
+      "id": "c102",
+      "kind": "part",
+      "text": "608 베어링 (푸시로드 핀 D 쪽) — 다른 이름: brg_D",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "brg_D"
+    },
+    {
+      "id": "c103",
+      "kind": "part",
+      "text": "핀 A M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinA",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "pinA"
+    },
+    {
+      "id": "c104",
+      "kind": "part",
+      "text": "발목 슬리브 20.4 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 20.4 mm, sleeve_ankle · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
+      "step_id": "L09",
+      "source": "부품 목록",
+      "part_id": "sleeve_ankle"
+    },
+    {
+      "id": "c105",
+      "kind": "part",
+      "text": "발과 신발 (그대로) — 다른 이름: foot",
+      "step_id": "L09",
+      "source": "부품 목록",
+      "part_id": "foot"
+    },
+    {
+      "id": "c106",
+      "kind": "part",
+      "text": "볼 C — 다른 이름: 볼 C (핀 C 반대편 받침), cheek_C · 출력: 채움 100 %, PETG, 158.5 면 바닥 · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "cheek_C"
+    },
+    {
+      "id": "c107",
+      "kind": "part",
+      "text": "무릎 링 2 mm — 다른 이름: 무릎 608 안쪽 링 받침 2 mm, ring_knee_in · 출력: 채움 100 % · 왼·오 같은 부품",
+      "step_id": "L10",
+      "source": "부품 목록",
+      "part_id": "ring_knee_in"
+    },
+    {
+      "id": "c108",
+      "kind": "part",
+      "text": "핀 C M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinC",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "pinC"
+    },
+    {
+      "id": "c109",
+      "kind": "part",
+      "text": "발목 모터 RobStride02 (그대로) — 다른 이름: ankle_rs",
+      "step_id": "L06",
+      "source": "부품 목록",
+      "part_id": "ankle_rs"
+    },
+    {
+      "id": "c110",
+      "kind": "part",
+      "text": "링 B 1 mm — 다른 이름: 핀 B 608 안쪽 링 받침 1 mm, ring_B · 출력: 채움 100 % · 왼·오 같은 부품",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "ring_B"
+    },
+    {
+      "id": "c111",
+      "kind": "part",
+      "text": "입력 크랭크 — 다른 이름: 무릎 입력 크랭크 15.5 mm (+ 볼 A 자리), input_crank · 출력: 채움 100 %, PETG, 155 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L05",
+      "source": "부품 목록",
+      "part_id": "input_crank"
+    },
+    {
+      "id": "c112",
+      "kind": "part",
+      "text": "볼 A — 다른 이름: 볼 A (핀 A 반대편 받침 + 기둥), cheek_A · 출력: 채움 100 %, PETG, 189.5 면 바닥 · 왼·오 같은 부품",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "cheek_A"
+    },
+    {
+      "id": "c113",
+      "kind": "part",
+      "text": "커플러 — 다른 이름: 무릎 커플러 130 mm, 9 x 22 mm, 608 x 2, coupler · 출력: 채움 100 %, PETG, 넓은 면 바닥 · 왼·오 같은 부품",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "coupler"
+    },
+    {
+      "id": "c114",
+      "kind": "part",
+      "text": "슬리브 B 7 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 7.0 mm, sleeve_B · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "sleeve_B"
+    },
+    {
+      "id": "c115",
+      "kind": "part",
+      "text": "608 베어링 (푸시로드 핀 C 쪽) — 다른 이름: brg_C",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "brg_C"
+    },
+    {
+      "id": "c116",
+      "kind": "part",
+      "text": "볼 D — 다른 이름: 볼 D (핀 D 반대편 받침 + 가운데 기둥), cheek_D · 출력: 채움 100 %, PETG, 133.5 면 바닥 · 왼·오 같은 부품",
+      "step_id": "L07",
+      "source": "부품 목록",
+      "part_id": "cheek_D"
+    },
+    {
+      "id": "c117",
+      "kind": "part",
+      "text": "608 베어링 (무릎 고리 바깥) — 다른 이름: brg_K2",
+      "step_id": "L01",
+      "source": "부품 목록",
+      "part_id": "brg_K2"
+    },
+    {
+      "id": "c118",
+      "kind": "part",
+      "text": "핀 D 머리 받침 6 mm — 다른 이름: 핀 D 머리 받침 6 mm (M6 x 35 끝이 정강이 판에 안 닿게), spacer_D_head · 출력: 채움 100 % · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "spacer_D_head"
+    },
+    {
+      "id": "c119",
+      "kind": "part",
+      "text": "발 바깥 판 (발목 크랭크) — 다른 이름: 발 바깥 판 #59 + 발목 크랭크 + 볼 C 기둥 (새로 출력), foot_outer_new · 출력: 벽 6, 채움 100 %, 133.5 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L09",
+      "source": "부품 목록",
+      "part_id": "foot_outer_new"
+    },
+    {
+      "id": "c120",
+      "kind": "part",
+      "text": "608 베어링 (무릎 고리 안쪽) — 다른 이름: brg_K1",
+      "step_id": "L01",
+      "source": "부품 목록",
+      "part_id": "brg_K1"
+    },
+    {
+      "id": "c121",
+      "kind": "part",
+      "text": "발판 밑창 — 다른 이름: foot_plate_crown_sole · 출력: TPU 95A 또는 PLA + 미끄럼 방지 시트, 땅 닿는 면 아래 (턱 위로) · 왼·오 같은 부품",
+      "step_id": "L15",
+      "source": "부품 목록",
+      "part_id": "foot_plate_crown_sole"
+    },
+    {
+      "id": "c122",
+      "kind": "part",
+      "text": "볼 B — 다른 이름: 볼 B (핀 B 반대편 받침 + 무릎 축 기둥), cheek_B · 출력: 채움 100 %, PETG, 189.5 면 바닥 · 왼·오 같은 부품",
+      "step_id": "L10",
+      "source": "부품 목록",
+      "part_id": "cheek_B"
+    },
+    {
+      "id": "c123",
+      "kind": "part",
+      "text": "608 베어링 (커플러 핀 B 쪽) — 다른 이름: brg_B",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "brg_B"
+    },
+    {
+      "id": "c124",
+      "kind": "part",
+      "text": "발판 윗판 — 다른 이름: foot_plate_crown_upper · 출력: PETG/PLA, 넓은 바닥면 아래 (돌기 위로) · 왼·오 다른 부품",
+      "step_id": "L15",
+      "source": "부품 목록",
+      "part_id": "foot_plate_crown_upper"
+    },
+    {
+      "id": "c125",
+      "kind": "part",
+      "text": "핀 B M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinB",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "pinB"
+    },
+    {
+      "id": "c126",
+      "kind": "part",
+      "text": "볼 D 나사 M4×30 — 다른 이름: M4 x 30 육각 렌치, screwD",
+      "step_id": "L07",
+      "source": "부품 목록",
+      "part_id": "screwD"
+    },
+    {
+      "id": "c127",
+      "kind": "part",
+      "text": "688 베어링 (발목 바깥) — 다른 이름: brg_A2",
+      "step_id": "L09",
+      "source": "부품 목록",
+      "part_id": "brg_A2"
+    },
+    {
+      "id": "c128",
+      "kind": "part",
+      "text": "슬리브 C 7 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 7.0 mm, sleeve_C · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "sleeve_C"
+    },
+    {
+      "id": "c129",
+      "kind": "part",
+      "text": "슬리브 A 7 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 7.0 mm, sleeve_A · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "sleeve_A"
+    },
+    {
+      "id": "c130",
+      "kind": "part",
+      "text": "슬리브 D 7 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 7.0 mm, sleeve_D · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "sleeve_D"
+    },
+    {
+      "id": "c131",
+      "kind": "part",
+      "text": "688 베어링 (발목 안쪽) — 다른 이름: brg_A1",
+      "step_id": "L09",
+      "source": "부품 목록",
+      "part_id": "brg_A1"
+    },
+    {
+      "id": "c132",
+      "kind": "speech",
+      "text": "11단계에서는 앵클을 넣는 게 어려워요.",
+      "step_id": "L11",
+      "source": "설계자 설명 (녹화 20261122-001516-1a1d)",
+      "slide_no": "rec-20261122-001516-1a1d-0",
+      "t": 3.2,
+      "also": []
+    },
+    {
+      "id": "c133",
+      "kind": "speech",
+      "text": "그래서 먼저 뛰어놔야 돼.",
+      "step_id": "L11",
+      "source": "설계자 설명 (녹화 20261122-001516-1a1d)",
+      "slide_no": "rec-20261122-001516-1a1d-1",
+      "t": 5.4,
+      "also": []
+    }
+  ]
+}

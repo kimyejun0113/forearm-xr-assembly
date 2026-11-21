@@ -15,6 +15,10 @@
   #help { top: 16px; left: 16px; max-width: min(320px, calc(100% - 64px)); padding: 10px 12px; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
   #help b { color: var(--text); }
   #help label { display: block; margin-top: 6px; color: var(--text); }
+  #robotPick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 8px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+  #robotPick span { color: var(--text); font-weight: 600; margin-right: 2px; }
+  #robotPick button { padding: 6px 12px; }
+  #robotPick button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; cursor: default; }
   #card { left: 16px; right: 16px; bottom: 16px; max-width: 600px; margin: 0 auto; padding: 12px 14px; font-size: 14px; }
   #progress { color: var(--muted); font-size: 12.5px; }
   #bar { height: 4px; background: var(--line); border-radius: 2px; margin: 5px 0 8px; overflow: hidden; }
@@ -34,6 +38,7 @@
 </head>
 <body>
 <div id="help" class="panel">
+  <div id="robotPick"></div>
   <b>Quest</b>: 트리거·손가락 핀치로 부품 잡고 당기기 · <b>그립 버튼</b>으로 모델 옮기기 · <b>빈 공간 양손 핀치</b>: 확대·축소·이동 · <b>한 손 핀치 끌기</b>: 돌리기 · 버튼 사이 빈 곳을 잡으면 버튼 패널 이동 · 버튼에 화면 가운데를 <b>1초 맞추면</b> 눌림<br>
   <b>PC</b>: 부품을 끌어 빼기 · 빈 곳 드래그로 회전
   <label><input type="checkbox" id="physics" checked> 실제처럼: 막힌 부품과 볼트로 고정된 부품은 안 빠짐</label>
@@ -121,10 +126,25 @@ function matcher(pattern) {
   return (name) => re.test(name) && (wantsCopy || !name.includes('#'));
 }
 
-// 어떤 로봇인지: ?robot=leg_L > 에이전트 서버가 가진 지식의 로봇 > forearm
+// 어떤 로봇인지: ?robot=leg_L > 처음 화면에서 마지막으로 고른 것 > 서버 기본 로봇 > forearm
+const ROBOT_NAME = { forearm: '포어암', leg_L: '왼다리 (S08)' };
+const ROBOTS = await fetch('/api/robots', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+let savedRobot = null; try { savedRobot = localStorage.getItem('xr.robot'); } catch {}
 const ROBOT = new URLSearchParams(location.search).get('robot')
-  || await fetch('/api/kb', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((k) => k?.robot).catch(() => null)
-  || 'forearm';
+  || (savedRobot && (!ROBOTS || ROBOTS.some((r) => r.robot === savedRobot)) ? savedRobot : null)
+  || ROBOTS?.[0]?.robot || 'forearm';
+{ // 처음 화면(왼쪽 위 판)에서 로봇 바꾸기: 고르면 그 로봇으로 페이지를 다시 연다
+  const box = document.getElementById('robotPick');
+  const list = ROBOTS ? ROBOTS.map((r) => r.robot) : ['forearm', 'leg_L'];
+  box.innerHTML = '<span>조립할 로봇</span>' + list.map((r) =>
+    `<button type="button" data-robot="${r}" aria-pressed="${r === ROBOT}">${ROBOT_NAME[r] || r}</button>`).join('');
+  box.addEventListener('click', (e) => {
+    const r = e.target.closest('button')?.dataset.robot;
+    if (!r || r === ROBOT) return;
+    try { localStorage.setItem('xr.robot', r); } catch {}
+    const u = new URL(location.href); u.searchParams.set('robot', r); location.href = u.href;
+  });
+}
 const assembly = await (await fetch(`assets/${ROBOT}.assembly.json`, { cache: 'no-store' })).json();
 const gltf = await new GLTFLoader().loadAsync(assembly.model);
 const cad = gltf.scene;                 // CAD 좌표 그대로 (m)
@@ -748,6 +768,23 @@ addEventListener('pointerup', () => {
 //                              서버 → {"type":"nav",cmd|to}, {"type":"highlight",part_ids}, step_card, answer, prompt, toast
 const agent = { on: false, kb: null, ws: null, card: null, reply: null, toast: '', toastT: 0, status: 'AI 연결 중…',
   phase: 'work', commentT: 0, builder: new URLSearchParams(location.search).get('op') || '' };
+// 오른쪽 패널 대화 기록: 새 답이 와도 앞 대화가 남는다. agent.reply에 값이 들어갈 때마다 (질문 → 내 말풍선, 답 → AI 말풍선)
+// 쌓고, 내 말·AI 말 합쳐 CHAT_MAX개가 넘으면 오래된 것부터 위로 빠진다. 단계를 넘겨도 이어지고, 다음 사람이면 비운다.
+const CHAT_MAX = 5;
+agent.chat = [];
+{
+  let last = null;
+  Object.defineProperty(agent, 'reply', {
+    get: () => last,
+    set: (r) => {
+      last = r;
+      if (!r) return;
+      if (r.q) agent.chat.push({ who: 'me', text: r.q });
+      agent.chat.push({ who: 'ai', kind: r.kind, text: r.text, src: r.src, long: r.q === '설명 녹화' });
+      agent.chat.splice(0, Math.max(0, agent.chat.length - CHAT_MAX));
+    },
+  });
+}
 const agentHi = new Map();          // 부품 → 남은 강조 시간(초)
 
 // 에이전트 부품 id → 우리 3D 부품들
@@ -813,7 +850,7 @@ function agentHandle(m) {
 
 async function connectAgent(builder = agent.builder, retry = false) {
   try {
-    const r = await fetch('/api/kb', { cache: 'no-store' });
+    const r = await fetch(`/api/kb?robot=${ROBOT}`, { cache: 'no-store' });
     if (!r.ok) throw new Error();
     agent.kb = await r.json();
   } catch {
@@ -828,7 +865,7 @@ async function connectAgent(builder = agent.builder, retry = false) {
   builder = builder || newWorkerName();
   agent.builder = builder; if (!retry) agent.phase = 'work';
   let s;
-  try { s = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ builder }) }).then((r) => r.json()); }
+  try { s = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ builder, robot: ROBOT }) }).then((r) => r.json()); }
   catch { agentReconnect(); return; }
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   const ws = agent.ws = new WebSocket(`${proto}://${location.host}/ws/${s.session_id}`);
@@ -925,7 +962,7 @@ async function capStop() {
   }
   agent.status = CAP.status0;
   if (!CAP.frames.length) { agentToast('찍힌 슬라이드가 없어요'); drawPanel(); return; }
-  const pend = { frames: CAP.frames.map((f) => ({ b: f.b, t: f.t })), audio };
+  const pend = { frames: CAP.frames.map((f) => ({ b: f.b, t: f.t })), audio, robot: ROBOT };   // 녹화한 로봇 (나중에 다른 로봇 화면에서 다시 보내도 그대로)
   await capSave(pend);                    // 보내기 전에 헤드셋에 먼저 보관 (와이파이·adb가 끊기거나 새로고침돼도 안 잃게)
   capSend(pend);
 }
@@ -961,10 +998,18 @@ async function capSend(p) {
   const fd = new FormData();
   p.frames.forEach((f, i) => fd.append('frames', f.b, `f_${i + 1}.jpg`));
   fd.append('frame_times', JSON.stringify(p.frames.map((f) => f.t)));
+  fd.append('robot', p.robot || 'forearm');   // 예전 보관본에는 로봇이 없다 = 포어암
   if (p.audio) fd.append('audio', p.audio, /mp4/.test(p.audio.type) ? 'talk.m4a' : 'talk.webm');
   let j;
   try {
     const r = await fetch('/api/briefing', { method: 'POST', body: fd });
+    if (r.status >= 400 && r.status < 500) {   // 서버가 받을 수 없다고 한 것: 다시 보내도 소용없으니 보관본을 지우고 알리기만
+      const d = await r.json().catch(() => ({}));
+      await capSave(null);
+      CAP.sending = false; CAP.busy = false; drawPanel();
+      agentToast('녹화를 받지 않았어요 · ' + (d.detail || '서버 ' + r.status));
+      return;
+    }
     if (!r.ok) throw new Error('서버 ' + r.status);
     j = await r.json();
   } catch (e) {
@@ -984,13 +1029,15 @@ async function capSend(p) {
   }
   try {
     if (st.ok) {
-      agent.kb = await fetch('/api/kb', { cache: 'no-store' }).then((r) => r.json());
+      agent.kb = await fetch(`/api/kb?robot=${ROBOT}`, { cache: 'no-store' }).then((r) => r.json());
       if (shown >= 0) agentStep(shown);                       // 지금 단계 카드를 새 지식으로
       if (st.added !== undefined) {   // 기존 지식에 합침: 새로 배운 말·보완·뺀 말
-        agentToast(`설명 반영 완료 · 새로 배운 말 ${st.added}문장 · 보완 ${st.updated} · 뺀 말 ${st.dropped}`);
+        const cf = st.conflicts || [];
+        agentToast(`설명 반영 완료 · 새로 배운 말 ${st.added}문장 · 보완 ${st.updated} · 뺀 말 ${st.dropped}` + (cf.length ? ` · ⚠ 기존과 다른 말 ${cf.length}` : ''));
         const learned = (st.learned || []).map((t) => `+ ${t}`), changed = (st.changed || []).map((c) => `~ ${c.new}`);
-        agent.reply = { kind: 'answer', q: '설명 녹화', src: [], text: (learned.length || changed.length)
-          ? [...learned, ...changed].join('\n') + `\n(잡담·이미 아는 내용 ${st.dropped}문장은 뺐어요. 설계자 말 모두 ${st.segments}문장)`
+        const conflict = cf.map((c) => `⚠ 기존과 달라 안 넣음: ${c.new}`);
+        agent.reply = { kind: cf.length ? 'prompt' : 'answer', q: '설명 녹화', src: [], text: (learned.length || changed.length || conflict.length)
+          ? [...conflict, ...learned, ...changed].join('\n') + `\n(잡담·이미 아는 내용 ${st.dropped}문장은 뺐어요. 설계자 말 모두 ${st.segments}문장)`
           : `새로 배울 말이 없었어요. 들은 ${st.dropped}문장은 잡담이거나 이미 아는 내용이라 지식은 그대로예요.` };
       } else {
         agentToast(`설명 반영 완료 · 슬라이드 ${st.slides}장, 설계자 말 ${st.segments}문장`);
@@ -1026,7 +1073,7 @@ async function nextWorker() {
   const old = agent.ws;
   clearTimeout(agent.retryT);
   if (old) { old.onclose = null; old.onmessage = null; try { old.close(); } catch {} }
-  agent.on = false; agent.card = null; agent.reply = null; agent.status = 'AI 연결 중…';
+  agent.on = false; agent.card = null; agent.reply = null; agent.chat = []; agent.status = 'AI 연결 중…';
   agent.phase = 'work'; agent.commentT = 0;
   goTo(-1); placeInFront = true;
   await connectAgent(newWorkerName());
@@ -1196,13 +1243,24 @@ function onHeard(raw) {
 }
 
 // ---------- 오른쪽 설명 패널 (헤드셋 안에서 보이는 에이전트 화면) ----------
-const INFO_W = 1024, INFO_H = 1240;
+// 높이는 대화 길이에 따라 INFO_H(기본) ~ INFO_HMAX로 늘어난다. 캔버스는 최대 높이로 두고 위쪽 infoH만큼만 판에 비춘다.
+const INFO_W = 1024, INFO_H = 1240, INFO_HMAX = 2600;
 const infoCanvas = document.createElement('canvas');
-infoCanvas.width = INFO_W; infoCanvas.height = INFO_H;
+infoCanvas.width = INFO_W; infoCanvas.height = INFO_HMAX;
 const ictx = infoCanvas.getContext('2d');
 const infoTex = new THREE.CanvasTexture(infoCanvas);
 infoTex.colorSpace = THREE.SRGBColorSpace;
 const infoPanel = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.32 * INFO_H / INFO_W), new THREE.MeshBasicMaterial({ map: infoTex, transparent: true }));
+let infoH = INFO_H;
+function setInfoHeight(h) {   // 판 위쪽 끝은 그대로 두고 아래로 늘이기 (단계 카드가 움직이지 않게)
+  infoTex.repeat.set(1, h / INFO_HMAX); infoTex.offset.set(0, 1 - h / INFO_HMAX);
+  if (h === infoH) return;
+  infoH = h;
+  const base = 0.32 * INFO_H / INFO_W, hm = 0.32 * h / INFO_W;
+  infoPanel.geometry.dispose();
+  infoPanel.geometry = new THREE.PlaneGeometry(0.32, hm).translate(0, -(hm - base) / 2, 0);
+}
+setInfoHeight(INFO_H);
 infoPanel.userData.isInfo = true;
 infoPanel.position.set(0.48, 1.08, 0.05);         // PC 화면용 위치 (헤드셋은 기본 배치에서 다시 놓음)
 scene.add(infoPanel);
@@ -1244,16 +1302,12 @@ function specChips(st) {   // 볼트·공구·부품을 수치 칩으로 (문장
 }
 function drawInfo() {
   const c = ictx, P = 52, W = INFO_W - P * 2;
-  c.clearRect(0, 0, INFO_W, INFO_H);
+  c.clearRect(0, 0, INFO_W, INFO_HMAX);
   c.textBaseline = 'alphabetic';
-  // 판: 잘린 모서리 + 바깥 선 + 왼쪽 위 빛줄기 + 구석 표시
-  chamfer(c, 2, 2, INFO_W - 4, INFO_H - 4, 40, true);
-  const bg = c.createLinearGradient(0, 0, 0, INFO_H); bg.addColorStop(0, 'rgba(20,28,36,0.95)'); bg.addColorStop(1, 'rgba(9,12,16,0.95)');
-  c.fillStyle = bg; c.fill(); c.lineWidth = 3; c.strokeStyle = HUD.line2; c.stroke();
+  // 판(배경·테두리)은 대화 길이로 높이를 정한 뒤 맨 끝에 내용 뒤로 깐다. 여기서는 왼쪽 위 빛줄기·구석 표시만.
   c.fillStyle = HUD.acc; c.shadowColor = HUD.acc; c.shadowBlur = 16; c.fillRect(44, 0, 220, 5); c.shadowBlur = 0;
   c.strokeStyle = HUD.acc; c.lineWidth = 3;
   c.beginPath(); c.moveTo(16, 40); c.lineTo(16, 16); c.lineTo(40, 16); c.stroke();
-  c.beginPath(); c.moveTo(INFO_W - 16, INFO_H - 40); c.lineTo(INFO_W - 16, INFO_H - 16); c.lineTo(INFO_W - 40, INFO_H - 16); c.stroke();
 
   const txt = (t, x, y, font, color, align = 'left', spacing = 0) => {
     c.font = font; c.fillStyle = color; c.textAlign = align; c.letterSpacing = spacing + 'px'; c.fillText(t, x, y); c.letterSpacing = '0px'; c.textAlign = 'left';
@@ -1328,11 +1382,9 @@ function drawInfo() {
   }
 
   // ---------- JARVIS ----------
-  const r = agent.reply;
+  const chat = agent.chat;
   const jy = Math.max(y + 34, 880);
   c.fillStyle = HUD.line; c.fillRect(2, jy, INFO_W - 4, 2);
-  const jg = c.createLinearGradient(0, jy, 0, INFO_H); jg.addColorStop(0, 'rgba(92,230,255,0.05)'); jg.addColorStop(0.3, 'rgba(6,9,12,0.6)'); jg.addColorStop(1, 'rgba(6,9,12,0.6)');
-  c.save(); chamfer(c, 2, 2, INFO_W - 4, INFO_H - 4, 40, true); c.clip(); c.fillStyle = jg; c.fillRect(2, jy + 2, INFO_W - 4, INFO_H - jy); c.restore();
   const talking = aiTalking(), listening = VOICE.speaking || VOICE.waitQ > 0, thinking = VOICE.busy > 0;
   const state = talking ? 'SPEAKING' : thinking ? 'THINKING' : listening ? 'LISTENING' : VOICE.on ? 'STANDBY' : 'MIC OFF';
   const live = talking || thinking || listening;
@@ -1347,29 +1399,49 @@ function drawInfo() {
 
   let ay = oy + 76;
   const hint = agent.phase === 'comment' ? '막혔던 점을 그냥 말하세요 · "없어" · "다음 사람"' : VOICE.on ? `${VOICE.wake ? `"${VOICE.wake}" + 질문 · ` : ''}"다음" "이전" "7단계" "모두 펼치기"` : '마이크를 켜면 말로 물어볼 수 있어요';
-  if (VOICE.waitQ > 0) txt('네? 말씀하세요', P, ay, `700 32px ${HUD.KR}`, HUD.acc);
-  else if (VOICE.heard && listening) txt(VOICE.heard, P, ay, `500 28px ${HUD.KR}`, HUD.ink2);
-  else if (!r) txt(hint, P, ay, `500 24px ${HUD.MONO}`, HUD.ink3);
-  if (r) {
-    if (r.q) {   // 질문: 오른쪽 말풍선
-      c.font = `500 28px ${HUD.KR}`; const q = wrapText(c, r.q, W * 0.7)[0] || '', qw = c.measureText(q).width + 44;
-      c.fillStyle = 'rgba(190,215,230,0.1)'; c.beginPath(); c.roundRect(INFO_W - P - qw, ay - 38, qw, 58, [24, 24, 4, 24]); c.fill();
-      txt(q, INFO_W - P - 22, ay, `500 28px ${HUD.KR}`, HUD.ink2, 'right'); ay += 54;
+  if (!chat.length && !(VOICE.waitQ > 0) && !(VOICE.heard && listening)) { txt(hint, P, ay, `500 24px ${HUD.MONO}`, HUD.ink3); ay += 30; }
+  // 대화 기록: 위에서부터 오래된 순 (최근 CHAT_MAX개). 내 말은 오른쪽 말풍선, AI 말은 왼쪽 판
+  for (const b of chat) {
+    if (b.who === 'me') {
+      c.font = `500 28px ${HUD.KR}`; const ls = wrapText(c, b.text, W * 0.7).slice(0, 2);
+      const qw = Math.max(...ls.map((l) => c.measureText(l).width)) + 44, qh = 20 + ls.length * 38;
+      c.fillStyle = 'rgba(190,215,230,0.1)'; c.beginPath(); c.roundRect(INFO_W - P - qw, ay - 38, qw, qh, [24, 24, 4, 24]); c.fill();
+      ls.forEach((l, j) => txt(l, INFO_W - P - 22, ay + j * 38, `500 28px ${HUD.KR}`, HUD.ink2, 'right'));
+      ay += qh + 16;
+    } else {
+      const col = b.kind === 'danger' ? HUD.danger : b.kind === 'prompt' ? HUD.warn : HUD.acc;
+      c.font = `500 33px ${HUD.KR}`; const ls = wrapText(c, b.text, W - 50).slice(0, b.long ? 8 : 5);   // 녹화 결과는 배운 문장 목록이라 길다
+      const h = 34 + ls.length * 46 + (b.src?.length ? 36 : 0);
+      const g = c.createLinearGradient(P, 0, INFO_W - P, 0);
+      g.addColorStop(0, b.kind === 'danger' ? 'rgba(255,93,108,0.2)' : b.kind === 'prompt' ? 'rgba(255,181,71,0.15)' : HUD.accDim); g.addColorStop(1, 'rgba(0,0,0,0.02)');
+      c.fillStyle = g; c.fillRect(P, ay - 38, W, h); c.fillStyle = col; c.fillRect(P, ay - 38, 4, h);
+      ls.forEach((l, j) => txt(l, P + 26, ay + 10 + j * 46, `500 33px ${HUD.KR}`, HUD.ink));
+      if (b.src?.length) txt('SRC // ' + b.src.join(' · '), P + 26, ay + 10 + ls.length * 46, `500 20px ${HUD.MONO}`, HUD.ink3);
+      ay += h + 16;
     }
-    const col = r.kind === 'danger' ? HUD.danger : r.kind === 'prompt' ? HUD.warn : HUD.acc;
-    c.font = `500 33px ${HUD.KR}`; const ls = wrapText(c, r.text, W - 50).slice(0, r.q === '설명 녹화' ? 8 : 5);   // 녹화 결과는 배운 문장 목록이라 길다
-    const h = 34 + ls.length * 46 + (r.src?.length ? 36 : 0);
-    const g = c.createLinearGradient(P, 0, INFO_W - P, 0);
-    g.addColorStop(0, r.kind === 'danger' ? 'rgba(255,93,108,0.2)' : r.kind === 'prompt' ? 'rgba(255,181,71,0.15)' : HUD.accDim); g.addColorStop(1, 'rgba(0,0,0,0.02)');
-    c.fillStyle = g; c.fillRect(P, ay, W, h); c.fillStyle = col; c.fillRect(P, ay, 4, h);
-    ls.forEach((l, j) => txt(l, P + 26, ay + 48 + j * 46, `500 33px ${HUD.KR}`, HUD.ink));
-    if (r.src?.length) txt('SRC // ' + r.src.join(' · '), P + 26, ay + 48 + ls.length * 46, `500 20px ${HUD.MONO}`, HUD.ink3);
   }
+  if (VOICE.waitQ > 0) { txt('네? 말씀하세요', P, ay, `700 32px ${HUD.KR}`, HUD.acc); ay += 44; }
+  else if (VOICE.heard && listening) { txt(VOICE.heard, INFO_W - P, ay, `500 28px ${HUD.KR}`, HUD.ink3, 'right'); ay += 40; }   // 지금 듣는 말
+
+  // 판 높이: 기본 높이 안에 들어가면 그대로, 넘치면 아래로 늘인다 (아래 안내 띠 자리까지)
+  const H = Math.min(INFO_HMAX, Math.max(INFO_H, Math.ceil((ay + 120) / 40) * 40));
   if (agent.toast) {   // 잠깐 뜨는 안내: 아래쪽 청록 띠
     c.font = `700 28px ${HUD.KR}`; const t = wrapText(c, agent.toast, W - 40)[0] || '';
-    c.fillStyle = 'rgba(92,230,255,0.92)'; c.beginPath(); c.moveTo(P + 12, INFO_H - 112); c.lineTo(INFO_W - P, INFO_H - 112); c.lineTo(INFO_W - P, INFO_H - 60); c.lineTo(INFO_W - P - 12, INFO_H - 48); c.lineTo(P, INFO_H - 48); c.lineTo(P, INFO_H - 100); c.fill();
-    txt(t, P + 22, INFO_H - 70, `700 28px ${HUD.KR}`, '#041016');
+    c.fillStyle = 'rgba(92,230,255,0.92)'; c.beginPath(); c.moveTo(P + 12, H - 112); c.lineTo(INFO_W - P, H - 112); c.lineTo(INFO_W - P, H - 60); c.lineTo(INFO_W - P - 12, H - 48); c.lineTo(P, H - 48); c.lineTo(P, H - 100); c.fill();
+    txt(t, P + 22, H - 70, `700 28px ${HUD.KR}`, '#041016');
   }
+  c.strokeStyle = HUD.acc; c.lineWidth = 3;
+  c.beginPath(); c.moveTo(INFO_W - 16, H - 40); c.lineTo(INFO_W - 16, H - 16); c.lineTo(INFO_W - 40, H - 16); c.stroke();
+  // 내용 뒤로: JARVIS 칸 그늘, 그 뒤에 판 (destination-over = 이미 그린 것 뒤에 그리기)
+  c.save(); c.globalCompositeOperation = 'destination-over';
+  const jg = c.createLinearGradient(0, jy, 0, H); jg.addColorStop(0, 'rgba(92,230,255,0.05)'); jg.addColorStop(0.3, 'rgba(6,9,12,0.6)'); jg.addColorStop(1, 'rgba(6,9,12,0.6)');
+  c.save(); chamfer(c, 2, 2, INFO_W - 4, H - 4, 40, true); c.clip(); c.fillStyle = jg; c.fillRect(2, jy + 2, INFO_W - 4, H - jy); c.restore();
+  chamfer(c, 2, 2, INFO_W - 4, H - 4, 40, true);
+  const bg = c.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, 'rgba(20,28,36,0.95)'); bg.addColorStop(1, 'rgba(9,12,16,0.95)');
+  c.fillStyle = bg; c.fill();
+  c.restore();
+  chamfer(c, 2, 2, INFO_W - 4, H - 4, 40, true); c.lineWidth = 3; c.strokeStyle = HUD.line2; c.stroke();   // 테두리는 위에
+  setInfoHeight(H);
   infoTex.needsUpdate = true;
 }
 drawInfo();
@@ -1382,7 +1454,7 @@ const clock = new THREE.Clock();
 const ease = (t) => 1 - Math.pow(1 - t, 3);
 renderCard();
 setStatus('');
-window.__xr = { CAP, capStart, capStop, capShot, parts, steps, camera, membersOf, goTo, showAll, beginGrab, updateGrab, endGrab, axisWorld, blockerOf, isOut, renderer, gaze: () => ({ ...gazeInfo, dwell: dwell.t, cooldown: dwellCooldown }), agent, agentHi, VOICE, onHeard, sendUtterance };   // 디버그용
+window.__xr = { CAP, capStart, capStop, capShot, parts, steps, camera, membersOf, goTo, showAll, beginGrab, updateGrab, endGrab, axisWorld, blockerOf, isOut, renderer, gaze: () => ({ ...gazeInfo, dwell: dwell.t, cooldown: dwellCooldown }), agent, agentHi, VOICE, onHeard, sendUtterance, infoCanvas, infoPanel, drawInfo, info: () => infoH };   // 디버그용
 
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05);

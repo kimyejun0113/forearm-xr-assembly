@@ -70,7 +70,9 @@ class Session:
             out.append(self._prompt("irreversible", "warn", "이 단계는 되돌리기 어려워요. " + f["irreversible"][0], f["irreversible"][0]))
         if "lr" in f:
             out.append(self._prompt("lr", "info", None, "왼쪽·오른쪽 구분: " + f["lr"][0]))
-        if self.kn.agg.get("kb_reader") and self.kn.agg.get("kb_reader") != self.kn.kb.get("reader"):
+        prev = self.kn.agg.get("kb_reader")    # 로봇별 {robot: reader} (예전 파일은 포어암 reader 글자 하나)
+        prev = prev.get(self.kn.robot) if isinstance(prev, dict) else (prev if self.kn.robot == "forearm" else None)
+        if prev and prev != self.kn.kb.get("reader"):
             out.append(self._prompt("design_changed", "info", None, "설명 자료가 이전 작업자 때와 바뀌었어요. 이전 작업자 팁은 참고만 하세요."))
         return [p for p in out if p]
 

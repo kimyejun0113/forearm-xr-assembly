@@ -1,0 +1,708 @@
+{
+ "source": [
+  "C:/Users/KimYeJun/Documents/카카오톡 받은 파일/S08 다리 조립 안내서.html",
+  "C:/Users/KimYeJun/AppData/Local/Temp/claude/077f4372f652e266/e8729ff0-4927-471b-9f17-9aae951e47d2/scratchpad/s08_full.glb"
+ ],
+ "parts": [
+  {
+   "name": "thigh",
+   "triangles": 3390,
+   "size_mm": [
+    45.0,
+    179.0,
+    147.0
+   ],
+   "center_mm": [
+    115.5,
+    -39.5,
+    -23.5
+   ]
+  },
+  {
+   "name": "brg_K1",
+   "triangles": 224,
+   "size_mm": [
+    7.0,
+    22.0,
+    22.0
+   ],
+   "center_mm": [
+    121.5,
+    -112.0,
+    -80.0
+   ]
+  },
+  {
+   "name": "brg_K2",
+   "triangles": 224,
+   "size_mm": [
+    7.0,
+    22.0,
+    22.0
+   ],
+   "center_mm": [
+    134.5,
+    -112.0,
+    -80.0
+   ]
+  },
+  {
+   "name": "sleeve_knee",
+   "triangles": 288,
+   "size_mm": [
+    20.0,
+    8.0,
+    8.0
+   ],
+   "center_mm": [
+    128.0,
+    -112.0,
+    -80.0
+   ]
+  },
+  {
+   "name": "hip",
+   "triangles": 96097,
+   "size_mm": [
+    83.5,
+    163.9,
+    176.9
+   ],
+   "center_mm": [
+    62.5,
+    19.5,
+    17.9
+   ]
+  },
+  {
+   "name": "knee_gim",
+   "triangles": 36909,
+   "size_mm": [
+    50.0,
+    96.0,
+    96.0
+   ],
+   "center_mm": [
+    130.0,
+    0.0,
+    0.0
+   ]
+  },
+  {
+   "name": "thigh_front",
+   "triangles": 3840,
+   "size_mm": [
+    21.0,
+    130.1,
+    111.4
+   ],
+   "center_mm": [
+    148.5,
+    -11.1,
+    -1.8
+   ]
+  },
+  {
+   "name": "input_crank",
+   "triangles": 2084,
+   "size_mm": [
+    16.5,
+    49.5,
+    52.8
+   ],
+   "center_mm": [
+    163.2,
+    -3.8,
+    5.4
+   ]
+  },
+  {
+   "name": "shin_outer",
+   "triangles": 5092,
+   "size_mm": [
+    32.5,
+    158.4,
+    148.7
+   ],
+   "center_mm": [
+    154.2,
+    -152.8,
+    -34.4
+   ]
+  },
+  {
+   "name": "ankle_rs",
+   "triangles": 15884,
+   "size_mm": [
+    45.4,
+    78.4,
+    78.4
+   ],
+   "center_mm": [
+    189.3,
+    -150.9,
+    -41.1
+   ]
+  },
+  {
+   "name": "motor_crank",
+   "triangles": 1530,
+   "size_mm": [
+    14.0,
+    41.9,
+    48.3
+   ],
+   "center_mm": [
+    159.5,
+    -146.9,
+    -34.0
+   ]
+  },
+  {
+   "name": "cheek_D",
+   "triangles": 780,
+   "size_mm": [
+    19.0,
+    34.9,
+    41.3
+   ],
+   "center_mm": [
+    143.0,
+    -143.4,
+    -30.5
+   ]
+  },
+  {
+   "name": "screwD",
+   "triangles": 284,
+   "size_mm": [
+    34.0,
+    7.0,
+    7.0
+   ],
+   "center_mm": [
+    146.5,
+    -150.9,
+    -41.1
+   ]
+  },
+  {
+   "name": "shin_posts",
+   "triangles": 576,
+   "size_mm": [
+    47.5,
+    62.9,
+    62.9
+   ],
+   "center_mm": [
+    139.7,
+    -164.3,
+    -41.8
+   ]
+  },
+  {
+   "name": "shin_inner",
+   "triangles": 2180,
+   "size_mm": [
+    28.0,
+    154.0,
+    156.7
+   ],
+   "center_mm": [
+    114.0,
+    -157.0,
+    -36.3
+   ]
+  },
+  {
+   "name": "foot",
+   "triangles": 15450,
+   "size_mm": [
+    30.4,
+    60.2,
+    121.0
+   ],
+   "center_mm": [
+    128.3,
+    -230.4,
+    45.5
+   ]
+  },
+  {
+   "name": "ankle_spacer",
+   "triangles": 732,
+   "size_mm": [
+    6.2,
+    36.0,
+    36.0
+   ],
+   "center_mm": [
+    130.4,
+    -220.0,
+    28.0
+   ]
+  },
+  {
+   "name": "foot_outer_new",
+   "triangles": 3330,
+   "size_mm": [
+    19.0,
+    55.9,
+    115.0
+   ],
+   "center_mm": [
+    143.0,
+    -222.0,
+    45.5
+   ]
+  },
+  {
+   "name": "brg_A1",
+   "triangles": 224,
+   "size_mm": [
+    5.0,
+    16.0,
+    16.0
+   ],
+   "center_mm": [
+    120.6,
+    -220.0,
+    28.0
+   ]
+  },
+  {
+   "name": "brg_A2",
+   "triangles": 224,
+   "size_mm": [
+    5.0,
+    16.0,
+    16.0
+   ],
+   "center_mm": [
+    136.0,
+    -220.0,
+    28.0
+   ]
+  },
+  {
+   "name": "sleeve_ankle",
+   "triangles": 288,
+   "size_mm": [
+    20.4,
+    8.0,
+    8.0
+   ],
+   "center_mm": [
+    128.3,
+    -220.0,
+    28.0
+   ]
+  },
+  {
+   "name": "ring_knee_in",
+   "triangles": 288,
+   "size_mm": [
+    2.0,
+    11.5,
+    11.5
+   ],
+   "center_mm": [
+    117.0,
+    -112.0,
+    -80.0
+   ]
+  },
+  {
+   "name": "cheek_B",
+   "triangles": 780,
+   "size_mm": [
+    19.0,
+    53.4,
+    43.7
+   ],
+   "center_mm": [
+    180.0,
+    -98.3,
+    -88.9
+   ]
+  },
+  {
+   "name": "knee_axle",
+   "triangles": 284,
+   "size_mm": [
+    94.8,
+    12.0,
+    12.0
+   ],
+   "center_mm": [
+    146.9,
+    -112.0,
+    -80.0
+   ]
+  },
+  {
+   "name": "ring_ankle_in",
+   "triangles": 288,
+   "size_mm": [
+    2.1,
+    10.0,
+    10.0
+   ],
+   "center_mm": [
+    117.0,
+    -220.0,
+    28.0
+   ]
+  },
+  {
+   "name": "ankle_axle",
+   "triangles": 284,
+   "size_mm": [
+    69.8,
+    12.0,
+    12.0
+   ],
+   "center_mm": [
+    140.4,
+    -220.0,
+    28.0
+   ]
+  },
+  {
+   "name": "coupler",
+   "triangles": 804,
+   "size_mm": [
+    9.0,
+    94.0,
+    142.6
+   ],
+   "center_mm": [
+    176.0,
+    -51.6,
+    -42.4
+   ]
+  },
+  {
+   "name": "brg_AIN",
+   "triangles": 224,
+   "size_mm": [
+    7.0,
+    22.0,
+    22.0
+   ],
+   "center_mm": [
+    175.0,
+    -19.5,
+    13.9
+   ]
+  },
+  {
+   "name": "brg_B",
+   "triangles": 224,
+   "size_mm": [
+    7.0,
+    22.0,
+    22.0
+   ],
+   "center_mm": [
+    175.0,
+    -83.6,
+    -98.8
+   ]
+  },
+  {
+   "name": "ring_B",
+   "triangles": 288,
+   "size_mm": [
+    1.0,
+    11.5,
+    11.5
+   ],
+   "center_mm": [
+    171.0,
+    -83.6,
+    -98.7
+   ]
+  },
+  {
+   "name": "sleeve_A",
+   "triangles": 288,
+   "size_mm": [
+    7.0,
+    8.0,
+    8.0
+   ],
+   "center_mm": [
+    175.0,
+    -19.5,
+    13.9
+   ]
+  },
+  {
+   "name": "sleeve_B",
+   "triangles": 288,
+   "size_mm": [
+    7.0,
+    8.0,
+    8.0
+   ],
+   "center_mm": [
+    175.0,
+    -83.6,
+    -98.7
+   ]
+  },
+  {
+   "name": "cheek_A",
+   "triangles": 780,
+   "size_mm": [
+    19.0,
+    46.4,
+    30.9
+   ],
+   "center_mm": [
+    180.0,
+    -8.3,
+    17.4
+   ]
+  },
+  {
+   "name": "screwA",
+   "triangles": 284,
+   "size_mm": [
+    34.0,
+    7.0,
+    7.0
+   ],
+   "center_mm": [
+    176.5,
+    4.9,
+    22.8
+   ]
+  },
+  {
+   "name": "pinA",
+   "triangles": 284,
+   "size_mm": [
+    39.8,
+    12.0,
+    12.0
+   ],
+   "center_mm": [
+    174.4,
+    -19.5,
+    13.9
+   ]
+  },
+  {
+   "name": "pinB",
+   "triangles": 284,
+   "size_mm": [
+    39.8,
+    12.0,
+    12.0
+   ],
+   "center_mm": [
+    174.4,
+    -83.6,
+    -98.7
+   ]
+  },
+  {
+   "name": "pushrod",
+   "triangles": 844,
+   "size_mm": [
+    10.0,
+    99.0,
+    99.0
+   ],
+   "center_mm": [
+    146.5,
+    -170.5,
+    14.7
+   ]
+  },
+  {
+   "name": "brg_D",
+   "triangles": 224,
+   "size_mm": [
+    7.0,
+    22.0,
+    22.0
+   ],
+   "center_mm": [
+    145.0,
+    -136.0,
+    -19.8
+   ]
+  },
+  {
+   "name": "brg_C",
+   "triangles": 224,
+   "size_mm": [
+    7.0,
+    22.0,
+    22.0
+   ],
+   "center_mm": [
+    148.0,
+    -205.1,
+    49.3
+   ]
+  },
+  {
+   "name": "ring_D",
+   "triangles": 288,
+   "size_mm": [
+    4.0,
+    11.5,
+    11.5
+   ],
+   "center_mm": [
+    150.5,
+    -136.0,
+    -19.8
+   ]
+  },
+  {
+   "name": "sleeve_D",
+   "triangles": 288,
+   "size_mm": [
+    7.0,
+    8.0,
+    8.0
+   ],
+   "center_mm": [
+    145.0,
+    -136.0,
+    -19.8
+   ]
+  },
+  {
+   "name": "sleeve_C",
+   "triangles": 288,
+   "size_mm": [
+    7.0,
+    8.0,
+    8.0
+   ],
+   "center_mm": [
+    148.0,
+    -205.1,
+    49.3
+   ]
+  },
+  {
+   "name": "spacer_D_head",
+   "triangles": 288,
+   "size_mm": [
+    6.0,
+    14.0,
+    14.0
+   ],
+   "center_mm": [
+    130.5,
+    -136.0,
+    -19.8
+   ]
+  },
+  {
+   "name": "pinD",
+   "triangles": 284,
+   "size_mm": [
+    39.8,
+    12.0,
+    12.0
+   ],
+   "center_mm": [
+    142.6,
+    -136.0,
+    -19.8
+   ]
+  },
+  {
+   "name": "cheek_C",
+   "triangles": 780,
+   "size_mm": [
+    7.0,
+    24.5,
+    45.6
+   ],
+   "center_mm": [
+    155.0,
+    -206.3,
+    61.1
+   ]
+  },
+  {
+   "name": "screwC",
+   "triangles": 284,
+   "size_mm": [
+    24.0,
+    7.0,
+    7.0
+   ],
+   "center_mm": [
+    150.5,
+    -209.6,
+    74.9
+   ]
+  },
+  {
+   "name": "pinC",
+   "triangles": 284,
+   "size_mm": [
+    39.8,
+    12.0,
+    12.0
+   ],
+   "center_mm": [
+    142.4,
+    -205.1,
+    49.3
+   ]
+  },
+  {
+   "name": "knee_shield",
+   "triangles": 1902,
+   "size_mm": [
+    40.8,
+    176.4,
+    177.0
+   ],
+   "center_mm": [
+    179.4,
+    -39.4,
+    -44.0
+   ]
+  },
+  {
+   "name": "foot_plate_crown_upper",
+   "triangles": 5588,
+   "size_mm": [
+    46.6,
+    14.0,
+    166.6
+   ],
+   "center_mm": [
+    128.3,
+    -258.5,
+    28.0
+   ]
+  },
+  {
+   "name": "foot_plate_crown_sole",
+   "triangles": 2194,
+   "size_mm": [
+    50.0,
+    7.0,
+    170.0
+   ],
+   "center_mm": [
+    128.3,
+    -267.0,
+    28.0
+   ]
+  }
+ ]
+}

@@ -1,10 +1,22 @@
 """지식 저장소: kb.json(설명 자료) + aggregate.json(이전 작업자들에게서 쌓인 것)."""
-import json, re
+import json, os, re
 from pathlib import Path
 from .textutil import BM25, expand
 
 ROOT = Path(__file__).resolve().parents[1]
-KB_FILE = ROOT / "data/kb/kb.json"
+# 로봇마다 지식 파일이 따로 있다: forearm = 설명 녹화로 만든 data/kb/kb.json,
+# 다른 로봇 = tools/guide_to_robot.py 가 만든 data/kb/robots/<robot>.json. 서버 하나가 전부 들고 있다.
+ROBOT = os.environ.get("ROBOT", "forearm")      # 로봇을 고르지 않은 화면에 줄 기본 로봇
+
+
+def kb_file(robot: str) -> Path:
+    return ROOT / "data/kb/kb.json" if robot == "forearm" else ROOT / f"data/kb/robots/{robot}.json"
+
+
+def robots() -> list[str]:
+    return ["forearm"] + sorted(p.stem for p in (ROOT / "data/kb/robots").glob("*.json"))
+
+
 AGG_FILE = ROOT / "data/kb/aggregate.json"
 
 # 질문 종류별로 어떤 자료를 더 믿을지
@@ -23,17 +35,20 @@ PART_ONLY_FOR = {"part"}
 
 
 class Knowledge:
-    def __init__(self):
+    def __init__(self, robot: str = ROBOT):
+        self.robot = robot
         self.reload()
 
     def reload(self):
-        self.kb = json.loads(KB_FILE.read_text(encoding="utf-8"))
+        self.kb = json.loads(kb_file(self.robot).read_text(encoding="utf-8"))
         self.agg = json.loads(AGG_FILE.read_text(encoding="utf-8")) if AGG_FILE.exists() else {"steps": {}}
         self.steps = {s["step_id"]: s for s in self.kb["steps"]}
         self.order = [s["step_id"] for s in sorted(self.kb["steps"], key=lambda s: s["order"])]
         self.chunks = list(self.kb["chunks"])
         # 이전 작업자 지식도 같은 검색에 넣는다
         for sid, a in self.agg.get("steps", {}).items():
+            if sid not in self.steps:      # 다른 로봇의 단계 기록은 섞지 않는다
+                continue
             for q in a.get("faq", []):
                 self.chunks.append({"id": f"qa-{sid}-{len(self.chunks)}", "kind": "prior_qa", "step_id": sid,
                                     "text": f"질문: {q['question']} → 답: {q['answer']}",

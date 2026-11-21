@@ -12,16 +12,34 @@ from fastapi.responses import FileResponse, Response, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import llm, aggregate, archive, local_ai
-from .knowledge import Knowledge
+from .knowledge import Knowledge, robots, ROBOT
 from .agent import Agent, STUCK
 from .session import Session
 
 ROOT = Path(__file__).resolve().parents[1]
 PRIOR_HINTS = os.environ.get("PRIOR_HINTS", "0") == "1"
-kn = Knowledge()
-agent = Agent(kn)
+# 로봇마다 지식·에이전트 하나씩 (포어암 + data/kb/robots/*.json). 작업 세션이 어느 로봇인지 기억한다.
+kns = {r: Knowledge(r) for r in robots()}
+agents = {r: Agent(k) for r, k in kns.items()}
+kn = kns.get(ROBOT, kns["forearm"])       # 로봇을 말하지 않은 요청의 기본
+
+
+def pick(robot: str | None) -> Knowledge:
+    return kns.get(robot or "", kn)
+
+
+def reload_all():
+    for k in kns.values():
+        k.reload()
+
+
+def readers():
+    """aggregate.json 에 남길 '이 기록이 쌓일 때의 설명 자료 버전' (로봇마다)"""
+    return {r: k.kb.get("reader") for r, k in kns.items()}
+
+
 sessions: dict[str, Session] = {}
-app = FastAPI(title="forearm assembly agent")
+app = FastAPI(title="robot assembly agent")
 app.mount("/client", StaticFiles(directory=ROOT / "client"), name="client")
 app.mount("/data/captures", StaticFiles(directory=ROOT / "data/captures"), name="captures")
 (ROOT / "data/briefings").mkdir(parents=True, exist_ok=True)
@@ -36,7 +54,7 @@ if (ROOT.parent / "web").is_dir():
 
 from . import briefing_api  # noqa: E402
 app.include_router(briefing_api.router)
-briefing_api.on_done(kn.reload)   # 설명을 새로 넣으면 지식을 다시 불러온다
+briefing_api.on_done(reload_all)   # 설명을 새로 넣으면 지식을 다시 불러온다 (포어암·안내서 로봇 모두 녹화를 받는다)
 
 
 @app.get("/")
@@ -45,21 +63,29 @@ def index():
 
 
 @app.get("/api/kb")
-def get_kb():
-    """3D 팀원도 쓰는 단계·부품 목록"""
-    return {"project": kn.kb["project"], "steps": [kn.steps[s] for s in kn.order], "parts": kn.kb["parts"],
+def get_kb(robot: str | None = None):
+    """3D 팀원도 쓰는 단계·부품 목록 (?robot=leg_L 처럼 로봇을 고를 수 있다)"""
+    k = pick(robot)
+    return {"project": k.kb["project"], "robot": k.robot, "steps": [k.steps[s] for s in k.order], "parts": k.kb["parts"],
             "llm": llm.available()}
 
 
+@app.get("/api/robots")
+def get_robots():
+    """처음 화면에서 고를 수 있는 로봇 (기본 로봇이 맨 앞)"""
+    order = [kn.robot] + [r for r in kns if r != kn.robot]
+    return [{"robot": r, "project": kns[r].kb["project"], "steps": len(kns[r].order)} for r in order]
+
+
 @app.get("/api/archive")
-def get_archive(step_id: str | None = None):
+def get_archive(step_id: str | None = None, robot: str | None = None):
     """기록 보관함 내용 (단계별: 설계자 / 이전 작업자 / 표시한 장면)"""
-    return archive.build(kn, step_id)
+    return archive.build(pick(robot), step_id)
 
 
 @app.post("/api/session")
 def new_session(body: dict = Body(...)):
-    s = Session(kn, (body.get("builder") or "worker").strip()[:40])
+    s = Session(pick(body.get("robot")), (body.get("builder") or "worker").strip()[:40])
     sessions[s.id] = s
     resume = s.resume_summary()
     return {"session_id": s.id, "resume": resume}
@@ -90,17 +116,17 @@ async def tts(text: str):
 
 @app.post("/api/aggregate")
 def run_aggregate():
-    out = aggregate.run(kn.kb.get("reader"))
-    kn.reload()
+    out = aggregate.run(readers())
+    reload_all()
     return {"steps": {k: {kk: v[kk] for kk in ("n_builders", "median_sec", "difficulty")} for k, v in out["steps"].items()}}
 
 
 def refresh_knowledge():
-    aggregate.run(kn.kb.get("reader"))
-    kn.reload()
+    aggregate.run(readers())
+    reload_all()
 
 
-def comment_steps(text: str, cur: str | None) -> list[str]:
+def comment_steps(text: str, cur: str | None, kn: Knowledge = kn) -> list[str]:
     """끝나고 남긴 한마디가 어느 단계 얘기인지: 말한 단계 번호 > 부품 이름(가장 구체적인 것) > 글 검색."""
     by_order = {st["order"]: sid for sid, st in kn.steps.items()}
     nums = [by_order[int(n)] for n in re.findall(r"(\d{1,2})\s*(?:번|단계)", text) if int(n) in by_order]
@@ -123,6 +149,7 @@ def comment_steps(text: str, cur: str | None) -> list[str]:
 
 
 def card_payload(s: Session):
+    kn = s.kn
     c = kn.steps.get(s.step_id)
     if not c:
         return None
@@ -138,6 +165,7 @@ async def ws(websocket: WebSocket, sid: str):
     s = sessions.get(sid)
     if not s:
         await websocket.send_json({"type": "error", "text": "세션이 없습니다"}); await websocket.close(); return
+    kn, agent = s.kn, agents[s.kn.robot]       # 이 작업자가 조립하는 로봇
 
     async def send_all(items):
         for it in items:
@@ -207,7 +235,7 @@ async def ws(websocket: WebSocket, sid: str):
                 s.log("bookmark", note=m.get("note", ""))
                 await websocket.send_json({"type": "toast", "text": "이 장면을 표시해 뒀어요"})
             elif t == "final_comment":
-                about = comment_steps(m.get("text", ""), s.step_id)
+                about = comment_steps(m.get("text", ""), s.step_id, kn)
                 s.log("final_comment", text=m.get("text", ""), about_step=about[0], about_steps=about)
                 await asyncio.to_thread(refresh_knowledge)
                 await websocket.send_json({"type": "toast", "text": "다음 작업자에게 전달할게요. 고맙습니다!"})

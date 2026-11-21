@@ -1,0 +1,32 @@
+{
+  "robot": "leg_L",
+  "recordings": [
+    {
+      "briefing": "20261122-001516-1a1d",
+      "added": [
+        {
+          "id": "c132",
+          "kind": "speech",
+          "text": "11단계에서는 앵클을 넣는 게 어려워요.",
+          "step_id": "L11",
+          "source": "설계자 설명 (녹화 20261122-001516-1a1d)",
+          "slide_no": "rec-20261122-001516-1a1d-0",
+          "t": 3.2,
+          "also": []
+        },
+        {
+          "id": "c133",
+          "kind": "speech",
+          "text": "그래서 먼저 뛰어놔야 돼.",
+          "step_id": "L11",
+          "source": "설계자 설명 (녹화 20261122-001516-1a1d)",
+          "slide_no": "rec-20261122-001516-1a1d-1",
+          "t": 5.4,
+          "also": []
+        }
+      ],
+      "updated": [],
+      "conflicts": []
+    }
+  ]
+}

@@ -36,14 +36,21 @@ def _work(d: Path):
 
 @router.post("/api/briefing")
 async def upload(frames: List[UploadFile] = File(default=[]), frame_times: str = Form(default="[]"),
-                 audio: Optional[UploadFile] = File(default=None), doc: Optional[UploadFile] = File(default=None)):
-    if not frames and not doc:
+                 audio: Optional[UploadFile] = File(default=None), doc: Optional[UploadFile] = File(default=None),
+                 robot: str = Form(default="forearm")):
+    from .knowledge import robots
+    if robot not in robots():
+        raise HTTPException(400, f"모르는 로봇이에요: {robot}")
+    has_audio = audio is not None and bool(audio.filename)
+    if robot != "forearm" and not has_audio:   # 안내서로 만든 로봇은 슬라이드가 없어 녹음으로만 배운다
+        raise HTTPException(400, f"{robot} 은 녹음으로 배워요. 녹음이 없어요")
+    if not frames and not doc and not has_audio:
         raise HTTPException(400, "슬라이드 사진이나 PPT/PDF 파일이 하나는 있어야 합니다")
     bid = time.strftime("%Y%m%d-%H%M%S-") + uuid.uuid4().hex[:4]
     d = BDIR / bid
     d.mkdir(parents=True)
     times = json.loads(frame_times or "[]")
-    meta = {"kind": "doc" if doc else "capture", "frames": [], "audio": None, "doc": None}
+    meta = {"kind": "doc" if doc else "capture", "frames": [], "audio": None, "doc": None, "robot": robot}
     for i, f in enumerate(frames, 1):
         name = f"f_{i:03d}{Path(f.filename or 'x.jpg').suffix or '.jpg'}"
         (d / name).write_bytes(await f.read())
