@@ -1,6 +1,6 @@
-# Quest 테스트용 실행: https://<이 PC의 IP>:8443
-# 처음 한 번 인증서를 만들고, 서버를 같은 Wi-Fi에 연다.
+# 서버 실행: 노트북 http://localhost:8000 + 헤드셋 https://<노트북 Wi-Fi IP>:8443 (서버 하나, 지식·세션 공유)
+# 인증서는 serve.py가 알아서 만든다 (Wi-Fi IP가 바뀌면 다시 만듦 → 헤드셋에서 '고급 → 계속' 한 번 더).
+# 8443은 이 노트북과 tools\quest_ip.txt 의 헤드셋 IP만 받는다.
 Set-Location -LiteralPath $PSScriptRoot
-if (-not (Test-Path "certs\cert.pem")) { & .\.venv\Scripts\python.exe tools\make_cert.py }
-Write-Host "Quest 브라우저에서 위에 나온 https 주소를 여세요. (경고가 뜨면 '고급 → 계속')"
-& .\.venv\Scripts\python.exe -m uvicorn server.main:app --host 0.0.0.0 --port 8443 --ssl-keyfile certs\key.pem --ssl-certfile certs\cert.pem
+$env:PYTHONIOENCODING = "utf-8"
+& ..\.venv\Scripts\python.exe serve.py
