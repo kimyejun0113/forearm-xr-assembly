@@ -121,7 +121,11 @@ function matcher(pattern) {
   return (name) => re.test(name) && (wantsCopy || !name.includes('#'));
 }
 
-const assembly = await (await fetch('assets/forearm.assembly.json', { cache: 'no-store' })).json();
+// 어떤 로봇인지: ?robot=leg_L > 에이전트 서버가 가진 지식의 로봇 > forearm
+const ROBOT = new URLSearchParams(location.search).get('robot')
+  || await fetch('/api/kb', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((k) => k?.robot).catch(() => null)
+  || 'forearm';
+const assembly = await (await fetch(`assets/${ROBOT}.assembly.json`, { cache: 'no-store' })).json();
 const gltf = await new GLTFLoader().loadAsync(assembly.model);
 const cad = gltf.scene;                 // CAD 좌표 그대로 (m)
 cad.updateMatrixWorld(true);
@@ -170,7 +174,8 @@ cad.updateMatrixWorld(true);
 // 모델 묶음: 덮개 쪽(-Y)이 위를 보게 뒤집고 가운데를 원점에
 const model = new THREE.Group();
 const pivot = new THREE.Group();
-pivot.rotation.x = Math.PI;
+if (assembly.up) pivot.quaternion.setFromUnitVectors(new THREE.Vector3(...assembly.up).normalize(), new THREE.Vector3(0, 1, 0));
+else pivot.rotation.x = Math.PI;        // 포어암: 덮개 쪽(-Y)이 위
 cad.position.sub(cadCenter);
 pivot.add(cad);
 model.add(pivot);
@@ -183,7 +188,9 @@ const byMesh = new Map();
 cad.traverse((o) => {
   if (!o.isMesh) return;
   o.geometry.computeVertexNormals();
-  o.material = new THREE.MeshStandardMaterial(materialFor(o.name));
+  const col = assembly.colors?.[o.name];   // 안내서에서 온 로봇은 설계자가 정한 부품 색
+  o.material = new THREE.MeshStandardMaterial(col ? (assembly.metal?.includes(o.name)
+    ? { color: col, metalness: 0.55, roughness: 0.35 } : { color: col, metalness: 0.05, roughness: 0.6 }) : materialFor(o.name));
   o.castShadow = o.receiveShadow = true;
   const p = { mesh: o, home: o.position.clone(), offset: 0, step: -1, axisLocal: null, max: 0.12, bolt: boltData.get(o.name) || null };
   parts.push(p);
@@ -214,7 +221,8 @@ const orphans = parts.filter((p) => p.step < 0);
 if (orphans.length) console.warn('순서표에 없는 부품:', orphans.map((p) => p.mesh.name));
 
 for (const p of parts) {
-  const dirCad = p.bolt ? new THREE.Vector3(...p.bolt.dir) : p.step >= 0 ? steps[p.step].dir : new THREE.Vector3(0, -1, 0);
+  const own = p.step >= 0 && assembly.steps[p.step].part_dirs?.[p.mesh.name];   // 부품마다 들어오는 방향이 다를 때
+  const dirCad = p.bolt ? new THREE.Vector3(...p.bolt.dir) : own ? new THREE.Vector3(...own) : p.step >= 0 ? steps[p.step].dir : new THREE.Vector3(0, -1, 0);
   const parentInv = new THREE.Matrix4().copy(p.mesh.parent.matrixWorld).invert();
   p.axisLocal = dirCad.clone().normalize().transformDirection(parentInv);
   const size = new THREE.Box3().setFromObject(p.mesh).getSize(new THREE.Vector3()).length();
@@ -380,8 +388,8 @@ const buttons = [
   { x: 768, y: 140, label: '기본 배치', act: () => { placeInFront = true; } },
   { x: 24, y: 256, w: 400, label: () => (VOICE.on ? '🎤 듣는 중 · 끄기' : '🎤 음성 켜기'), on: () => VOICE.on,
     act: () => (VOICE.on ? voiceStop() : voiceStart()) },
-  { x: 440, y: 256, w: 270, label: () => (CAP.busy ? '◌ 읽는 중…' : CAP.on ? '■ 녹화 끝' : '● 설명 녹화'), on: () => CAP.on,
-    off: () => CAP.busy, act: () => (CAP.on ? capStop() : capStart()) },
+  { x: 440, y: 256, w: 270, label: () => (CAP.pending ? '◌ 보내기 대기' : CAP.busy ? '◌ 읽는 중…' : CAP.on ? '■ 녹화 끝' : '● 설명 녹화'), on: () => CAP.on,
+    off: () => CAP.busy || !!CAP.pending, act: () => (CAP.on ? capStop() : capStart()) },
   { x: 726, y: 256, w: 274, label: () => (agent.phase === 'comment' ? '다음 사람 ▶' : '✓ 조립 완료'),
     primary: true, act: () => (agent.phase === 'comment' ? nextWorker() : finishWork()) },
 ];
@@ -812,6 +820,10 @@ async function connectAgent(builder = agent.builder, retry = false) {
     if (retry) { agentReconnect(); return; }               // 다시 연결하는 중이면 계속 시도
     infoPanel.visible = false; return;                     // 처음부터 에이전트 서버가 아니면 패널 없이 동작
   }
+  if ((agent.kb.robot || 'forearm') !== ROBOT) {           // 다른 로봇 지식을 가진 서버면 붙지 않는다 (단계가 어긋남)
+    console.warn(`이 서버의 AI 지식은 ${agent.kb.robot || 'forearm'} 용이라 ${ROBOT} 화면에는 붙이지 않아요`);
+    agent.kb = null; infoPanel.visible = false; return;
+  }
   if (agent.kb.steps.length !== steps.length) console.warn(`단계 수가 달라요: 3D ${steps.length}, 에이전트 ${agent.kb.steps.length}`);
   builder = builder || newWorkerName();
   agent.builder = builder; if (!retry) agent.phase = 'work';
@@ -873,6 +885,7 @@ function capWatch() {
 }
 function capStatus() { agent.status = `● 설명 녹화 중 · 사진 ${CAP.frames.length}장 · "찍어" "녹화 끝"`; drawInfo(); drawPanel(); }
 async function capStart() {
+  if (CAP.pending) { agentToast('앞 녹화를 아직 못 보냈어요 · 연결되면 보내고 나서 다시 녹화하세요'); return; }
   if (CAP.on || CAP.busy) return;
   if (!agent.on) { agentToast('AI 서버에 연결돼야 녹화할 수 있어요'); return; }
   const v = { width: { ideal: 1280 }, height: { ideal: 960 } };
@@ -912,29 +925,72 @@ async function capStop() {
   }
   agent.status = CAP.status0;
   if (!CAP.frames.length) { agentToast('찍힌 슬라이드가 없어요'); drawPanel(); return; }
-  CAP.busy = true; drawPanel();
-  agentToast(`사진 ${CAP.frames.length}장 보내는 중…`);
-  const fd = new FormData();
-  CAP.frames.forEach((f, i) => fd.append('frames', f.b, `f_${i + 1}.jpg`));
-  fd.append('frame_times', JSON.stringify(CAP.frames.map((f) => f.t)));
-  if (audio) fd.append('audio', audio, /mp4/.test(audio.type) ? 'talk.m4a' : 'talk.webm');
+  const pend = { frames: CAP.frames.map((f) => ({ b: f.b, t: f.t })), audio };
+  await capSave(pend);                    // 보내기 전에 헤드셋에 먼저 보관 (와이파이·adb가 끊기거나 새로고침돼도 안 잃게)
+  capSend(pend);
+}
+
+// 못 보낸 녹화는 IndexedDB에 두고 연결되면 다시 보낸다
+function capDB() {
+  return new Promise((ok, no) => {
+    const r = indexedDB.open('capture', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('p');
+    r.onsuccess = () => ok(r.result); r.onerror = () => no(r.error);
+  });
+}
+async function capSave(p) {
   try {
-    const j = await fetch('/api/briefing', { method: 'POST', body: fd }).then((r) => r.json());
-    let st;
-    for (;;) {
-      await new Promise((r) => setTimeout(r, 1500));
-      st = await fetch('/api/briefing/' + j.id).then((r) => r.json());
-      if (st.ok === true || st.ok === false) break;
-      agent.toast = `슬라이드 읽는 중… ${(st.log || []).slice(-1)[0]?.slice(9) || ''}`; agent.toastT = 3; drawInfo();
-    }
+    const db = await capDB();
+    await new Promise((ok, no) => {
+      const tx = db.transaction('p', 'readwrite');
+      if (p) tx.objectStore('p').put(p, 'pending'); else tx.objectStore('p').delete('pending');
+      tx.oncomplete = ok; tx.onerror = () => no(tx.error);
+    });
+  } catch (e) { console.warn('녹화 보관 실패', e); }
+}
+async function capLoad() {
+  try {
+    const db = await capDB();
+    return await new Promise((ok) => { const q = db.transaction('p').objectStore('p').get('pending'); q.onsuccess = () => ok(q.result || null); q.onerror = () => ok(null); });
+  } catch { return null; }
+}
+async function capSend(p) {
+  if (CAP.sending) return;
+  CAP.sending = true; CAP.busy = true; CAP.pending = null; drawPanel();
+  agentToast(`사진 ${p.frames.length}장${p.audio ? '·녹음' : ''} 보내는 중…`);
+  const fd = new FormData();
+  p.frames.forEach((f, i) => fd.append('frames', f.b, `f_${i + 1}.jpg`));
+  fd.append('frame_times', JSON.stringify(p.frames.map((f) => f.t)));
+  if (p.audio) fd.append('audio', p.audio, /mp4/.test(p.audio.type) ? 'talk.m4a' : 'talk.webm');
+  let j;
+  try {
+    const r = await fetch('/api/briefing', { method: 'POST', body: fd });
+    if (!r.ok) throw new Error('서버 ' + r.status);
+    j = await r.json();
+  } catch (e) {
+    CAP.sending = false; CAP.pending = p; drawPanel();
+    agentToast('연결이 끊겨 못 보냈어요 · 다시 연결되면 알아서 보내요');
+    setTimeout(() => { if (CAP.pending === p) capSend(p); }, 5000);
+    return;
+  }
+  await capSave(null);                     // 서버가 받았으니 보관본은 지운다
+  let st = {}, fails = 0;
+  for (let k = 0; k < 600; k++) {          // 최대 15분 (녹음이 길면 글자로 바꾸는 데 오래 걸림)
+    await new Promise((r) => setTimeout(r, 1500));
+    try { st = await fetch('/api/briefing/' + j.id).then((r) => r.json()); fails = 0; }
+    catch { if (++fails % 4 === 1) agentToast('연결 기다리는 중… (서버는 계속 처리해요)'); continue; }
+    if (st.ok === true || st.ok === false) break;
+    agent.toast = `${p.audio ? '설명 읽는 중' : '슬라이드 읽는 중'}… ${(st.log || []).slice(-1)[0]?.slice(9) || ''}`; agent.toastT = 3; drawInfo();
+  }
+  try {
     if (st.ok) {
       agent.kb = await fetch('/api/kb', { cache: 'no-store' }).then((r) => r.json());
       if (shown >= 0) agentStep(shown);                       // 지금 단계 카드를 새 지식으로
       agentToast(`설명 반영 완료 · 슬라이드 ${st.slides}장, 설계자 말 ${st.segments}문장`);
-      agent.reply = { kind: 'answer', q: '설명 녹화', text: `슬라이드 ${st.slides}장을 읽어 단계 안내를 다시 만들었어요. 설계자 말 ${st.segments}문장은 ${audio ? '이번 녹음에서 새로 받았어요' : '그대로예요'}.`, src: [] };
-    } else agentToast('분석 실패: ' + ((st.log || []).slice(-1)[0] || ''));
-  } catch (e) { agentToast('업로드 실패: ' + e.message); }
-  CAP.busy = false; drawPanel(); drawInfo();
+      agent.reply = { kind: 'answer', q: '설명 녹화', text: `슬라이드 ${st.slides}장을 읽어 단계 안내를 다시 만들었어요. 설계자 말 ${st.segments}문장은 ${p.audio ? '이번 녹음에서 새로 받았어요' : '그대로예요'}.`, src: [] };
+    } else agentToast('분석 실패: ' + ((st.log || []).slice(-1)[0] || '응답 없음'));
+  } catch (e) { agentToast('결과를 못 받았어요: ' + e.message); }
+  CAP.sending = false; CAP.busy = false; drawPanel(); drawInfo();
 }
 
 // ---------- 조립 완료 → 한마디 → 다음 사람 ----------
@@ -1199,8 +1255,9 @@ function drawInfo() {
   };
 
   // 머리: 문서 이름, 연결 상태, 큰 단계 번호
-  txt('FOREARM', P, 86, `700 24px ${HUD.OR}`, HUD.ink2, 'left', 7);
-  c.font = `700 24px ${HUD.OR}`; c.letterSpacing = '7px'; const fw = c.measureText('FOREARM ').width; c.letterSpacing = '0px';
+  const LABEL = assembly.label || 'FOREARM';
+  txt(LABEL, P, 86, `700 24px ${HUD.OR}`, HUD.ink2, 'left', 7);
+  c.font = `700 24px ${HUD.OR}`; c.letterSpacing = '7px'; const fw = c.measureText(LABEL + ' ').width; c.letterSpacing = '0px';
   txt('//', P + fw, 86, `700 24px ${HUD.OR}`, HUD.acc, 'left', 4);
   txt('ASSEMBLY', P + fw + 50, 86, `700 24px ${HUD.OR}`, HUD.ink2, 'left', 7);
   c.fillStyle = agent.on ? HUD.acc : HUD.danger; c.beginPath(); c.arc(P + 7, 124, 6, 0, 7); c.fill();
@@ -1309,6 +1366,7 @@ function drawInfo() {
 drawInfo();
 document.fonts?.ready.then(() => drawInfo());   // 웹 글꼴을 받은 뒤 다시 그림
 connectAgent();
+capLoad().then((p) => { if (p?.frames?.length) { agentToast('지난번에 못 보낸 녹화를 보내요'); capSend(p); } });   // 새로고침 전에 못 보낸 녹화
 
 // ======================= 매 프레임 =======================
 const clock = new THREE.Clock();
