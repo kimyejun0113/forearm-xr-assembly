@@ -885,7 +885,8 @@ async function capStart() {
   // 설계자 말 녹음: 사진과 같은 시각(t0)부터. 서버가 글자로 바꾸고 사진 시각으로 슬라이드와 잇는다
   CAP.rec = null; CAP.chunks = [];
   try {
-    CAP.mic = await navigator.mediaDevices.getUserMedia({ audio: VOICE_AUDIO });
+    // 음성 명령용 설정(소음 제거)은 헤드셋 쓴 사람 목소리만 남기고 옆 사람 말을 잡음으로 지운다 → 녹화는 소음 제거·반향 제거를 끈다
+    CAP.mic = await navigator.mediaDevices.getUserMedia({ audio: CAP_AUDIO });
     const mt = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find((m) => window.MediaRecorder?.isTypeSupported?.(m)) || '';
     CAP.rec = new MediaRecorder(CAP.mic, mt ? { mimeType: mt, audioBitsPerSecond: 48000 } : undefined);
     CAP.rec.ondataavailable = (e) => { if (e.data.size) CAP.chunks.push(e.data); };
@@ -980,6 +981,7 @@ const VOICE = {
 const aiTalking = () => (agentAudio && !agentAudio.paused) || (window.speechSynthesis?.speaking ?? false);
 
 const VOICE_AUDIO = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+const CAP_AUDIO = { echoCancellation: false, noiseSuppression: false, autoGainControl: true };   // 설명 녹화: 옆 사람 말도 담기
 async function voiceStart() {
   if (VOICE.on) return;
   if (!agent.on) { agentToast('AI 서버에 연결돼야 음성을 쓸 수 있어요'); return; }
