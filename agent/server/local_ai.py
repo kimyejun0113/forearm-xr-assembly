@@ -10,7 +10,7 @@ from pathlib import Path
 
 WHISPER_SIZE = os.environ.get("WHISPER_SIZE", "small")
 # 조립 현장 단어를 미리 알려 주면 잘못 알아듣는 일이 줄어든다 (예: 브래킷 → 브레키든)
-STT_HINT = os.environ.get("STT_HINT", "자비스, 다음, 이전, 다시, 처음, 단계, 브래킷, 액추에이터, 카본 튜브, 클램프, "
+STT_HINT = os.environ.get("STT_HINT", "자비스, 다음, 이전, 다시, 처음부터, 단계, 전체 보기, 모두 펼치기, 모두 조립, 기본 배치, 마지막, 브래킷, 액추에이터, 카본 튜브, 클램프, "
                           "마운트, 하우징, 볼트, 렌치, 구동 링크, 끝단, 커넥터, XT30, M3, M4, M5")
 TTS_VOICE_KO = os.environ.get("EDGE_TTS_VOICE", "ko-KR-SunHiNeural")
 _whisper = None
