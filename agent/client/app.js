@@ -160,6 +160,8 @@ function ask(text) {
 // 카메라로 슬라이드가 바뀔 때마다 사진을 찍고, 말은 통째로 녹음한다.
 // 끝나면 서버에 올리고 "분석 중" → 지식에 반영되면 알림.
 const CAP_SCREEN = new URLSearchParams(location.search).get("cap") === "screen";
+// ?keep=speech : 슬라이드만 새로 읽고 설계자 말(지금 지식의 speech.json)은 그대로 둔다 → 녹음하지 않음
+const CAP_KEEP = new URLSearchParams(location.search).get("keep") === "speech";
 const Cap = {
   stream: null, rec: null, audio: [], frames: [], t0: 0, timer: null, small: null, sctx: null, last: null, prev: null, pend: 0,
   set(cls, text) { const b = $("capBtn"); b.className = "cap " + cls; b.textContent = text; },
@@ -169,18 +171,22 @@ const Cap = {
     try {
       if (CAP_SCREEN) {   // ?cap=screen : 같은 노트북에 띄운 PPT를 화면째로 찍고, 말은 마이크로
         const scr = await navigator.mediaDevices.getDisplayMedia({ video: { width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
-        const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
-        this.stream = new MediaStream([...scr.getVideoTracks(), ...mic.getAudioTracks()]);
+        const mic = CAP_KEEP ? null : await navigator.mediaDevices.getUserMedia({ audio: true });
+        this.stream = new MediaStream([...scr.getVideoTracks(), ...(mic ? mic.getAudioTracks() : [])]);
       } else {
         this.stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: true });
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: !CAP_KEEP });
       }
     } catch (e) { return toast("카메라·마이크를 열 수 없어요 (" + e.name + "). Quest는 https 주소가 필요해요"); }
     $("capVideo").srcObject = this.stream;
     this.frames = []; this.audio = []; this.last = null; this.prev = null; this.pend = 0;
-    this.rec = new MediaRecorder(new MediaStream(this.stream.getAudioTracks()));
-    this.rec.ondataavailable = (e) => e.data.size && this.audio.push(e.data);
-    this.rec.start(1000); this.t0 = performance.now();
+    if (CAP_KEEP) this.rec = { stop() { this.onstop?.(); } };            // 녹음 없이 "녹화 중" 표시만
+    else {
+      this.rec = new MediaRecorder(new MediaStream(this.stream.getAudioTracks()));
+      this.rec.ondataavailable = (e) => e.data.size && this.audio.push(e.data);
+      this.rec.start(1000);
+    }
+    this.t0 = performance.now();
     this.small = document.createElement("canvas"); this.small.width = 48; this.small.height = 27;
     this.sctx = this.small.getContext("2d", { willReadFrequently: true });
     setTimeout(() => this.shot(), 1500);
@@ -216,7 +222,7 @@ const Cap = {
     const fd = new FormData();
     this.frames.forEach((f, i) => fd.append("frames", f.b, `f_${i + 1}.jpg`));
     fd.append("frame_times", JSON.stringify(this.frames.map((f) => f.t)));
-    fd.append("audio", new Blob(this.audio, { type: this.audio[0]?.type || "audio/webm" }), "audio.webm");
+    if (!CAP_KEEP) fd.append("audio", new Blob(this.audio, { type: this.audio[0]?.type || "audio/webm" }), "audio.webm");
     const j = await fetch("/api/briefing", { method: "POST", body: fd }).then((r) => r.json());
     const poll = async () => {
       const s = await fetch("/api/briefing/" + j.id).then((r) => r.json());

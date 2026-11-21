@@ -105,9 +105,19 @@ def run(d: Path):
         if segs or not (ROOT / "data/source/speech.json").exists():
             (ROOT / "data/source/speech.json").write_text(json.dumps(
                 {"note": f"briefing {d.name}", "speaker": "설계자", "segments": segs}, ensure_ascii=False, indent=2), encoding="utf-8")
+        else:   # 녹음 없이 슬라이드만 새로 읽음: 설계자 말은 그대로 두고, 슬라이드 번호가 안 맞으면 내용으로 다시 맞춘다
+            sp_file = ROOT / "data/source/speech.json"
+            sp = json.loads(sp_file.read_text(encoding="utf-8"))
+            old_n = max([g.get("slide_hint", 0) for g in sp.get("segments", [])] or [0])
+            if old_n != len(slides):
+                for g in sp.get("segments", []):
+                    g.pop("slide_hint", None)
+                sp_file.write_text(json.dumps(sp, ensure_ascii=False, indent=2), encoding="utf-8")
+            job.status["segments"] = len(sp.get("segments", []))
+            job.step("speech", f"설계자 말 {len(sp.get('segments', []))}문장은 그대로 유지")
         build_kb.main()
         job.status["ok"] = True
-        job.step("done", f"완료: 슬라이드 {len(slides)}장, 설계자 말 {len(segs)}문장")
+        job.step("done", f"완료: 슬라이드 {len(slides)}장, 설계자 말 {job.status['segments']}문장")
     except Exception as e:
         job.status["ok"] = False
         job.step("error", f"실패: {e}")
