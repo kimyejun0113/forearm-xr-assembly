@@ -72,12 +72,26 @@ def run(d: Path):
             job.step("slides", f"문서 읽는 중: {meta['doc']}")
             slides, notes = read_docs.read_doc(d / meta["doc"], d / "pages")
         if meta.get("frames"):
-            job.step("slides", f"사진 {len(meta['frames'])}장 비전으로 읽는 중")
-            read = read_slides.read_images([d / f["file"] for f in meta["frames"]])
+            frames, paths = meta["frames"], [d / f["file"] for f in meta["frames"]]
+            groups = None
+            if len(paths) > 4 and read_slides.llm.can("vision"):
+                # 사진이 많으면 먼저 제목만 싸게 읽어 같은 슬라이드끼리 묶고, 묶음마다 가장 또렷한 한 장만 자세히 읽는다
+                job.step("slides", f"사진 {len(paths)}장 제목만 먼저 읽는 중")
+                groups = read_slides.pick_frames(paths)
+            if groups:
+                job.step("slides", f"슬라이드 후보 {len(groups)}개 · 또렷한 사진 {len(groups)}장만 자세히 읽는 중")
+                read = read_slides.read_images([paths[g["best"]] for g in groups])
+                for k, (g, s) in enumerate(zip(groups, read)):   # 자세히 읽었는데 흐리면 다음으로 또렷한 사진 한 장 더
+                    if (not s.get("is_slide", True) or not s.get("title") or s.get("clarity") == "low") and g["rest"]:
+                        read[k] = read_slides.read_images([paths[g["rest"][0]]])[0]
+                frames = [frames[g["first"]] for g in groups]          # 슬라이드가 처음 보인 시각
+            else:
+                job.step("slides", f"사진 {len(paths)}장 비전으로 읽는 중")
+                read = read_slides.read_images(paths)
             # 헤드셋 카메라는 같은 슬라이드를 여러 번(멀리·가까이·돌아와서) 찍는다:
             # 제목·단계 표시가 같으면 한 장으로 합치고, 가장 또렷하고 내용이 많은 사진을 남긴다. 순서는 처음 본 시각.
             merged = []
-            for f, s in zip(meta["frames"], read):
+            for f, s in zip(frames, read):
                 if not s.get("is_slide", True) or not s.get("title") or s.get("clarity") == "low":
                     continue
                 m = next((m for m in merged if _same_slide(m["s"], s)), None)
@@ -90,7 +104,7 @@ def run(d: Path):
             if not meta.get("doc"):
                 slides = [m["s"] for m in merged]
             flips = [{"t": m["t"], "slide": i} for i, m in enumerate(merged, 1)]
-            job.step("slides", f"슬라이드 {len(merged)}장으로 정리 (겹친 사진 {sum(m['dup'] for m in merged)}장 합침)")
+            job.step("slides", f"슬라이드 {len(merged)}장으로 정리 (사진 {len(paths)}장 중 {len(read)}장만 자세히 읽음)")
         if not slides:
             raise RuntimeError("읽은 슬라이드가 없습니다")
         for n, s in enumerate(slides, 1):

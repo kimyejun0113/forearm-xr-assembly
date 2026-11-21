@@ -52,6 +52,58 @@ def read_images(paths):
         return list(ex.map(one, paths))
 
 
+TITLE_SYSTEM = ('사진 속 노트북·모니터 화면에 보이는 슬라이드의 제목만 JSON으로 답한다: {"title": "...", "is_slide": true|false}. '
+                '보이는 글자 그대로 옮기고, 제목이 안 보이거나 슬라이드가 아니면 title은 "".')
+
+
+def _screen_crop(p):
+    """사진에서 밝은 화면 부분만 잘라 낸다 (못 찾으면 사진 전체). 또렷함 점수도 함께."""
+    import numpy as np
+    from PIL import Image, ImageFilter, ImageStat
+    im = Image.open(p).convert("RGB")
+    g = np.asarray(im.convert("L").resize((320, 240)), dtype=np.float32) > 170
+    rows, cols = np.where(g.mean(1) > 0.25)[0], np.where(g.mean(0) > 0.25)[0]
+    if len(rows) >= 40 and len(cols) >= 40:
+        sx, sy = im.width / 320, im.height / 240
+        im = im.crop((int(cols[0] * sx), int(rows[0] * sy), int((cols[-1] + 1) * sx), int((rows[-1] + 1) * sy)))
+    e = im.convert("L")
+    e = e.resize((640, max(1, round(640 * e.height / e.width))))
+    return im, ImageStat.Stat(e.filter(ImageFilter.FIND_EDGES)).var[0]
+
+
+def pick_frames(paths):
+    """헤드셋은 같은 슬라이드를 여러 장 찍는다. 화면 부분을 작게(낮은 해상도) 보내 제목만 읽고(사진당 약 280토큰),
+    제목이 같은 사진끼리 묶어 가장 또렷한 사진만 고른다. 전부 읽으면 사진당 약 2,300토큰.
+    돌려주는 것: 묶음마다 {"best": 사진 번호, "first": 처음 본 사진 번호, "rest": 나머지(또렷한 순)}. 못 읽으면 None."""
+    import base64, io
+    from concurrent.futures import ThreadPoolExecutor
+
+    def one(p):
+        im, sharp = _screen_crop(p)
+        im.thumbnail((512, 512))
+        b = io.BytesIO(); im.save(b, "JPEG", quality=85)
+        part = {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(b.getvalue()).decode(), "detail": "low"}}
+        try:
+            r = llm.chat_json(TITLE_SYSTEM, [part], model=llm.VISION_MODEL, temperature=0)
+        except Exception:
+            r = {}
+        return (r.get("title") or "").strip() if r.get("is_slide", True) else "", sharp
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        res = list(ex.map(one, paths))
+    key = lambda t: "".join(ch for ch in t if ch.isalnum())
+    groups = {}
+    for i, (title, sharp) in enumerate(res):
+        if key(title):
+            groups.setdefault(key(title), []).append((sharp, i))
+    if not groups:
+        return None
+    out = []
+    for g in groups.values():
+        order = [i for _, i in sorted(g, reverse=True)]
+        out.append({"best": order[0], "first": min(i for _, i in g), "rest": order[1:]})
+    return sorted(out, key=lambda x: x["first"])
+
+
 def main():
     cap = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "data/captures"
     if not llm.available():
