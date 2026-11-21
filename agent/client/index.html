@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FOREARM ASSY // AGENT</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@400;600;700&family=Rajdhani:wght@500;600;700&family=Gothic+A1:wght@400;500;700&family=Share+Tech+Mono&display=swap">
+<link rel="stylesheet" href="/client/style.css">
+</head>
+<body>
+<div class="grid-bg" aria-hidden="true"></div>
+
+<style>
+/* 설계자 설명 녹화 상태: 위쪽 막대에 작은 표시만 */
+.cap{white-space:nowrap;font-family:var(--label);font-weight:700;font-size:12px;letter-spacing:1.5px;padding:3px 10px;cursor:pointer;
+  border:1px solid var(--cy-line);background:transparent;color:var(--dim);clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+.cap.rec{background:var(--red);border-color:var(--red);color:#fff;animation:blink 1.4s infinite}
+.cap.busy{background:var(--amber);border-color:var(--amber);color:#1a0d00}
+#capVideo{position:fixed;width:2px;height:2px;opacity:0;pointer-events:none}
+</style>
+<video id="capVideo" autoplay playsinline muted></video>
+
+<main id="app">
+  <!-- TOP STATUS BAR -->
+  <header class="topbar">
+    <span class="k"><b class="dot"></b>FOREARM ASSY v1</span>
+    <span class="sep"></span>
+    <span class="k dim">OPERATOR <b id="opName" class="v">—</b></span>
+    <span class="k dim">AI LINK <b id="aiLink" class="v">—</b></span>
+    <button id="capBtn" class="cap" title="설계자 설명 녹화 (말로: 설명 시작 / 설명 끝)">● 설명 녹화</button>
+    <span class="trace" aria-hidden="true"></span>
+    <div id="segs" class="segs" aria-label="단계 진행"></div>
+    <span id="clock" class="mono v"></span>
+  </header>
+
+  <!-- LEFT: 3D VIEW (teammate module mounts into #viewer) -->
+  <section class="pane left hud">
+    <i class="notch" aria-hidden="true"></i>
+    <div class="phead"><span class="k">3D VIEW</span><span class="mono dim">MODULE // STANDBY</span></div>
+    <div id="viewer" class="viewer">
+      <i class="br tl"></i><i class="br tr"></i><i class="br bl"></i><i class="br bot"></i>
+      <div class="scan" aria-hidden="true"></div>
+      <div class="reticle" aria-hidden="true"><i></i></div>
+      <p class="mono dim coord">X 000.0 · Y 000.0 · Z 000.0 · ZOOM 1.00</p>
+      <div id="mockStep" class="mock-step"></div>
+      <p class="viewer-label mono dim">AWAITING 3D MODULE</p>
+    </div>
+    <div class="phead"><span class="k">TARGET PARTS</span><span class="mono dim">HIGHLIGHT</span></div>
+    <div id="highlight" class="parts"><p class="mono dim">— NONE —</p></div>
+    <div class="nav">
+      <button class="btn" data-nav="prev">◂ PREV</button>
+      <button class="btn" data-nav="replay">↻ REPLAY</button>
+      <button class="btn primary" data-nav="next">NEXT ▸</button>
+    </div>
+  </section>
+
+  <!-- RIGHT: STEP + AI -->
+  <section class="pane right hud">
+    <i class="notch" aria-hidden="true"></i>
+    <header class="stephead">
+      <svg class="ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="44" class="ring-track"/>
+        <circle id="ringArc" cx="50" cy="50" r="44" class="ring-arc"/>
+        <circle cx="50" cy="50" r="34" class="ring-ticks"/>
+      </svg>
+      <div class="ring-num"><b id="stepIdx">--</b><span id="stepTot">/--</span></div>
+      <div class="stepmeta">
+        <p id="stepNo" class="k"></p>
+        <h2 id="stepName"></h2>
+        <div class="timer">
+          <span class="mono">T+ <b id="stepTimer" class="v">00:00</b></span>
+          <span class="bar"><i id="dwellBar"></i></span>
+          <span class="mono dim">EST <b id="stepEst">--:--</b></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="cols">
+      <div class="col">
+        <div class="phead"><span class="k">TASK SEQUENCE</span><span id="taskCount" class="mono dim"></span></div>
+        <ol id="todo" class="todo"></ol>
+        <div id="warn" class="frame warn" hidden><p class="tab k">CAUTION</p><ul id="warnList"></ul></div>
+        <div id="hints" class="hints"></div>
+      </div>
+      <div class="col">
+        <div class="phead"><span class="k">AI CHANNEL</span><span class="mono dim">VOICE + VISUAL</span></div>
+        <div id="answer" class="frame answer" hidden>
+          <p class="tab k">RESPONSE</p>
+          <p id="answerQ" class="q mono"></p>
+          <p id="answerText" class="a"></p>
+          <img id="answerSlide" alt="설계자 슬라이드" hidden>
+          <p id="answerSrc" class="src mono"></p>
+        </div>
+        <div id="prompt" class="frame prompt" hidden></div>
+        <p id="idle" class="mono dim idle">// STANDING BY — HOLD TO TALK</p>
+      </div>
+    </div>
+
+    <footer class="ask">
+      <button id="talk" class="btn talk" aria-label="누르고 있는 동안 말하기"><i class="wave"><b></b><b></b><b></b><b></b></i><span>HOLD TO TALK</span></button>
+      <input id="askText" placeholder="> TYPE COMMAND OR QUESTION" autocomplete="off">
+      <button id="mark" class="btn" title="이 장면 표시">★ MARK</button>
+      <button id="openArch" class="btn" title="기록 보관함">ARCHIVE</button>
+      <button id="finish" class="btn">COMPLETE</button>
+    </footer>
+  </section>
+</main>
+
+<!-- ARCHIVE OVERLAY: "기록 보여줘" opens, "닫아" closes -->
+<div id="archive" class="archive" hidden role="dialog" aria-label="기록 보관함">
+  <div class="archive-box hud">
+    <i class="notch" aria-hidden="true"></i>
+    <header class="archive-head">
+      <h2><span class="k">ARCHIVE</span> // BUILD KNOWLEDGE</h2>
+      <div id="archTabs" class="arch-tabs" role="tablist"></div>
+      <button id="archClose" class="btn" aria-label="닫기">CLOSE ✕</button>
+    </header>
+    <div class="arch-cols">
+      <section class="frame"><p class="tab k">DESIGNER</p><div id="archDesigner"></div></section>
+      <section class="frame"><p class="tab k">BUILD LOG</p><div id="archWorkers"></div></section>
+      <section class="frame"><p class="tab k">MARKED</p><div id="archMarks"></div></section>
+    </div>
+  </div>
+</div>
+<div id="toast" class="toast mono" hidden></div>
+<script src="/client/app.js"></script>
+</body>
+</html>

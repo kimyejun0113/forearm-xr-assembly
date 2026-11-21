@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QUEST VIEW // MOCKUP</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oxanium:wght@600;700&family=Rajdhani:wght@700&family=Gothic+A1:wght@500;700&family=Share+Tech+Mono&display=swap">
+<style>
+html,body{margin:0;height:100%;background:#02070b;overflow:hidden}
+#v{position:absolute;inset:0;cursor:grab}
+.bar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;background:rgba(4,20,28,.88);border:1px solid rgba(47,227,255,.5);padding:6px 8px;z-index:2;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.bar button{white-space:nowrap;font:700 13px "Rajdhani",sans-serif;letter-spacing:1.5px;color:#9cf3ff;background:rgba(47,227,255,.12);border:1px solid rgba(47,227,255,.5);padding:6px 12px;cursor:pointer;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px)}
+.bar button:hover{background:rgba(47,227,255,.3);color:#fff}
+.bar span{font:12px "Share Tech Mono",monospace;color:#6fa6b5;margin-left:6px;min-width:170px}
+</style></head><body>
+<div id="v"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const el=document.getElementById('v');
+const R=new THREE.WebGLRenderer({antialias:true});R.setPixelRatio(Math.min(2,devicePixelRatio));el.appendChild(R.domElement);
+const S=new THREE.Scene();S.background=new THREE.Color(0x8e8a83);S.fog=new THREE.Fog(0x8e8a83,4,9);
+const C=new THREE.PerspectiveCamera(72,1,0.05,30);C.position.set(0,1.55,0);C.rotation.order='YXZ';C.rotation.x=-0.2;
+function size(){R.setSize(innerWidth,innerHeight);C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()}size();addEventListener('resize',size);
+S.add(new THREE.HemisphereLight(0xfff6ea,0x5a5650,0.85));
+const sun=new THREE.DirectionalLight(0xffffff,0.55);sun.position.set(2,4,1);S.add(sun);
+const M=(c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:0.85},o||{}));
+function box(w,h,d,c,x,y,z,o,par){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c,o));m.position.set(x,y,z);(par||S).add(m);return m}
+function cyl(r,l,c,x,y,z,rx,rz,o,par){const m=new THREE.Mesh(new THREE.CylinderGeometry(r,r,l,24),M(c,o));m.position.set(x,y,z);m.rotation.x=rx||0;m.rotation.z=rz||0;(par||S).add(m);return m}
+
+// ---- 방 (패스스루로 보이는 실제 공간 대역) ----
+box(12,0.02,12,0x6c6963,0,0,0);
+box(8,3.2,0.1,0xc4bfb6,0,1.6,-3);box(0.1,3.2,8,0xbcb7ae,-3.2,1.6,0);box(0.1,3.2,8,0xbcb7ae,3.2,1.6,0);
+box(0.02,1.1,1.3,0xe9eef2,3.14,1.75,-0.9);
+box(2.2,0.05,0.85,0x9a7b55,0,0.9,-1.15);
+[[-1,-0.8],[1,-0.8],[-1,-1.5],[1,-1.5]].forEach(p=>box(0.05,0.88,0.05,0x3d3d3d,p[0],0.45,p[1]));
+box(2.2,0.9,0.04,0x8f8f8a,0,1.8,-2.94);
+for(let i=0;i<6;i++)for(let j=0;j<4;j++)box(0.02,0.02,0.01,0x5c5c58,-0.9+i*0.36,1.45+j*0.24,-2.91);
+cyl(0.0125,0.6,0x1e2126,-0.45,0.95,-1.05,0,Math.PI/2);
+cyl(0.0125,0.55,0x1e2126,-0.4,0.95,-1.2,0,Math.PI/2+0.08);
+box(0.16,0.1,0.09,0xd9732c,0.15,0.97,-1.15);
+cyl(0.042,0.04,0x2f6fdb,0.15,1.04,-1.15);
+cyl(0.02,0.05,0xe0a23a,0.32,0.95,-1.08,0,Math.PI/2);
+box(0.07,0.06,0.05,0xd9732c,0.55,0.95,-1.25);
+cyl(0.042,0.04,0x2f6fdb,0.75,0.94,-1.0);
+box(0.3,0.04,0.2,0x2b2e33,-0.8,0.94,-1.3);
+box(0.12,0.01,0.01,0x777777,0.9,0.93,-0.95);
+box(0.6,0.7,0.5,0x7b7a76,2.3,0.37,-1.0);box(0.5,0.02,0.34,0x2a2c30,2.3,0.75,-1.0);box(0.5,0.3,0.02,0x2a2c30,2.3,0.9,-1.16);
+box(0.6,0.03,0.35,0x8a7a62,-2.8,1.2,-1.4);box(0.25,0.18,0.2,0xb98b4e,-2.75,1.31,-1.45);box(0.2,0.12,0.2,0x6a8fb3,-2.75,1.28,-1.1);
+
+// ---- 실제 클램프 위 표시: 이중 링 ----
+const CY=0x2fe3ff;
+const ring=new THREE.Group();
+ring.add(new THREE.Mesh(new THREE.RingGeometry(0.045,0.052,48),new THREE.MeshBasicMaterial({color:CY,side:THREE.DoubleSide})));
+const ring2=new THREE.Mesh(new THREE.RingGeometry(0.062,0.066,48,1,0,Math.PI*1.4),new THREE.MeshBasicMaterial({color:CY,side:THREE.DoubleSide,transparent:true,opacity:.8}));ring.add(ring2);
+ring.position.set(0.32,0.96,-1.08);ring.lookAt(C.position);S.add(ring);
+// 답변 말풍선·링·연결선은 질문했을 때만 잠깐 뜬다 (평소 정면은 비워 둔다)
+const askGroup=[ring];
+const leader=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0.38,1.13,-0.99),new THREE.Vector3(0.36,1.04,-1.03),new THREE.Vector3(0.33,1.01,-1.07)]),new THREE.LineBasicMaterial({color:CY}));
+S.add(leader);askGroup.push(leader);
+askGroup.forEach(o=>o.visible=false);
+let askUntil=0;
+
+// ---- HUD 그리기 도구 (화면 v2와 같은 규칙) ----
+const K='#2fe3ff',K2='#9cf3ff',DIM='#6fa6b5',DK='#0d4b5a',FILL='rgba(4,20,28,0.88)',FILL2='rgba(8,36,48,0.75)',AMB='#ffb02e';
+const DISP='"Oxanium",sans-serif',LAB='"Rajdhani",sans-serif',MONO='"Share Tech Mono",monospace',KR='"Gothic A1","Malgun Gothic",sans-serif';
+function cham(g,x,y,w,h,c){g.beginPath();g.moveTo(x+c,y);g.lineTo(x+w-c,y);g.lineTo(x+w,y+c);g.lineTo(x+w,y+h-c);g.lineTo(x+w-c,y+h);g.lineTo(x+c,y+h);g.lineTo(x,y+h-c);g.lineTo(x,y+c);g.closePath()}
+function plate(g,x,y,w,h,c,fill,line,notch){g.save();cham(g,x,y,w,h,c);g.fillStyle=fill;g.fill();g.shadowColor=line;g.shadowBlur=10;g.strokeStyle=line;g.lineWidth=1.6;g.stroke();g.restore();
+  if(notch){g.fillStyle=line;g.beginPath();g.moveTo(x+36,y-2);g.lineTo(x+132,y-2);g.lineTo(x+124,y+3);g.lineTo(x+44,y+3);g.closePath();g.fill()}}
+function frame(g,x,y,w,h,tab,line){line=line||K;g.save();g.beginPath();g.moveTo(x,y);g.lineTo(x+w-10,y);g.lineTo(x+w,y+10);g.lineTo(x+w,y+h);g.lineTo(x+10,y+h);g.lineTo(x,y+h-10);g.closePath();
+  g.fillStyle=line===AMB?'rgba(54,34,4,0.88)':FILL2;g.fill();g.strokeStyle=line;g.lineWidth=1.2;g.stroke();g.restore();
+  g.font='700 11px '+LAB;const tw=g.measureText(tab).width+26;g.fillStyle=line;g.beginPath();g.moveTo(x,y);g.lineTo(x+tw,y);g.lineTo(x+tw-6,y+15);g.lineTo(x,y+15);g.closePath();g.fill();
+  g.fillStyle='#012029';g.fillText(tab,x+8,y+11.5)}
+function k(g,t,x,y,col,sz){g.fillStyle=col||K;g.font='700 '+(sz||12)+'px '+LAB;g.letterSpacing='2.5px';g.fillText(t,x,y);g.letterSpacing='0px'}
+function mono(g,t,x,y,col,sz){g.fillStyle=col||DIM;g.font=(sz||12)+'px '+MONO;g.fillText(t,x,y)}
+function phead(g,t,x,y,w,right){g.fillStyle=K;g.save();g.translate(x+3,y-4);g.rotate(Math.PI/4);g.fillRect(-3,-3,6,6);g.restore();k(g,t,x+12,y);
+  const tw=g.measureText(t).width+12+18;const rw=right?(g.font=12+'px '+MONO,g.measureText(right).width):0;
+  const grd=g.createLinearGradient(x+tw,0,x+w-rw-8,0);grd.addColorStop(0,'rgba(47,227,255,0.5)');grd.addColorStop(1,'rgba(47,227,255,0)');g.fillStyle=grd;g.fillRect(x+tw,y-4,w-tw-rw-14,1);
+  if(right)mono(g,right,x+w-rw,y)}
+function wrap(g,t,x,y,mw,lh){let line='';for(const ch of t){if(g.measureText(line+ch).width>mw){g.fillText(line,x,y);y+=lh;line=ch}else line+=ch}g.fillText(line,x,y);return y+lh}
+function brackets(g,x,y,w,h,s){g.strokeStyle=K;g.lineWidth=2;[[x,y,1,1],[x+w,y,-1,1],[x,y+h,1,-1],[x+w,y+h,-1,-1]].forEach(([a,b,dx,dy])=>{g.beginPath();g.moveTo(a,b+dy*s);g.lineTo(a,b);g.lineTo(a+dx*s,b);g.stroke()})}
+function panel(w,h,draw){const sc=3,cv=document.createElement('canvas');cv.width=w*sc;cv.height=h*sc;const g=cv.getContext('2d');g.scale(sc,sc);draw(g,w,h);
+  const t=new THREE.CanvasTexture(cv);t.anisotropy=8;return new THREE.Mesh(new THREE.PlaneGeometry(w/720,h/720),new THREE.MeshBasicMaterial({map:t,transparent:true,depthWrite:false}))}
+function place(m,a,r,y){m.position.set(-Math.sin(a)*r,y,-Math.cos(a)*r);m.rotation.y=a;S.add(m)}
+const aL=1.2,aR=-1.2;
+
+// ---- 왼쪽 3D 뷰 안의 작은 팔 모형 ----
+const arm=new THREE.Group();const G=0x8d949c,gm={transparent:true,opacity:0.3};
+cyl(0.05,0.05,G,-0.26,0.14,0,Math.PI/2,0,gm,arm);
+cyl(0.012,0.3,G,-0.17,0.0,0,0,-0.5,gm,arm);
+box(0.1,0.07,0.05,0xd9732c,-0.05,-0.13,0,null,arm);
+cyl(0.03,0.055,0x2f6fdb,-0.05,-0.13,0,Math.PI/2,0,null,arm);
+cyl(0.014,0.05,0xe0a23a,-0.09,-0.07,0,0,-0.5,null,arm);
+cyl(0.012,0.3,0x1e2126,0.1,-0.2,0,0,1.05,null,arm);
+cyl(0.014,0.05,0xe0a23a,0.21,-0.26,0,0,1.05,null,arm);
+box(0.05,0.06,0.04,0xd9732c,0.25,-0.29,0,null,arm);
+place(arm,aL,1.42,1.72);arm.scale.setScalar(1.45);
+
+function build(){
+// 정면 위: 상태 막대
+place(panel(820,70,(g,w,h)=>{plate(g,4,6,w-8,h-12,10,FILL,K);
+  g.fillStyle=K;g.beginPath();g.arc(24,h/2,4,0,7);g.fill();k(g,'FOREARM ASSY V1',36,h/2+4);
+  g.fillStyle='rgba(47,227,255,0.5)';g.fillRect(170,h/2-7,1,14);
+  g.fillStyle='#fff';g.font='700 19px '+KR;g.fillText('액추에이터 1 브래킷',186,h/2+6);
+  ['S02','S03','S04'].forEach((s,i)=>{const x=372+i*54;g.beginPath();g.moveTo(x+6,h/2-10);g.lineTo(x+50,h/2-10);g.lineTo(x+44,h/2+10);g.lineTo(x,h/2+10);g.closePath();
+    g.fillStyle=i===1?K:i===0?DK:'rgba(0,0,0,0)';g.fill();g.strokeStyle=i===1?K:DK;g.lineWidth=1;g.stroke();g.fillStyle=i===1?'#012029':i===0?K2:DIM;g.font='700 11px '+LAB;g.fillText(s,x+14,h/2+4)});
+  mono(g,'T+',548,h/2+4,K2,13);mono(g,'01:24',568,h/2+4,K2,13);
+  g.fillStyle=DK;g.fillRect(620,h/2-2,120,4);g.fillStyle=K;g.fillRect(620,h/2-2,42,4);mono(g,'EST 07:20',748,h/2+4)}),0,1.6,2.06);
+
+// 정면: 답변 (실제 클램프 옆)
+const bub=panel(560,210,(g,w,h)=>{plate(g,4,8,w-8,h-14,14,FILL,K,true);
+  frame(g,18,22,w-36,h-42,'AI RESPONSE');
+  mono(g,'> 클램프랑 브래킷 틈 얼마야?',30,60,DIM,13);
+  g.fillStyle='#fff';g.font='500 18px '+KR;let y=wrap(g,'1밀리 정도 떠 있어야 해요. 붙으면 팔꿈치 돌릴 때 비벼요.',30,92,w-72,26);
+  mono(g,'SRC // DESIGNER VOICE 0:39 · SLIDE 2',30,h-30,DIM,11)});
+bub.position.set(0.6,1.3,-0.98);bub.rotation.y=-0.25;S.add(bub);bub.visible=false;askGroup.push(bub);
+
+// 왼쪽: 3D 뷰 + 강조 부품
+place(panel(760,640,(g,w,h)=>{plate(g,4,8,w-8,h-14,18,'rgba(4,20,28,0.72)',K,true);
+  phead(g,'3D VIEW',22,40,w-44,'MODULE // ONLINE');
+  const vx=22,vy=56,vw=w-44,vh=400;brackets(g,vx,vy,vw,vh,16);
+  g.strokeStyle='rgba(47,227,255,0.12)';g.lineWidth=1;for(let i=1;i<10;i++){g.beginPath();g.moveTo(vx,vy+i*40);g.lineTo(vx+vw,vy+i*40);g.stroke()}
+  g.setLineDash([3,5]);g.strokeStyle='rgba(47,227,255,0.35)';g.beginPath();g.arc(vx+vw/2,vy+vh/2,120,0,7);g.stroke();g.setLineDash([]);
+  mono(g,'X 128.4 · Y -42.0 · Z 1221.0 · ZOOM 1.40',vx+10,vy+vh-12);
+  phead(g,'TARGET PARTS',22,490,w-44,'HIGHLIGHT');
+  [['Part18','액추에이터 1 브래킷'],['Part19','튜브 클램프'],['actuator_1','액추에이터 1']].forEach(([id,n],i)=>{const x=22+(i%2)*(w-44)/2,y=508+Math.floor(i/2)*34;
+    g.fillStyle='rgba(47,227,255,0.12)';g.fillRect(x,y,(w-44)/2-6,28);g.fillStyle=K;g.fillRect(x,y,2,28);mono(g,id,x+10,y+19,K,11);g.fillStyle='#e3fbff';g.font='500 14px '+KR;g.fillText(n,x+110,y+19)})}),aL,1.5,1.58);
+
+// 오른쪽: 단계 안내
+place(panel(760,700,(g,w,h)=>{plate(g,4,8,w-8,h-14,18,FILL,K,true);
+  const cx=62,cy=72;g.lineWidth=4;g.strokeStyle=DK;g.beginPath();g.arc(cx,cy,32,0,7);g.stroke();
+  g.lineWidth=7;g.strokeStyle=K;g.beginPath();g.arc(cx,cy,32,-Math.PI/2,-Math.PI/2+Math.PI*2*3/14);g.stroke();
+  g.setLineDash([1.5,5]);g.lineWidth=6;g.strokeStyle='rgba(47,227,255,0.5)';g.beginPath();g.arc(cx,cy,24,0,7);g.stroke();g.setLineDash([]);
+  g.fillStyle='#fff';g.font='700 22px '+DISP;g.textAlign='center';g.fillText('03',cx-4,cy+7);g.fillStyle=DIM;g.font='11px '+DISP;g.fillText('/14',cx+20,cy+7);g.textAlign='left';
+  k(g,'STEP 03 OF 14 // S03',112,52);g.fillStyle='#fff';g.font='700 23px '+KR;g.fillText('액추에이터 1 브래킷 (Part18)',112,82);
+  mono(g,'T+ 01:24',112,104,K2,12);g.fillStyle=DK;g.fillRect(188,99,200,4);g.fillStyle=K;g.fillRect(188,99,70,4);mono(g,'EST 07:20',398,104);
+  phead(g,'TASK SEQUENCE',22,140,w-44,'S01–S05');
+  const L=['액추에이터 1을 모듈 통째로 놓기','튜브 클램프(Part19) 놓기','브래킷(Part18)을 맞춰 얹기','M3 약 10 mm × 6 · 브래킷 ↔ 아래 하우징','M3 약 12.5 mm × 6 · 브래킷 ↔ 위 하우징'];
+  L.forEach((t,i)=>{const y=152+i*38,cur=i===2;g.fillStyle=cur?'rgba(47,227,255,0.16)':'rgba(47,227,255,0.04)';g.fillRect(22,y,w-44,32);g.fillStyle=cur?K:DK;g.fillRect(22,y,2,32);
+    mono(g,'0'+(i+1),34,y+21,K,11);g.fillStyle=cur?K2:'#e3fbff';g.font='500 15px '+KR;g.fillText(t,62,y+21)});
+  frame(g,22,352,w-44,124,'CAUTION',AMB);g.fillStyle='#ffe0a8';g.font='500 14px '+KR;
+  ['03 · Part18과 Part19 사이 약 1 mm 틈 유지','01 · XT30·USB-C 커넥터는 바깥쪽','04·05 · 10 mm와 12.5 mm 볼트 섞지 않기'].forEach((t,i)=>g.fillText('·  '+t,36,388+i*26));
+  phead(g,'AI CHANNEL',22,512,w-44,'VOICE + VISUAL');
+  mono(g,'// STANDING BY — HOLD TO TALK',22,542);
+  const bx=22,by=h-70;[['HOLD TO TALK',150],['> TYPE COMMAND',250],['★ MARK',90],['ARCHIVE',100]].reduce((x,[t,bw])=>{cham(g,x,by,bw,36,7);g.fillStyle='rgba(47,227,255,0.12)';g.fill();g.strokeStyle='rgba(47,227,255,0.5)';g.lineWidth=1;g.stroke();
+    if(t[0]==='>'){mono(g,t,x+12,by+23)}else{g.fillStyle=K2;g.font='700 12px '+LAB;g.fillText(t,x+12,by+23)}return x+bw+6},bx)}),aR,1.5,1.55);
+}
+// 웹 글꼴을 다 받은 다음 패널을 그린다 (안 그러면 기본 글꼴로 굳어 버림)
+Promise.race([Promise.all(['700 12px Rajdhani','700 22px Oxanium','12px "Share Tech Mono"','500 15px "Gothic A1"','700 23px "Gothic A1"'].map(f=>document.fonts.load(f,'가A'))),new Promise(r=>setTimeout(r,2500))]).then(build);
+
+// 화면 버튼 없음: 드래그로 둘러보기. 키보드 ← → 는 좌우 패널, ↓ 는 정면, Q 는 질문 장면 미리보기
+let yaw=0,tgt=0,drag=null;
+addEventListener('keydown',e=>{if(e.key==='ArrowLeft')tgt=aL;if(e.key==='ArrowRight')tgt=aR;if(e.key==='ArrowDown')tgt=0;
+  if(e.key==='q'||e.key==='Q'){askUntil=performance.now()+8000;tgt=0}});
+const q=new URLSearchParams(location.search).get('view');
+if(q==='left')yaw=tgt=aL;if(q==='right')yaw=tgt=aR;
+el.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:yaw};el.style.cursor='grabbing'});
+addEventListener('pointerup',()=>{drag=null;el.style.cursor='grab'});
+addEventListener('pointermove',e=>{if(drag)tgt=Math.max(-1.4,Math.min(1.4,drag.y+(e.clientX-drag.x)*0.006))});
+let t0=performance.now();
+function loop(t){const dt=(t-t0)/1000;t0=t;yaw+=(tgt-yaw)*Math.min(1,dt*5);C.rotation.y=yaw;arm.rotation.y=aL+Math.sin(t/1400)*0.6;
+  const on=t<askUntil;askGroup.forEach(o=>o.visible=on);
+  const s=1+0.12*Math.sin(t/260);ring.scale.set(s,s,s);ring2.rotation.z=t/500;R.render(S,C);requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script></body></html>

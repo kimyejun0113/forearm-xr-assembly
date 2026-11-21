@@ -1,0 +1,34 @@
+{
+  "note": "3D 뷰어(팀원 모듈)와 공유하는 단계 목록. 팀원이 CAD 간섭 계산으로 뽑은 순서(2026-11-21)를 그대로 따른다. id는 두 프로그램이 함께 쓰는 키.",
+  "project": "forearm v1",
+  "source": "팀원 3D 조립 순서 초안 (CAD 자동 계산). 볼트 종류·길이는 CAD 구멍으로 추정한 값",
+  "steps": [
+    {"id": "S01", "order": 1,  "name": "액추에이터 1 놓기", "parts": ["actuator_1"], "tools": []},
+    {"id": "S02", "order": 2,  "name": "튜브 클램프 (Part19)", "parts": ["Part19"], "tools": []},
+    {"id": "S03", "order": 3,  "name": "액추에이터 1 브래킷 (Part18)", "parts": ["Part18"], "tools": [], "check": "계산으로 순서를 못 정해 강제로 넣은 단계. 브래킷을 먼저 놓고 액추에이터를 넣는 게 맞는지 확인 필요"},
+    {"id": "S04", "order": 4,  "name": "브래킷 ↔ 아래 하우징 볼트", "parts": ["Part18", "actuator_1"], "bolts": [["M3", "약 10 mm", 6]], "tools": ["2.5 mm 육각 렌치"]},
+    {"id": "S05", "order": 5,  "name": "브래킷 ↔ 위 하우징 볼트", "parts": ["Part18", "actuator_1"], "bolts": [["M3", "약 12.5 mm", 6]], "tools": ["2.5 mm 육각 렌치"]},
+    {"id": "S06", "order": 6,  "name": "액추에이터 2 놓기", "parts": ["actuator_2"], "tools": []},
+    {"id": "S07", "order": 7,  "name": "손목 쪽 클램프 (Part19 두 번째)", "parts": ["Part19_2"], "tools": []},
+    {"id": "S08", "order": 8,  "name": "두 번째 카본 튜브", "parts": ["carbontube_2"], "tools": ["사포", "장갑"]},
+    {"id": "S09", "order": 9,  "name": "이두 쪽 액추에이터 마운트", "parts": ["actmount_bicep"], "tools": []},
+    {"id": "S10", "order": 10, "name": "마운트 ↔ 아래 하우징 볼트", "parts": ["actmount_bicep", "actuator_2"], "bolts": [["M4", "약 11 mm", 6], ["M5", "약 11 mm", 1]], "tools": ["3 mm 육각 렌치", "4 mm 육각 렌치"], "check": "M5 하나는 구멍 크기로 추정한 값. 확인 필요"},
+    {"id": "S11", "order": 11, "name": "메인 카본 튜브", "parts": ["carbontube_main"], "tools": ["사포", "장갑"]},
+    {"id": "S12", "order": 12, "name": "구동 링크 2", "parts": ["drivenlink2"], "tools": ["핀(키트)"]},
+    {"id": "S13", "order": 13, "name": "구동 링크 1", "parts": ["drivenlink"], "tools": ["핀(키트)"]},
+    {"id": "S14", "order": 14, "name": "끝단 (Part21)", "parts": ["Part21"], "tools": ["전류 제한 전원", "USB-C 케이블"]}
+  ],
+  "parts": {
+    "actuator_1": {"name": "액추에이터 1 (허브 쪽, 모듈 통째로)", "aliases": ["액추에이터 1", "1번 액추에이터", "허브 쪽 액추에이터"]},
+    "actuator_2": {"name": "액추에이터 2 (이두 쪽, 모듈 통째로)", "aliases": ["액추에이터 2", "2번 액추에이터", "이두 쪽 액추에이터", "팔꿈치 쪽 액추에이터"]},
+    "Part18": {"name": "액추에이터 1 브래킷", "aliases": ["Part18", "브래킷", "허브"]},
+    "Part19": {"name": "튜브 클램프 (허브 쪽)", "aliases": ["Part19", "튜브 클램프", "클램프"]},
+    "Part19_2": {"name": "손목 쪽 클램프", "aliases": ["손목 쪽 클램프", "두 번째 클램프", "Part19 두 번째"]},
+    "carbontube_2": {"name": "두 번째 카본 튜브 (손목 쪽)", "aliases": ["두 번째 카본 튜브", "두 번째 튜브", "손목 쪽 튜브", "카본 튜브"]},
+    "carbontube_main": {"name": "메인 카본 튜브 (이두 쪽)", "aliases": ["메인 카본 튜브", "메인 튜브", "카본 튜브"]},
+    "actmount_bicep": {"name": "이두 쪽 액추에이터 마운트", "aliases": ["actmount_bicep", "이두 쪽 마운트", "마운트", "이두 마운트"]},
+    "drivenlink": {"name": "구동 링크 1", "aliases": ["drivenlink", "구동 링크 1", "링크 1"]},
+    "drivenlink2": {"name": "구동 링크 2", "aliases": ["drivenlink2", "구동 링크 2", "링크 2"]},
+    "Part21": {"name": "끝단", "aliases": ["Part21", "끝단", "손목 끝"]}
+  }
+}

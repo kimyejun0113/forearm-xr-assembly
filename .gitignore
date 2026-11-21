@@ -4,3 +4,10 @@ tools/android/
 __pycache__/
 *.pyc
 tools/models/
+# 에이전트: 비밀·개인 기록은 올리지 않음
+agent/.env
+agent/certs/
+agent/data/sessions/
+agent/data/briefings/
+agent/data/kb/history/
+agent/data/kb/aggregate.json

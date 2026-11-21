@@ -1,0 +1,81 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>html,body{margin:0;width:1920px;height:1080px;overflow:hidden}
+section{position:relative;width:1920px;height:1080px}
+:root{
+  --bg:#F3F5F7; --bg2:#E6EBF0; --ink:#18212B; --body:#3E4A57; --muted:#5B6876;
+  --blue:#2F6FDB; --orange:#C9621F; --line:#CFD6DE;
+  --warn-bg:#FFF1DC; --warn-ink:#6E4200; --warn-line:#E8B45A;
+}
+body{font-family:'IBM Plex Sans KR', Arial, sans-serif; color:var(--ink);}
+section{background:var(--bg); padding:128px 128px 160px; box-sizing:border-box; display:flex; flex-direction:column; gap:28px;}
+section.cover{background:var(--bg2);}
+
+.eyebrow{font-size:24px; font-weight:700; color:var(--blue); letter-spacing:1px; margin:0;}
+h1{font-size:88px; font-weight:700; line-height:1.1; margin:0; color:var(--ink);}
+h2{font-size:56px; font-weight:700; line-height:1.1; margin:0; color:var(--ink);}
+h3{font-size:30px; font-weight:700; margin:0;}
+.lead{font-size:30px; line-height:1.45; color:var(--body); margin:0;}
+.head{display:flex; flex-direction:column; gap:10px;}
+
+.row{display:flex; gap:64px; align-items:flex-start;}
+.col{display:flex; flex-direction:column; gap:24px; flex:1;}
+
+.bom{font-size:24px; color:var(--ink); width:100%;}
+.flow{display:flex; gap:12px;}
+.pill{font-size:24px; font-weight:500; background:var(--ink); color:#F3F5F7; padding:10px 18px; border-radius:10px; margin:0;}
+
+.body{display:flex; gap:64px; align-items:flex-start;}
+.fig{display:flex; flex-direction:column; gap:16px; background:#FBFCFD; border:1px solid var(--line); border-radius:16px; padding:24px;}
+.cap{font-size:24px; line-height:1.45; color:var(--muted); margin:0;}
+.text{display:flex; flex-direction:column; gap:24px; flex:1;}
+.do{font-size:28px; line-height:1.45; color:var(--ink); margin:0; padding-left:44px;}
+.do li{margin:0 0 10px;}
+
+.warn{background:var(--warn-bg); border:2px solid var(--warn-line); border-radius:14px; padding:22px 28px; display:flex; flex-direction:column; gap:10px;}
+.warn h3{color:var(--warn-ink); font-size:28px;}
+.warn ul{font-size:24px; line-height:1.45; color:var(--warn-ink); margin:0; padding-left:32px;}
+.warn li{margin:0 0 6px;}
+
+.stps{display:flex;flex-direction:column;gap:10px;}
+.stp{display:flex;gap:18px;align-items:baseline;}
+.stp .n{font-family:'IBM Plex Mono', 'Courier New', monospace;font-size:26px;font-weight:500;color:var(--blue);margin:0;width:44px;flex:none;}
+.stp .t{font-size:26px;line-height:1.4;color:var(--ink);margin:0;}
+.stp .b{font-size:24px;line-height:1.4;color:var(--muted);margin:0;}
+.foot{position:absolute; left:128px; bottom:64px; width:1664px; display:flex; justify-content:space-between;}
+.foot p{font-size:24px; color:var(--muted); margin:0;}
+.mono{font-family:'IBM Plex Mono', 'Courier New', monospace;}
+
+.fade-in{animation:rise 500ms ease-out both;}
+.d1{animation-delay:120ms;} .d2{animation-delay:240ms;}
+@keyframes rise{from{opacity:0; transform:translateY(16px);} to{opacity:1; transform:translateY(0);}}
+</style></head><body><section id="cover" class="cover">
+<div class="head">
+<p class="eyebrow">조립 설명 · FOREARM V1</p>
+<h1>포어암 조립</h1>
+<p class="lead">액추에이터는 모듈 통째로 받습니다. 14단계를 세 묶음으로 나눠 조립합니다.</p>
+</div>
+<div class="row">
+<img class="fade-in" src="file:///C:/Users/HP/Desktop/%EA%B0%9C%EC%9D%B8%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%2B%EB%8C%80%ED%9A%8C/2026_XR.AI%EC%9B%90%ED%84%B0%EC%8A%A4%EC%BF%A8/agent/data/source/assets/32aaa2831c98b4b23d139381ceb6cd24.png" alt="포어암 전체 조립 모습. 왼쪽 위 이두 쪽 마운트의 파란 액추에이터, 가운데 주황 브래킷, 검은 카본 튜브 두 개, 오른쪽 아래 끝단, 초록 링크 두 개" style="width:540px; height:546px; object-fit:contain;">
+<div class="col fade-in d1">
+<table class="bom">
+<tr><th style="width:38%">부품</th><th style="width:44%">이름</th><th style="width:18%">수량</th></tr>
+<tr><td>액추에이터 (모듈)</td><td>액추에이터 1 · 2</td><td>2</td></tr>
+<tr><td>액추에이터 1 브래킷</td><td>Part18</td><td>1</td></tr>
+<tr><td>튜브 클램프</td><td>Part19 (허브 쪽 · 손목 쪽)</td><td>2</td></tr>
+<tr><td>이두 쪽 마운트</td><td>actmount_bicep</td><td>1</td></tr>
+<tr><td>카본 튜브</td><td>메인 · 두 번째</td><td>2</td></tr>
+<tr><td>구동 링크</td><td>drivenlink, drivenlink2</td><td>각 1</td></tr>
+<tr><td>끝단</td><td>Part21</td><td>1</td></tr>
+<tr><td>볼트</td><td>M3 ×12 · M4 ×6 · M5 ×1</td><td>19</td></tr>
+</table>
+<div class="flow">
+<p class="pill">01–05 액추에이터 1</p>
+<p class="pill">06–10 액추에이터 2</p>
+<p class="pill">11–14 마무리</p>
+</div>
+</div>
+</div>
+<div class="foot"><p>forearm v1 · 조립 설명</p><p class="mono">1 / 4</p></div>
+
+</section>
+</body></html>
