@@ -825,7 +825,6 @@ const VOICE = {
   wake: new URLSearchParams(location.search).get('wake') ?? '자비스',   // ?wake= 로 바꾸기, 빈 값이면 호출어 없이
   floor: 0.01, speaking: false, frames: [], pre: [], loudT: 0, quietT: 0, len: 0, busy: 0, waitQ: 0, heard: '',
 };
-const NAV_RE = /^(다음|이전|뒤로|다시|처음|\d+\s*번?\s*단계|[일이삼사오육칠팔구십]+\s*단계)/;
 const aiTalking = () => (agentAudio && !agentAudio.paused) || (window.speechSynthesis?.speaking ?? false);
 
 const VOICE_AUDIO = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
@@ -896,11 +895,27 @@ async function sendUtterance(frames, rate) {
   finally { VOICE.busy--; drawInfo(); }
 }
 function agentAsk(text) { if (agent.on) agent.ws.send(JSON.stringify({ type: 'ask', text })); }
+// 단계 명령을 에이전트가 확실히 알아듣는 모양으로 ("3단계로 가죠" → "3단계")
+const KO_NUM = { 일: 1, 이: 2, 삼: 3, 사: 4, 오: 5, 육: 6, 칠: 7, 팔: 8, 구: 9, 십: 10, 십일: 11, 십이: 12, 십삼: 13, 십사: 14 };
+function navCommand(compact) {
+  if (compact.length > 10) return null;
+  if (/^다음/.test(compact)) return '다음';
+  if (/^(이전|뒤로)/.test(compact)) return '이전';
+  if (/^다시/.test(compact)) return '다시';
+  if (/^처음/.test(compact)) return '처음';
+  const m = compact.match(/^(\d+|[일이삼사오육칠팔구십]+)번?단계/);
+  if (m) { const n = /^\d+$/.test(m[1]) ? +m[1] : KO_NUM[m[1]]; if (n) return `${n}단계`; }
+  return null;
+}
+// 막힌 듯한 짧은 혼잣말은 호출어 없이도 보냄 (팀원 문서 예외 6번. 서버가 "어떤 부분이 막히셨어요?" 한 번만)
+const STUCK_RE = /아\s*뭐지|왜\s*안\s*(들어|돼|맞)|모르겠|헷갈/;
 function onHeard(raw) {
   const t = raw.trim().replace(/[.?!。]+$/, '');
   if (!t) return;
-  const compact = t.replace(/[\s,]/g, '');
-  if (NAV_RE.test(compact) && compact.length <= 10) { VOICE.heard = t; agentAsk(t); return; }   // 단계 명령은 바로
+  const compact = t.replace(/[\s,.]/g, '');
+  const nav = navCommand(compact);
+  if (nav) { VOICE.heard = t; agentAsk(nav); return; }                       // 단계 명령은 바로
+  if (STUCK_RE.test(t) && compact.length <= 12) { VOICE.heard = t; agentAsk(t); return; }
   const w = VOICE.wake;
   if (!w) { VOICE.heard = t; agentAsk(t); return; }
   if (VOICE.waitQ > 0) { VOICE.waitQ = 0; VOICE.heard = t; agentAsk(t); return; }              // "네?" 다음 5초 안의 말
