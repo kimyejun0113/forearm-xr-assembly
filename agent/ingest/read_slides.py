@@ -17,6 +17,7 @@ SYSTEM = """너는 로봇 조립 설명 슬라이드를 안경 카메라 사진�
 번호 목록 앞의 두 자리 번호(예: 04)와 주의 항목 앞 번호(예: "04·05 ·")는 지우지 말고 그대로 둔다.
 JSON으로만 답한다:
 {"is_slide": true 또는 false,
+ "clarity": "high(본문 글자까지 또렷) | mid(제목은 읽히고 본문 일부만) | low(제목도 겨우)",
  "kind": "overview|step|other",
  "step_label": "STEP 01–05 같은 위쪽 작은 글씨, 없으면 null",
  "title": "큰 제목",
@@ -39,14 +40,16 @@ def read_images(paths):
             s["image"] = str(Path(p).resolve().relative_to(ROOT)).replace("\\", "/")
             out.append(s)
         return out
-    slides = []
-    for p in paths:
+    from concurrent.futures import ThreadPoolExecutor
+
+    def one(p):
         p = Path(p)
         res = llm.chat_json(SYSTEM, [{"type": "text", "text": "이 사진의 슬라이드를 읽어 줘"}, llm.image_part(p)],
                             model=llm.VISION_MODEL, temperature=0)
         res["image"] = str(p.resolve().relative_to(ROOT)).replace("\\", "/")
-        slides.append(res)
-    return slides
+        return res
+    with ThreadPoolExecutor(max_workers=6) as ex:          # 헤드셋은 2~3초마다 찍으므로 사진이 많다 → 동시에 읽기
+        return list(ex.map(one, paths))
 
 
 def main():

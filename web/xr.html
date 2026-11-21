@@ -830,7 +830,7 @@ async function connectAgent(builder = agent.builder) {
 // 선배가 헤드셋을 쓰고 PPT(다른 노트북·모니터)를 보며 넘기면, 화면이 바뀌고 멈출 때마다 사진을 찍는다.
 // 끝내면 사진만 서버로 → 비전이 슬라이드를 읽어 지식을 다시 만든다. 설계자 말(지금 지식)은 그대로 둔다.
 // Quest 브라우저: facingMode 'ideal'이면 앞쪽 아바타 카메라(가짜 배경)를 주므로 뒤쪽(패스스루) 카메라를 꼭 집어 요청.
-const CAP = { on: false, busy: false, stream: null, video: null, frames: [], t0: 0, timer: null, sctx: null, last: null, prev: null, pend: 0, max: 60 };
+const CAP = { on: false, busy: false, stream: null, video: null, frames: [], t0: 0, timer: null, sctx: null, last: null, prev: null, pend: 0, max: 120 };
 function capGray() {
   CAP.sctx.drawImage(CAP.video, 0, 0, 48, 36);
   const d = CAP.sctx.getImageData(0, 0, 48, 36).data, g = new Uint8Array(48 * 36);
@@ -845,11 +845,14 @@ function capShot(why = 'auto') {
   c.toBlob((b) => { CAP.frames.push({ b, t }); CAP.last = capGray(); capStatus(); }, 'image/jpeg', 0.9);
   if (why === 'manual') { agentToast('📸 찍었어요'); xrInputs.forEach((s) => buzz(s, 0.3, 30)); }
 }
-function capWatch() {   // 많이 바뀌었고 이제 멈춰 있으면(넘기는 중·고개 돌리는 중 아님) 두 번 확인 후 찍기
+// 머리에 달린 카메라는 늘 조금씩 흔들리고, 노트북 화면 속 슬라이드가 바뀌어도 전체 그림은 조금만 바뀐다.
+// 그래서 "바뀌면 찍기" 대신: 고개가 어느 정도 멈춰 있으면 2.5초마다 찍고, 같은 슬라이드는 서버가 하나로 합친다.
+function capWatch() {
   if (!CAP.last || !CAP.video.videoWidth) return;
   const g = capGray(), dif = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0) / a.length;
-  const moved = dif(g, CAP.last), settle = CAP.prev ? dif(g, CAP.prev) : 99; CAP.prev = g;
-  if (moved > 16 && settle < 4) { if (++CAP.pend >= 2) { CAP.pend = 0; capShot(); } } else CAP.pend = 0;
+  const settle = CAP.prev ? dif(g, CAP.prev) : 99, same = dif(g, CAP.last) < 2; CAP.prev = g;
+  const since = (performance.now() - CAP.t0) / 1000 - (CAP.frames.at(-1)?.t ?? 0);
+  if (settle < 10 && since >= 2.5 && !(same && since < 8)) capShot();   // 완전히 같은 장면이면 8초에 한 번만
 }
 function capStatus() { agent.status = `● 설명 녹화 중 · 사진 ${CAP.frames.length}장 · "찍어" "녹화 끝"`; drawInfo(); drawPanel(); }
 async function capStart() {
@@ -865,7 +868,7 @@ async function capStart() {
   const sm = document.createElement('canvas'); sm.width = 48; sm.height = 36; CAP.sctx = sm.getContext('2d', { willReadFrequently: true });
   Object.assign(CAP, { on: true, frames: [], last: null, prev: null, pend: 0, t0: performance.now(), status0: agent.status });
   setTimeout(() => capShot(), 1500);
-  CAP.timer = setInterval(capWatch, 700);
+  CAP.timer = setInterval(capWatch, 500);
   capStatus(); agentToast('설명 녹화 시작 · PPT를 보면서 넘기세요');
 }
 async function capStop() {

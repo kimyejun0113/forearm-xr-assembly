@@ -39,6 +39,21 @@ class Job:
         self.save()
 
 
+def _norm(t):
+    return "".join(ch for ch in (t or "") if ch.isalnum())
+
+
+def _same_slide(a, b):
+    """같은 슬라이드인가: 제목이 같고 단계 표시가 같거나 한쪽이 못 읽음"""
+    return _norm(a.get("title")) == _norm(b.get("title"))   # 단계 표시는 멀리서 잘못 읽히기도 해서 제목만 본다
+
+
+def _score(s):
+    """또렷함 우선, 같으면 읽은 줄이 많은 쪽"""
+    rank = {"high": 2, "mid": 1}.get(s.get("clarity"), 0)
+    return (rank, len(s.get("instructions") or []) + len(s.get("warnings") or []) + len(s.get("text") or []))
+
+
 def _same(a, b):
     """연달아 찍힌 두 사진이 같은 슬라이드인가 (비전 결과 비교)"""
     if not a.get("title") or a.get("title") != b.get("title"):
@@ -59,14 +74,19 @@ def run(d: Path):
         if meta.get("frames"):
             job.step("slides", f"사진 {len(meta['frames'])}장 비전으로 읽는 중")
             read = read_slides.read_images([d / f["file"] for f in meta["frames"]])
+            # 헤드셋 카메라는 같은 슬라이드를 여러 번(멀리·가까이·돌아와서) 찍는다:
+            # 제목·단계 표시가 같으면 한 장으로 합치고, 가장 또렷하고 내용이 많은 사진을 남긴다. 순서는 처음 본 시각.
             merged = []
             for f, s in zip(meta["frames"], read):
-                if not s.get("is_slide", True):
+                if not s.get("is_slide", True) or not s.get("title") or s.get("clarity") == "low":
                     continue
-                if merged and _same(merged[-1]["s"], s):
-                    merged[-1]["dup"] += 1
+                m = next((m for m in merged if _same_slide(m["s"], s)), None)
+                if m is None:
+                    merged.append({"s": s, "t": f["t"], "dup": 0})
                     continue
-                merged.append({"s": s, "t": f["t"], "dup": 0})
+                m["dup"] += 1
+                if _score(s) > _score(m["s"]):
+                    m["s"] = s
             if not meta.get("doc"):
                 slides = [m["s"] for m in merged]
             flips = [{"t": m["t"], "slide": i} for i, m in enumerate(merged, 1)]
