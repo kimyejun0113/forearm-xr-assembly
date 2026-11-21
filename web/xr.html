@@ -32,7 +32,7 @@
 </head>
 <body>
 <div id="help" class="panel">
-  <b>Quest</b>: 트리거·손가락 핀치로 부품 잡고 당기기 · <b>그립 버튼</b>(또는 파란 공)으로 모델 옮기기 · <b>빈 공간에서 양손 핀치</b>: 벌리면 확대, 좁히면 축소, 움직이면 이동·회전 · 패널 위 막대를 잡으면 패널 이동 · 패널 버튼을 <b>1.2초 바라보거나</b> "다음/이전/다시"라고 말하기<br>
+  <b>Quest</b>: 트리거·손가락 핀치로 부품 잡고 당기기 · <b>그립 버튼</b>으로 모델 옮기기 · <b>빈 공간 양손 핀치</b>: 확대·축소·이동 · <b>한 손 핀치 끌기</b>: 돌리기 · 버튼 사이 빈 곳을 잡으면 버튼 패널 이동 · 버튼에 화면 가운데를 <b>1초 맞추면</b> 눌림<br>
   <b>PC</b>: 부품을 끌어 빼기 · 빈 곳 드래그로 회전
   <label><input type="checkbox" id="physics" checked> 실제처럼: 막힌 부품과 볼트로 고정된 부품은 안 빠짐</label>
   <label><input type="checkbox" id="fade"> 앞 단계 흐리게</label>
@@ -256,12 +256,6 @@ shadowFloor.position.y = -0.06;
 shadowFloor.receiveShadow = true;
 model.add(shadowFloor);
 
-const handle = new THREE.Mesh(new THREE.SphereGeometry(0.035, 24, 16),
-  new THREE.MeshStandardMaterial({ color: 0x2563eb, emissive: 0x1d4ed8, emissiveIntensity: 0.4 }));
-handle.position.set(0, -0.06, 0.28);
-handle.userData.isHandle = true;
-model.add(handle);
-
 function makeLabel(w = 512, h = 128) {
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
@@ -285,10 +279,6 @@ function setLabel(s, lines, bg = 'rgba(17,24,39,0.85)') {
   });
   tex.needsUpdate = true;
 }
-const handleLabel = makeLabel();
-setLabel(handleLabel, ['잡고 이동', '그립 버튼은 어디서든'], 'rgba(37,99,235,0.9)');
-handleLabel.position.set(0, 0.0, 0.28);
-model.add(handleLabel);
 
 const partLabel = makeLabel(640, 150);
 partLabel.scale.set(0.2, 0.047, 1);
@@ -358,100 +348,40 @@ function renderCard() {
   drawPanel();
 }
 
+// 기능 버튼만 있는 패널 (설명 창은 따로). 버튼 사이 빈 곳을 잡으면 패널이 옮겨짐
+const PANEL_W = 1024, PANEL_H = 260;
 const panelCanvas = document.createElement('canvas');
-panelCanvas.width = 1024; panelCanvas.height = 800;
+panelCanvas.width = PANEL_W; panelCanvas.height = PANEL_H;
 const pctx = panelCanvas.getContext('2d');
 const panelTex = new THREE.CanvasTexture(panelCanvas);
 panelTex.colorSpace = THREE.SRGBColorSpace;
-const panel = new THREE.Mesh(new THREE.PlaneGeometry(0.36, 0.28125), new THREE.MeshBasicMaterial({ map: panelTex, transparent: true }));
+const panel = new THREE.Mesh(new THREE.PlaneGeometry(0.36, 0.36 * PANEL_H / PANEL_W), new THREE.MeshBasicMaterial({ map: panelTex, transparent: true }));
 panel.userData.isPanel = true;
 scene.add(panel);                       // 모델과 따로 움직임
-const PANEL_BAR = 70;                   // 캔버스 위쪽 70px = 잡고 옮기는 막대
 function placePanel() {
-  // 모델 왼쪽 앞, 사람 쪽을 보게
-  model.updateMatrixWorld(true);
-  panel.position.copy(model.localToWorld(new THREE.Vector3(-0.38, 0.16, 0.08)));
-  panel.quaternion.copy(model.quaternion).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(-0.3, 0.5, 0)));
+  // PC 화면용: 모델 위
+  panel.position.copy(model.position).add(new THREE.Vector3(0, 0.28, 0));
+  panel.quaternion.copy(model.quaternion);
 }
 placePanel();
 
 const BW = 232, BH = 96;
 const buttons = [
-  { x: 24, y: 520, label: '처음부터', act: () => goTo(-1) },
-  { x: 272, y: 520, label: '◀ 이전', act: () => goTo(shown - 1), off: () => shown < 0 },
-  { x: 520, y: 520, label: '↻ 다시', act: () => goTo(shown), off: () => shown < 0 },
-  { x: 768, y: 520, label: '다음 ▶', act: () => goTo(shown + 1), off: () => shown >= steps.length - 1, primary: true },
-  { x: 24, y: 636, label: '전체 보기', act: showAll },
-  { x: 272, y: 636, label: '모두 펼치기', act: () => animateAll(1) },
-  { x: 520, y: 636, label: '모두 조립', act: () => animateAll(0) },
-  { x: 768, y: 636, label: '기본 배치', act: () => { placeInFront = true; } },
+  { x: 24, y: 24, label: '처음부터', act: () => goTo(-1) },
+  { x: 272, y: 24, label: '◀ 이전', act: () => goTo(shown - 1), off: () => shown < 0 },
+  { x: 520, y: 24, label: '↻ 다시', act: () => goTo(shown), off: () => shown < 0 },
+  { x: 768, y: 24, label: '다음 ▶', act: () => goTo(shown + 1), off: () => shown >= steps.length - 1, primary: true },
+  { x: 24, y: 140, label: '전체 보기', act: showAll },
+  { x: 272, y: 140, label: '모두 펼치기', act: () => animateAll(1) },
+  { x: 520, y: 140, label: '모두 조립', act: () => animateAll(0) },
+  { x: 768, y: 140, label: '기본 배치', act: () => { placeInFront = true; } },
 ];
-function wrap(c, text, maxW) {
-  const out = []; let line = '';
-  for (const ch of text) {
-    if (c.measureText(line + ch).width > maxW) { out.push(line); line = ch; } else line += ch;
-  }
-  if (line) out.push(line);
-  return out;
-}
 let dwell = { button: null, t: 0 };     // 시선으로 누르는 중인 버튼과 진행도(0~1)
-let voiceState = '화면 가운데 점을 버튼에 1초 맞추면 눌려요';
-let inputState = { text: '입력: 확인 중', ok: true };
-// 지금 세션이 인식한 입력 (손/컨트롤러)을 패널에 표시 → 손 인식 문제 진단용
-function checkInputs() {
-  const session = renderer.xr.getSession();
-  if (!session) return;
-  const srcs = [...session.inputSources];
-  const handOn = !session.enabledFeatures || session.enabledFeatures.includes('hand-tracking');
-  const desc = srcs.map((s) => `${s.handedness === 'left' ? '왼' : s.handedness === 'right' ? '오른' : ''}${s.hand ? '손' : '컨트롤러'}`);
-  let text, ok = true;
-  if (!handOn) { text = '손 추적이 이 세션에서 꺼져 있음'; ok = false; }
-  else if (!srcs.length) { text = '입력 없음: 손을 앞으로 들거나 컨트롤러를 내려놓기'; ok = false; }
-  else text = '입력: ' + desc.join(', ');
-  if (text !== inputState.text) { inputState = { text, ok }; drawPanel(); }
-}
 function drawPanel() {
-  const c = pctx, i = stepInfo();
-  c.clearRect(0, 0, 1024, 800);
-  c.fillStyle = 'rgba(255,255,255,0.94)';
-  c.beginPath(); c.roundRect(0, 0, 1024, 800, 36); c.fill();
-  // 잡고 옮기는 막대
-  c.fillStyle = '#e4e7ec';
-  c.beginPath(); c.roundRect(0, 0, 1024, PANEL_BAR - 8, [36, 36, 0, 0]); c.fill();
-  c.fillStyle = '#98a2b3';
-  c.beginPath(); c.roundRect(452, 22, 120, 12, 6); c.fill();
-  c.font = '26px "Malgun Gothic", sans-serif';
-  c.fillText('잡고 이동', 600, 38);
-  c.fillStyle = '#667085';
-  c.font = '22px "Malgun Gothic", sans-serif';
-  c.fillText(voiceState.slice(0, 26), 24, 28);
-  c.fillStyle = inputState.ok ? '#16a34a' : '#b42318';
-  c.fillText(inputState.text.slice(0, 26), 24, 54);
-  c.translate(0, PANEL_BAR - 30);
-  c.fillStyle = '#667085'; c.font = '30px "Malgun Gothic", sans-serif';
-  c.fillText(i.head, 32, 52);
-  c.fillStyle = '#d0d5dd'; c.fillRect(32, 68, 960, 8);
-  c.fillStyle = '#2563eb'; c.fillRect(32, 68, 960 * ((shown + 1) / steps.length), 8);
-  c.fillStyle = '#1d2330'; c.font = 'bold 46px "Malgun Gothic", sans-serif';
-  c.fillText(i.title.slice(0, 22), 32, 132);
-  // 칩
-  let x = 32, y = 160;
-  c.font = '28px "Malgun Gothic", sans-serif';
-  for (const ch of i.chips.slice(0, 6)) {
-    const w = c.measureText(ch.t).width + 28;
-    if (x + w > 992) { x = 32; y += 48; }
-    c.fillStyle = ch.bolt ? '#fef3c7' : '#eef2ff';
-    c.beginPath(); c.roundRect(x, y, w, 40, 20); c.fill();
-    c.fillStyle = ch.bolt ? '#92400e' : '#1d4ed8';
-    c.fillText(ch.t, x + 14, y + 30);
-    x += w + 8;
-  }
-  y += 82;
-  c.fillStyle = '#344054'; c.font = '30px "Malgun Gothic", sans-serif';
-  for (const l of wrap(c, i.desc, 960).slice(0, 2)) { c.fillText(l, 32, y); y += 40; }
-  if (i.warn) { c.fillStyle = '#b42318'; for (const l of wrap(c, '주의. ' + i.warn, 960).slice(0, 2)) { c.fillText(l, 32, y); y += 40; } }
-  c.fillStyle = '#16a34a'; c.font = 'bold 30px "Malgun Gothic", sans-serif';
-  for (const l of wrap(c, statusText, 960).slice(0, 1)) c.fillText(l, 32, 496);
+  const c = pctx;
+  c.clearRect(0, 0, PANEL_W, PANEL_H);
+  c.fillStyle = 'rgba(255,255,255,0.9)';
+  c.beginPath(); c.roundRect(0, 0, PANEL_W, PANEL_H, 32); c.fill();
   for (const b of buttons) {
     const off = b.off?.();
     c.globalAlpha = off ? 0.35 : 1;
@@ -466,15 +396,12 @@ function drawPanel() {
     c.fillText(b.label, b.x + (BW - c.measureText(b.label).width) / 2, b.y + 60);
     c.globalAlpha = 1;
   }
-  c.setTransform(1, 0, 0, 1, 0, 0);
   panelTex.needsUpdate = true;
 }
-// 패널 uv → 'bar' | 버튼 | null
+// 패널 uv → 버튼, 버튼이 아니면 'bar'(잡아서 옮기는 빈 곳)
 function panelTarget(uv) {
-  const x = uv.x * 1024, y = (1 - uv.y) * 800;
-  if (y < PANEL_BAR) return 'bar';
-  const yy = y - (PANEL_BAR - 30);
-  return buttons.find((b) => x >= b.x && x <= b.x + BW && yy >= b.y && yy <= b.y + BH) || null;
+  const x = uv.x * PANEL_W, y = (1 - uv.y) * PANEL_H;
+  return buttons.find((b) => x >= b.x && x <= b.x + BW && y >= b.y && y <= b.y + BH) || 'bar';
 }
 function pressPanel(uv) {
   const b = panelTarget(uv);
@@ -529,7 +456,7 @@ addEventListener('keydown', (e) => {
 const raycaster = new THREE.Raycaster();
 function hitFromRay(origin, dir) {
   raycaster.set(origin, dir);
-  const objs = [...parts.filter(visible).map((p) => p.mesh), handle, panel];
+  const objs = [...parts.filter(visible).map((p) => p.mesh), panel];
   return raycaster.intersectObjects(objs, false)[0] || null;
 }
 function beginGrab(hit, pointWorld) {
@@ -707,11 +634,10 @@ function updateGaze(dt) {
   const target = hit && panelTarget(hit.uv);
   const btn = target && target !== 'bar' && !target.off?.() ? target : null;
   gazeInfo = { hit: !!hit, button: btn ? btn.label : null };
-  // 가운데 점은 항상 보이게: 패널 위면 패널에, 아니면 1m 앞에 흐리게
-  gazeDot.visible = true;
+  // 가운데 점은 패널을 볼 때만 보임
+  gazeDot.visible = !!hit;
   if (hit) { gazeDot.position.copy(hit.point); gazeDot.quaternion.copy(panel.quaternion); }
-  else { gazeDot.position.copy(o).addScaledVector(d, 1.0); gazeDot.quaternion.copy(head.quaternion); }
-  gazeDot.material.opacity = btn ? 1 : hit ? 0.8 : 0.35;
+  gazeDot.material.opacity = btn ? 1 : 0.7;
   gazeDot.scale.setScalar(btn ? 1.6 : 1);
   if (btn !== dwell.button) { dwell = { button: btn, t: 0 }; drawPanel(); return; }
   if (!btn || dwellCooldown > 0) return;
@@ -727,7 +653,7 @@ function updateGaze(dt) {
 
 let placeInFront = false;
 // 시선 기준 배치 거리 (m): 앞으로 depth, 좌우로 side 만큼
-const LAYOUT = { depth: 0.55, side: 0.45 };
+const LAYOUT = { depth: 0.55, side: 0.45, panelAbove: 0.28 };
 renderer.xr.addEventListener('sessionstart', () => {
   scene.background = null;
   $('help').style.display = $('card').style.display = 'none';
@@ -800,13 +726,14 @@ renderer.setAnimationLoop(() => {
       model.position.y = pos.y - 0.35;
       model.rotation.set(0, Math.atan2(-fwd.x, -fwd.z), 0);   // 기울기도 초기화
       model.scale.setScalar(1);                                // 실물 크기로
-      panel.position.copy(pos).addScaledVector(fwd, LAYOUT.depth).addScaledVector(right, LAYOUT.side);
-      panel.position.y = pos.y - 0.12;
+      // 버튼 패널은 가상 로봇 위 (오른쪽은 설명 창 자리로 비워 둠)
+      panel.position.copy(model.position);
+      panel.position.y = model.position.y + LAYOUT.panelAbove;
       panel.lookAt(pos);                   // 패널이 나를 보게
       placeInFront = false;
     }
   }
-  if (renderer.xr.isPresenting) { updateTwoHand(); updateOneHandRotate(); updateGaze(dt); checkInputs(); }
+  if (renderer.xr.isPresenting) { updateTwoHand(); updateOneHandRotate(); updateGaze(dt); }
 
   hovered.clear();
   if (mouseHover && !mouseGrab && visible(mouseHover)) membersOf(mouseHover).forEach((q) => hovered.add(q));
