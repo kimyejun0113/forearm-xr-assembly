@@ -1113,7 +1113,7 @@ function drawInfo() {
   txt(state, INFO_W - P, oy + 4, `500 21px ${HUD.MONO}`, live ? HUD.acc : HUD.ink3, 'right', 3);
 
   let ay = oy + 76;
-  const hint = VOICE.on ? `${VOICE.wake ? `"${VOICE.wake}" + 질문 · ` : ''}"다음" "이전" "다시"` : '마이크를 켜면 말로 물어볼 수 있어요';
+  const hint = VOICE.on ? `${VOICE.wake ? `"${VOICE.wake}" + 질문 · ` : ''}"다음" "이전" "7단계" "모두 펼치기"` : '마이크를 켜면 말로 물어볼 수 있어요';
   if (VOICE.waitQ > 0) txt('네? 말씀하세요', P, ay, `700 32px ${HUD.KR}`, HUD.acc);
   else if (VOICE.heard && listening) txt(VOICE.heard, P, ay, `500 28px ${HUD.KR}`, HUD.ink2);
   else if (!r) txt(hint, P, ay, `500 24px ${HUD.MONO}`, HUD.ink3);
