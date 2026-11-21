@@ -378,9 +378,11 @@ const buttons = [
   { x: 272, y: 140, label: '모두 펼치기', act: () => animateAll(1) },
   { x: 520, y: 140, label: '모두 조립', act: () => animateAll(0) },
   { x: 768, y: 140, label: '기본 배치', act: () => { placeInFront = true; } },
-  { x: 24, y: 256, w: 600, label: () => (VOICE.on ? '🎤 듣는 중 · 누르면 끄기' : '🎤 음성 켜기'), on: () => VOICE.on,
+  { x: 24, y: 256, w: 400, label: () => (VOICE.on ? '🎤 듣는 중 · 끄기' : '🎤 음성 켜기'), on: () => VOICE.on,
     act: () => (VOICE.on ? voiceStop() : voiceStart()) },
-  { x: 640, y: 256, w: 360, label: () => (agent.phase === 'comment' ? '다음 사람 시작 ▶' : '✓ 조립 완료'),
+  { x: 440, y: 256, w: 270, label: () => (CAP.busy ? '◌ 읽는 중…' : CAP.on ? '■ 녹화 끝' : '● 설명 녹화'), on: () => CAP.on,
+    off: () => CAP.busy, act: () => (CAP.on ? capStop() : capStart()) },
+  { x: 726, y: 256, w: 274, label: () => (agent.phase === 'comment' ? '다음 사람 ▶' : '✓ 조립 완료'),
     primary: true, act: () => (agent.phase === 'comment' ? nextWorker() : finishWork()) },
 ];
 const bw = (b) => b.w || BW;
@@ -824,6 +826,78 @@ async function connectAgent(builder = agent.builder) {
   agent.ws.onclose = () => { agent.on = false; agent.status = 'AI 연결 끊김'; drawInfo(); };
 }
 
+// ---------- 설계자 설명 녹화 (헤드셋 카메라로 슬라이드 찍기) ----------
+// 선배가 헤드셋을 쓰고 PPT(다른 노트북·모니터)를 보며 넘기면, 화면이 바뀌고 멈출 때마다 사진을 찍는다.
+// 끝내면 사진만 서버로 → 비전이 슬라이드를 읽어 지식을 다시 만든다. 설계자 말(지금 지식)은 그대로 둔다.
+// Quest 브라우저: facingMode 'ideal'이면 앞쪽 아바타 카메라(가짜 배경)를 주므로 뒤쪽(패스스루) 카메라를 꼭 집어 요청.
+const CAP = { on: false, busy: false, stream: null, video: null, frames: [], t0: 0, timer: null, sctx: null, last: null, prev: null, pend: 0, max: 60 };
+function capGray() {
+  CAP.sctx.drawImage(CAP.video, 0, 0, 48, 36);
+  const d = CAP.sctx.getImageData(0, 0, 48, 36).data, g = new Uint8Array(48 * 36);
+  for (let i = 0; i < g.length; i++) g[i] = (d[i * 4] * 3 + d[i * 4 + 1] * 6 + d[i * 4 + 2]) / 10;
+  return g;
+}
+function capShot(why = 'auto') {
+  const v = CAP.video; if (!CAP.on || !v?.videoWidth || CAP.frames.length >= CAP.max) return;
+  const c = document.createElement('canvas'); c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v, 0, 0);
+  const t = (performance.now() - CAP.t0) / 1000;
+  c.toBlob((b) => { CAP.frames.push({ b, t }); CAP.last = capGray(); capStatus(); }, 'image/jpeg', 0.9);
+  if (why === 'manual') { agentToast('📸 찍었어요'); xrInputs.forEach((s) => buzz(s, 0.3, 30)); }
+}
+function capWatch() {   // 많이 바뀌었고 이제 멈춰 있으면(넘기는 중·고개 돌리는 중 아님) 두 번 확인 후 찍기
+  if (!CAP.last || !CAP.video.videoWidth) return;
+  const g = capGray(), dif = (a, b) => a.reduce((s, v, i) => s + Math.abs(v - b[i]), 0) / a.length;
+  const moved = dif(g, CAP.last), settle = CAP.prev ? dif(g, CAP.prev) : 99; CAP.prev = g;
+  if (moved > 16 && settle < 4) { if (++CAP.pend >= 2) { CAP.pend = 0; capShot(); } } else CAP.pend = 0;
+}
+function capStatus() { agent.status = `● 설명 녹화 중 · 사진 ${CAP.frames.length}장 · "찍어" "녹화 끝"`; drawInfo(); drawPanel(); }
+async function capStart() {
+  if (CAP.on || CAP.busy) return;
+  if (!agent.on) { agentToast('AI 서버에 연결돼야 녹화할 수 있어요'); return; }
+  const v = { width: { ideal: 1280 }, height: { ideal: 960 } };
+  try {
+    try { CAP.stream = await navigator.mediaDevices.getUserMedia({ video: { ...v, facingMode: { exact: 'environment' } } }); }
+    catch { CAP.stream = await navigator.mediaDevices.getUserMedia({ video: { ...v, facingMode: { ideal: 'environment' } } }); }
+  } catch (e) { agentToast(`카메라를 열 수 없어요 (${e.name})`); return; }
+  CAP.video = Object.assign(document.createElement('video'), { muted: true, playsInline: true, srcObject: CAP.stream });
+  await CAP.video.play().catch(() => {});
+  const sm = document.createElement('canvas'); sm.width = 48; sm.height = 36; CAP.sctx = sm.getContext('2d', { willReadFrequently: true });
+  Object.assign(CAP, { on: true, frames: [], last: null, prev: null, pend: 0, t0: performance.now(), status0: agent.status });
+  setTimeout(() => capShot(), 1500);
+  CAP.timer = setInterval(capWatch, 700);
+  capStatus(); agentToast('설명 녹화 시작 · PPT를 보면서 넘기세요');
+}
+async function capStop() {
+  if (!CAP.on) return;
+  clearInterval(CAP.timer); CAP.on = false;
+  CAP.stream.getTracks().forEach((t) => t.stop());
+  agent.status = CAP.status0;
+  if (!CAP.frames.length) { agentToast('찍힌 슬라이드가 없어요'); drawPanel(); return; }
+  CAP.busy = true; drawPanel();
+  agentToast(`사진 ${CAP.frames.length}장 보내는 중…`);
+  const fd = new FormData();
+  CAP.frames.forEach((f, i) => fd.append('frames', f.b, `f_${i + 1}.jpg`));
+  fd.append('frame_times', JSON.stringify(CAP.frames.map((f) => f.t)));
+  try {
+    const j = await fetch('/api/briefing', { method: 'POST', body: fd }).then((r) => r.json());
+    let st;
+    for (;;) {
+      await new Promise((r) => setTimeout(r, 1500));
+      st = await fetch('/api/briefing/' + j.id).then((r) => r.json());
+      if (st.ok === true || st.ok === false) break;
+      agent.toast = `슬라이드 읽는 중… ${(st.log || []).slice(-1)[0]?.slice(9) || ''}`; agent.toastT = 3; drawInfo();
+    }
+    if (st.ok) {
+      agent.kb = await fetch('/api/kb', { cache: 'no-store' }).then((r) => r.json());
+      if (shown >= 0) agentStep(shown);                       // 지금 단계 카드를 새 지식으로
+      agentToast(`설명 반영 완료 · 슬라이드 ${st.slides}장, 설계자 말 ${st.segments}문장`);
+      agent.reply = { kind: 'answer', q: '설명 녹화', text: `슬라이드 ${st.slides}장을 읽어 단계 안내를 다시 만들었어요. 설계자 말 ${st.segments}문장은 그대로예요.`, src: [] };
+    } else agentToast('분석 실패: ' + ((st.log || []).slice(-1)[0] || ''));
+  } catch (e) { agentToast('업로드 실패: ' + e.message); }
+  CAP.busy = false; drawPanel(); drawInfo();
+}
+
 // ---------- 조립 완료 → 한마디 → 다음 사람 ----------
 // 완료를 누르면 서버가 이 사람 기록을 저장하고 바로 공통 지식(aggregate)에 합친다. 다음 사람은 새 작업자로 시작해서
 // 앞사람들이 오래 걸린 곳·물어본 것·남긴 한마디를 단계 카드와 답변에서 바로 받는다.
@@ -956,6 +1030,9 @@ function navCommand(compact) {
 }
 // 아래 버튼과 같은 일 (서버를 거치지 않고 바로). 단계를 바꾸는 건 goTo가 서버에 알린다
 const VIEW_CMDS = [
+  [/^(설명)?녹화(시작|해|켜)/, '설명 녹화 시작', () => capStart()],
+  [/^(설명)?녹화(끝|종료|그만|꺼|멈춰)/, '설명 녹화 끝', () => capStop()],
+  [/^(사진)?찍어|^캡처/, '사진 찍기', () => (CAP.on ? capShot('manual') : agentToast('녹화 중일 때만 찍어요'))],
   [/^다음(사람|작업자)/, '다음 사람 시작', () => nextWorker()],
   [/^(조립)?(완료|다했|끝났|끝$)/, '조립 완료', () => finishWork()],
   [/^처음(부터)?|^맨처음|^첫화면/, '처음부터', () => goTo(-1)],
@@ -1191,7 +1268,7 @@ const clock = new THREE.Clock();
 const ease = (t) => 1 - Math.pow(1 - t, 3);
 renderCard();
 setStatus('');
-window.__xr = { parts, steps, camera, membersOf, goTo, showAll, beginGrab, updateGrab, endGrab, axisWorld, blockerOf, isOut, renderer, gaze: () => ({ ...gazeInfo, dwell: dwell.t, cooldown: dwellCooldown }), agent, agentHi, VOICE, onHeard, sendUtterance };   // 디버그용
+window.__xr = { CAP, capStart, capStop, capShot, parts, steps, camera, membersOf, goTo, showAll, beginGrab, updateGrab, endGrab, axisWorld, blockerOf, isOut, renderer, gaze: () => ({ ...gazeInfo, dwell: dwell.t, cooldown: dwellCooldown }), agent, agentHi, VOICE, onHeard, sendUtterance };   // 디버그용
 
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05);
