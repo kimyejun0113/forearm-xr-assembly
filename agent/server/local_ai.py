@@ -55,11 +55,26 @@ def stt(audio: bytes, filename: str = "q.webm") -> str:
         os.unlink(p)
 
 
+def _level(path):
+    """소리 크기 맞추기. 헤드셋 마이크는 쓴 사람 입 쪽 소리만 크게 잡고 옆에서 설명하는 사람 말은 40분의 1쯤으로 작게 잡는다.
+    그대로 두면 무음 거르기(VAD)가 설명을 통째로 잘라 버려서, 0.5초마다 작은 말은 키운다 (최대 60배, 완전한 무음은 그대로)."""
+    import numpy as np
+    from faster_whisper.audio import decode_audio
+    w = decode_audio(str(path))
+    win, out = 8000, np.zeros_like(w)
+    for i in range(0, len(w), win):
+        seg = w[i:i + win]
+        r = float(np.sqrt((seg ** 2).mean())) + 1e-6
+        g = min(0.05 / r, 60.0) if r > 0.00005 else 1.0
+        out[i:i + win] = np.clip(seg * g, -1, 1)
+    return out
+
+
 def stt_segments(path) -> list[dict]:
     """긴 설명 녹음 → 문장마다 시작 시간.
     쉬지 않고 말하면 Whisper가 몇십 초를 한 덩어리로 주므로, 단어 시각을 받아 문장 끝(. ? !)에서 나눈다
     (그래야 문장마다 그때 보던 슬라이드가 붙는다)."""
-    segs, _ = _model().transcribe(str(path), language="ko", vad_filter=True, initial_prompt=STT_HINT, word_timestamps=True)
+    segs, _ = _model().transcribe(_level(path), language="ko", vad_filter=True, initial_prompt=STT_HINT, word_timestamps=True)
     out = []
     for s in segs:
         cur, t0 = "", None
