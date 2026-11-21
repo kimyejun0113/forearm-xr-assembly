@@ -57,7 +57,7 @@ def stt(audio: bytes, filename: str = "q.webm") -> str:
 
 def stt_segments(path) -> list[dict]:
     """긴 설명 녹음 → 문장마다 시작 시간"""
-    segs, _ = _model().transcribe(str(path), language="ko", vad_filter=True)
+    segs, _ = _model().transcribe(str(path), language="ko", vad_filter=True, initial_prompt=STT_HINT)
     return [{"start": round(s.start, 1), "text": s.text.strip()} for s in segs if s.text.strip()]
 
 

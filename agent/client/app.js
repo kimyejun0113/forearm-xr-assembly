@@ -159,6 +159,7 @@ function ask(text) {
 // ---------- 설계자 설명 녹화: 화면은 위쪽 표시만 ----------
 // 카메라로 슬라이드가 바뀔 때마다 사진을 찍고, 말은 통째로 녹음한다.
 // 끝나면 서버에 올리고 "분석 중" → 지식에 반영되면 알림.
+const CAP_SCREEN = new URLSearchParams(location.search).get("cap") === "screen";
 const Cap = {
   stream: null, rec: null, audio: [], frames: [], t0: 0, timer: null, small: null, sctx: null, last: null, prev: null, pend: 0,
   set(cls, text) { const b = $("capBtn"); b.className = "cap " + cls; b.textContent = text; },
@@ -166,8 +167,14 @@ const Cap = {
   async start() {
     if (this.rec) return;
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: true });
+      if (CAP_SCREEN) {   // ?cap=screen : 같은 노트북에 띄운 PPT를 화면째로 찍고, 말은 마이크로
+        const scr = await navigator.mediaDevices.getDisplayMedia({ video: { width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
+        const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+        this.stream = new MediaStream([...scr.getVideoTracks(), ...mic.getAudioTracks()]);
+      } else {
+        this.stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: true });
+      }
     } catch (e) { return toast("카메라·마이크를 열 수 없어요 (" + e.name + "). Quest는 https 주소가 필요해요"); }
     $("capVideo").srcObject = this.stream;
     this.frames = []; this.audio = []; this.last = null; this.prev = null; this.pend = 0;
