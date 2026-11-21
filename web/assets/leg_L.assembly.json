@@ -1,0 +1,876 @@
+{
+ "model": "assets/leg_L.glb",
+ "label": "LEG L",
+ "up": [
+  0,
+  1,
+  0
+ ],
+ "colors": {
+  "thigh": "#4f7cac",
+  "thigh_front": "#7d9fc2",
+  "input_crank": "#d9822b",
+  "coupler": "#a3459c",
+  "cheek_A": "#f2a65a",
+  "shin_outer": "#3f9a7d",
+  "cheek_B": "#7fd1ae",
+  "shin_inner": "#6bb69c",
+  "shin_posts": "#9fd3c0",
+  "motor_crank": "#e0b23a",
+  "cheek_D": "#f5d76e",
+  "pushrod": "#c8392f",
+  "foot_outer_new": "#e07a5f",
+  "cheek_C": "#f0a08a",
+  "ankle_spacer": "#b9a27a",
+  "knee_shield": "#9db4c0",
+  "foot_plate_crown_upper": "#7a8a9a",
+  "foot_plate_crown_sole": "#3b4048",
+  "sleeve_knee": "#d8c9a0",
+  "ring_D": "#d8c9a0",
+  "knee_gim": "#9aa1a6",
+  "knee_axle": "#b8bec6",
+  "ring_ankle_in": "#d8c9a0",
+  "screwA": "#b8bec6",
+  "ankle_axle": "#b8bec6",
+  "brg_AIN": "#b8bec6",
+  "hip": "#9aa1a6",
+  "pinD": "#b8bec6",
+  "screwC": "#b8bec6",
+  "brg_D": "#b8bec6",
+  "pinA": "#b8bec6",
+  "sleeve_ankle": "#d8c9a0",
+  "foot": "#9aa1a6",
+  "ring_knee_in": "#d8c9a0",
+  "pinC": "#b8bec6",
+  "ankle_rs": "#9aa1a6",
+  "ring_B": "#d8c9a0",
+  "sleeve_B": "#d8c9a0",
+  "brg_C": "#b8bec6",
+  "brg_K2": "#b8bec6",
+  "spacer_D_head": "#d8c9a0",
+  "brg_K1": "#b8bec6",
+  "brg_B": "#b8bec6",
+  "pinB": "#b8bec6",
+  "screwD": "#b8bec6",
+  "brg_A2": "#b8bec6",
+  "sleeve_C": "#d8c9a0",
+  "sleeve_A": "#d8c9a0",
+  "sleeve_D": "#d8c9a0",
+  "brg_A1": "#b8bec6"
+ },
+ "status": "안내서(S08 다리 조립 안내서) 순서. 3D 는 원본 CAD s08_full_zero.step 의 왼다리.",
+ "metal": [
+  "ankle_axle",
+  "ankle_rs",
+  "brg_A1",
+  "brg_A2",
+  "brg_AIN",
+  "brg_B",
+  "brg_C",
+  "brg_D",
+  "brg_K1",
+  "brg_K2",
+  "hip",
+  "knee_axle",
+  "knee_gim",
+  "pinA",
+  "pinB",
+  "pinC",
+  "pinD",
+  "screwA",
+  "screwC",
+  "screwD"
+ ],
+ "steps": [
+  {
+   "title": "허벅지 무릎 고리에 베어링",
+   "parts": [
+    "thigh",
+    "brg_K1",
+    "brg_K2",
+    "sleeve_knee"
+   ],
+   "desc": "허벅지 아래쪽 무릎 고리에 608 베어링을 양쪽 면에서 하나씩 끼웁니다. 가운데 턱(6 mm)에 닿을 때까지 평평하게 눌러 넣습니다.",
+   "dir": [
+    -1.0,
+    0.0,
+    0.0001
+   ],
+   "part_dirs": {
+    "brg_K1": [
+     -1.0,
+     0.0,
+     0.0001
+    ],
+    "brg_K2": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "sleeve_knee": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   }
+  },
+  {
+   "title": "허벅지를 고관절 모터에",
+   "parts": [
+    "hip"
+   ],
+   "desc": "허벅지의 넓고 평평한 면(출력 바닥면)을 고관절 pitch 모터 출력면에 댑니다.",
+   "dir": [
+    -1.0,
+    0.0,
+    0.0001
+   ],
+   "part_dirs": {
+    "hip": [
+     -1.0,
+     0.0,
+     0.0001
+    ]
+   }
+  },
+  {
+   "title": "무릎 모터 얹기",
+   "parts": [
+    "knee_gim"
+   ],
+   "desc": "무릎 모터(GIM8115)를 허벅지 받침에 얹습니다. 덮개가 자리에 끼워지면서 중심이 맞습니다.",
+   "dir": [
+    1.0,
+    -0.0,
+    -0.0001
+   ],
+   "part_dirs": {
+    "knee_gim": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   }
+  },
+  {
+   "title": "허벅지 앞 링",
+   "parts": [
+    "thigh_front"
+   ],
+   "desc": "앞 링을 무릎 모터 앞면에 대고 M4×8 여덟 개로 조입니다.",
+   "dir": [
+    1.0,
+    -0.0,
+    -0.0001
+   ],
+   "part_dirs": {
+    "thigh_front": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   },
+   "bolts": [
+    "bolt_1",
+    "bolt_2"
+   ]
+  },
+  {
+   "title": "입력 크랭크",
+   "parts": [
+    "input_crank"
+   ],
+   "desc": "앞 링 가운데 구멍 안으로 입력 크랭크를 넣어 무릎 모터 출력에 대고 M4×10 세 개로 조입니다.",
+   "dir": [
+    1.0,
+    -0.0,
+    -0.0001
+   ],
+   "part_dirs": {
+    "input_crank": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   }
+  },
+  {
+   "title": "정강이 바깥 판에 발목 모터",
+   "parts": [
+    "shin_outer",
+    "ankle_rs"
+   ],
+   "desc": "여기서부터는 정강이 묶음을 허벅지와 따로 만듭니다 (화면에서 아래로 떨어져 있는 묶음).",
+   "dir": [
+    1.0,
+    -0.0,
+    -0.0001
+   ],
+   "part_dirs": {
+    "ankle_rs": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   }
+  },
+  {
+   "title": "모터 크랭크와 볼 D",
+   "parts": [
+    "motor_crank",
+    "cheek_D",
+    "screwD"
+   ],
+   "desc": "모터 크랭크를 발목 모터 출력에 대고 M4×16 세 개로 조입니다.",
+   "dir": [
+    -1.0,
+    0.0,
+    0.0001
+   ],
+   "part_dirs": {
+    "motor_crank": [
+     -1.0,
+     0.0,
+     0.0001
+    ],
+    "cheek_D": [
+     -1.0,
+     0.0,
+     0.0001
+    ],
+    "screwD": [
+     -1.0,
+     0.0,
+     0.0001
+    ]
+   }
+  },
+  {
+   "title": "정강이 기둥과 안쪽 판",
+   "parts": [
+    "shin_posts",
+    "shin_inner"
+   ],
+   "desc": "기둥 2개를 바깥 판에 세우고, 안쪽 판을 덮어 양쪽 끝을 M3로 고정합니다.",
+   "dir": [
+    -1.0,
+    0.0,
+    0.0001
+   ],
+   "part_dirs": {
+    "shin_posts": [
+     -1.0,
+     0.0,
+     0.0001
+    ],
+    "shin_inner": [
+     -1.0,
+     0.0,
+     0.0001
+    ]
+   },
+   "bolts": [
+    "bolt_6",
+    "bolt_7",
+    "bolt_8",
+    "bolt_9"
+   ]
+  },
+  {
+   "title": "발 묶음",
+   "parts": [
+    "foot",
+    "ankle_spacer",
+    "foot_outer_new",
+    "brg_A1",
+    "brg_A2",
+    "sleeve_ankle"
+   ],
+   "desc": "원래 발에서 688 베어링 2개를 빼서 새 발 바깥 판에 옮겨 끼웁니다.",
+   "dir": [
+    1.0,
+    -0.0,
+    -0.0001
+   ],
+   "part_dirs": {
+    "ankle_spacer": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "foot_outer_new": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "brg_A1": [
+     -1.0,
+     0.0,
+     0.0001
+    ],
+    "brg_A2": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "sleeve_ankle": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   },
+   "bolts": [
+    "bolt_10",
+    "bolt_11",
+    "bolt_12"
+   ]
+  },
+  {
+   "title": "무릎 축으로 허벅지와 정강이 잇기",
+   "parts": [
+    "ring_knee_in",
+    "cheek_B",
+    "knee_axle"
+   ],
+   "desc": "허벅지 무릎 고리(베어링 + 슬리브)를 정강이 두 판 사이에 넣습니다.",
+   "dir": [
+    -1.0,
+    0.0,
+    0.0001
+   ],
+   "part_dirs": {
+    "ring_knee_in": [
+     -1.0,
+     0.0,
+     0.0001
+    ],
+    "cheek_B": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "knee_axle": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   }
+  },
+  {
+   "title": "발목 축",
+   "parts": [
+    "ring_ankle_in",
+    "ankle_axle"
+   ],
+   "desc": "발 묶음을 정강이 두 판 사이에 넣습니다.",
+   "dir": [
+    -1.0,
+    0.0,
+    0.0001
+   ],
+   "part_dirs": {
+    "ring_ankle_in": [
+     -1.0,
+     0.0,
+     0.0001
+    ],
+    "ankle_axle": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   }
+  },
+  {
+   "title": "커플러 (무릎 링크)",
+   "parts": [
+    "coupler",
+    "brg_AIN",
+    "brg_B",
+    "ring_B",
+    "sleeve_A",
+    "sleeve_B",
+    "cheek_A",
+    "screwA",
+    "pinA",
+    "pinB"
+   ],
+   "desc": "커플러 양끝에 608을 끼웁니다. 큰 구멍(22 mm)이 있는 면, 즉 크랭크 쪽 면에서 넣습니다. 슬리브 A·B(7 mm)를 베어링 안쪽 링에.",
+   "dir": [
+    1.0,
+    -0.0,
+    -0.0001
+   ],
+   "part_dirs": {
+    "coupler": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "brg_AIN": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "brg_B": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "ring_B": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "sleeve_A": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "sleeve_B": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "cheek_A": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "screwA": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "pinA": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "pinB": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   }
+  },
+  {
+   "title": "푸시로드 (발목 링크)",
+   "parts": [
+    "pushrod",
+    "brg_D",
+    "brg_C",
+    "ring_D",
+    "sleeve_D",
+    "sleeve_C",
+    "spacer_D_head",
+    "pinD",
+    "cheek_C",
+    "screwC",
+    "pinC"
+   ],
+   "desc": "푸시로드 양끝에 608을 끼웁니다. D 끝(위)은 안쪽 면에서, C 끝(아래)은 바깥 면에서 넣고 슬리브 C·D(7 mm)를 끼웁니다.",
+   "dir": [
+    0.0001,
+    -0.0,
+    1.0
+   ],
+   "part_dirs": {
+    "pushrod": [
+     0.0001,
+     -0.0,
+     1.0
+    ],
+    "brg_D": [
+     0.0001,
+     -0.0,
+     1.0
+    ],
+    "brg_C": [
+     0.0001,
+     -0.0,
+     1.0
+    ],
+    "ring_D": [
+     0.0001,
+     -0.0,
+     1.0
+    ],
+    "sleeve_D": [
+     0.0001,
+     -0.0,
+     1.0
+    ],
+    "sleeve_C": [
+     0.0001,
+     -0.0,
+     1.0
+    ],
+    "spacer_D_head": [
+     -1.0,
+     0.0,
+     0.0001
+    ],
+    "pinD": [
+     -1.0,
+     0.0,
+     0.0001
+    ],
+    "cheek_C": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "screwC": [
+     1.0,
+     -0.0,
+     -0.0001
+    ],
+    "pinC": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   }
+  },
+  {
+   "title": "무릎 바깥 덮개",
+   "parts": [
+    "knee_shield"
+   ],
+   "desc": "덮개의 기둥 3개를 허벅지 앞 링에 대고, 판 위에서 M3×40 세 개로 고정합니다 (머리 6 mm 묻힘).",
+   "dir": [
+    1.0,
+    -0.0,
+    -0.0001
+   ],
+   "part_dirs": {
+    "knee_shield": [
+     1.0,
+     -0.0,
+     -0.0001
+    ]
+   },
+   "bolts": [
+    "bolt_3",
+    "bolt_4",
+    "bolt_5"
+   ]
+  },
+  {
+   "title": "발판",
+   "parts": [
+    "foot_plate_crown_upper",
+    "foot_plate_crown_sole"
+   ],
+   "desc": "신발 바닥의 나사 6개를 뺍니다 (안쪽 줄 3, 바깥쪽 줄 3).",
+   "dir": [
+    -0.0,
+    -1.0,
+    -0.0
+   ],
+   "part_dirs": {
+    "foot_plate_crown_upper": [
+     -0.0,
+     -1.0,
+     -0.0
+    ],
+    "foot_plate_crown_sole": [
+     -0.0,
+     -1.0,
+     -0.0
+    ]
+   }
+  }
+ ],
+ "bolts": [
+  {
+   "id": "bolt_1",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.15599,
+    -0.05288,
+    -0.03778
+   ],
+   "tail": [
+    0.12399,
+    -0.05288,
+    -0.03778
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "thigh",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_2",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.15599,
+    -0.06509,
+    -0.0465
+   ],
+   "tail": [
+    0.12399,
+    -0.06509,
+    -0.0465
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "thigh",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_3",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.19379,
+    0.0289,
+    -0.03833
+   ],
+   "tail": [
+    0.15249,
+    0.0289,
+    -0.03833
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_shield",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_4",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.19379,
+    0.03834,
+    0.0289
+   ],
+   "tail": [
+    0.15249,
+    0.03834,
+    0.02889
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_shield",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_5",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.19379,
+    -0.04753,
+    0.00669
+   ],
+   "tail": [
+    0.15249,
+    -0.04753,
+    0.00668
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_shield",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_6",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.10899,
+    -0.13886,
+    -0.06727
+   ],
+   "tail": [
+    0.12599,
+    -0.13886,
+    -0.06727
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "shin_inner",
+    "shin_posts"
+   ]
+  },
+  {
+   "id": "bolt_7",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.16749,
+    -0.13886,
+    -0.06727
+   ],
+   "tail": [
+    0.15349,
+    -0.13886,
+    -0.06727
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "shin_outer",
+    "shin_posts"
+   ]
+  },
+  {
+   "id": "bolt_8",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.10899,
+    -0.18977,
+    -0.01636
+   ],
+   "tail": [
+    0.12599,
+    -0.18977,
+    -0.01636
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "shin_inner",
+    "shin_posts"
+   ]
+  },
+  {
+   "id": "bolt_9",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.16749,
+    -0.18977,
+    -0.01636
+   ],
+   "tail": [
+    0.15349,
+    -0.18977,
+    -0.01636
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "shin_outer",
+    "shin_posts"
+   ]
+  },
+  {
+   "id": "bolt_10",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.12729,
+    -0.20739,
+    0.028
+   ],
+   "tail": [
+    0.13849,
+    -0.20739,
+    0.028
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_spacer",
+    "foot_outer_new"
+   ]
+  },
+  {
+   "id": "bolt_11",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.12729,
+    -0.22629,
+    0.03891
+   ],
+   "tail": [
+    0.13849,
+    -0.22629,
+    0.03891
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_spacer",
+    "foot_outer_new"
+   ]
+  },
+  {
+   "id": "bolt_12",
+   "size": "M3",
+   "diameter": 0.0028,
+   "head": [
+    0.12729,
+    -0.22629,
+    0.01708
+   ],
+   "tail": [
+    0.13849,
+    -0.22629,
+    0.01709
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_spacer",
+    "foot_outer_new"
+   ]
+  }
+ ]
+}
