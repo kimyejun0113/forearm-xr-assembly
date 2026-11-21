@@ -17,20 +17,39 @@ _whisper = None
 
 
 # ---------- 음성 인식 ----------
-def _model():
-    global _whisper
-    if _whisper is None:
+# 짧은 말(단계 명령)은 빠른 base, 긴 말(질문)은 정확한 small. CPU 코어를 전부 쓴다.
+# 측정 (Core Ultra 5 125H): base 약 0.9초, small 약 2.7초 (예전 설정 small 3~3.8초)
+FAST_SIZE = os.environ.get("WHISPER_FAST_SIZE", "base")
+SHORT_SEC = float(os.environ.get("STT_SHORT_SEC", "1.6"))
+_models = {}
+
+
+def _model(size: str | None = None):
+    size = size or WHISPER_SIZE
+    if size not in _models:
         from faster_whisper import WhisperModel
-        _whisper = WhisperModel(WHISPER_SIZE, device="cpu", compute_type="int8")
-    return _whisper
+        _models[size] = WhisperModel(size, device="cpu", compute_type="int8", cpu_threads=os.cpu_count() or 4)
+    return _models[size]
+
+
+def warm():
+    """서버 시작 때 미리 불러 두기 (첫 질문이 느리지 않게)"""
+    import numpy as np
+    for size in {FAST_SIZE, WHISPER_SIZE}:
+        list(_model(size).transcribe(np.zeros(16000, dtype="float32"), language="ko", beam_size=1)[0])
 
 
 def stt(audio: bytes, filename: str = "q.webm") -> str:
     """짧은 질문 녹음 → 글자"""
+    from faster_whisper.audio import decode_audio
     with tempfile.NamedTemporaryFile(suffix=Path(filename).suffix or ".webm", delete=False) as f:
         f.write(audio); p = f.name
     try:
-        segs, _ = _model().transcribe(p, language="ko", beam_size=1, vad_filter=True, initial_prompt=STT_HINT)
+        wav = decode_audio(p)                                  # 16 kHz
+        size = FAST_SIZE if len(wav) / 16000 <= SHORT_SEC else WHISPER_SIZE
+        # 말 앞뒤는 화면 쪽에서 이미 잘라서 보내므로 VAD 는 끔 (더 빠름)
+        segs, _ = _model(size).transcribe(wav, language="ko", beam_size=1, vad_filter=False, initial_prompt=STT_HINT,
+                                          without_timestamps=True, condition_on_previous_text=False)
         return " ".join(s.text.strip() for s in segs).strip()
     finally:
         os.unlink(p)

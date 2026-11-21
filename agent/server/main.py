@@ -25,6 +25,10 @@ app.mount("/client", StaticFiles(directory=ROOT / "client"), name="client")
 app.mount("/data/captures", StaticFiles(directory=ROOT / "data/captures"), name="captures")
 (ROOT / "data/briefings").mkdir(parents=True, exist_ok=True)
 app.mount("/data/briefings", StaticFiles(directory=ROOT / "data/briefings"), name="briefings")
+# 음성 인식을 이 PC 에서 하면 모델을 미리 불러 둔다 (첫 질문이 10초 넘게 걸리지 않게)
+if not llm.can("stt"):
+    import threading
+    threading.Thread(target=lambda: (local_ai.warm(), print("음성 인식 모델 준비 완료")), daemon=True).start()
 # 3D/XR 화면 (저장소 루트의 web/): Quest 에서 http://localhost:8000/xr/xr.html
 if (ROOT.parent / "web").is_dir():
     app.mount("/xr", StaticFiles(directory=ROOT.parent / "web", html=True), name="xr")

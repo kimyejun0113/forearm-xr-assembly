@@ -864,7 +864,7 @@ function onFrame(d) {
   } else {
     VOICE.frames.push(d); VOICE.len += dt;
     VOICE.quietT = loud ? 0 : VOICE.quietT + dt;
-    if (VOICE.quietT > 0.8 || VOICE.len > 8) {
+    if (VOICE.quietT > 0.6 || VOICE.len > 8) {          // 0.6초 조용하면 말 끝
       const frames = VOICE.frames; VOICE.speaking = false; VOICE.frames = []; VOICE.pre = [];
       if (VOICE.len > 0.35) sendUtterance(frames, VOICE.ctx.sampleRate);
       drawInfo();
