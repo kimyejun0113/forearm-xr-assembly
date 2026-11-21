@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>조립·분해 도우미</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=JetBrains+Mono:wght@500&display=swap">
 <style>
   :root { --bg: #f4f5f7; --panel: #ffffffee; --text: #1d2330; --muted: #667085; --accent: #2563eb; --line: #d0d5dd; --warn: #b42318; --chip: #eef2ff; }
   @media (prefers-color-scheme: dark) { :root { --bg: #14161b; --panel: #1f232bee; --text: #e8eaf0; --muted: #98a2b3; --line: #344054; --warn: #f97066; --chip: #1e2a4a; } }
@@ -947,67 +949,163 @@ function wrapText(c, text, maxW) {
   if (line) out.push(line);
   return out;
 }
+// 디자인: jarvis-previews/redesign (잘린 모서리 판 + 청록 강조, 안쪽은 테두리 없이 선·그라데이션만)
+const HUD = {
+  acc: '#5ce6ff', accDim: 'rgba(92,230,255,0.16)', ink: '#eef3f6', ink2: '#a9b4bc', ink3: '#6b7780',
+  line: 'rgba(190,215,230,0.16)', line2: 'rgba(190,215,230,0.34)', warn: '#ffb547', danger: '#ff5d6c',
+  KR: 'Pretendard, "Malgun Gothic", sans-serif', OR: 'Orbitron, "Arial Black", sans-serif', MONO: '"JetBrains Mono", Consolas, monospace',
+};
+function chamfer(c, x, y, w, h, k, notch) {
+  c.beginPath(); c.moveTo(x + k, y);
+  if (notch) { c.lineTo(x + w - 180, y); c.lineTo(x + w - 164, y + 12); c.lineTo(x + w - k, y + 12); c.lineTo(x + w, y + k + 12); }
+  else { c.lineTo(x + w - k, y); c.lineTo(x + w, y + k); }
+  c.lineTo(x + w, y + h - k); c.lineTo(x + w - k, y + h); c.lineTo(x + k, y + h); c.lineTo(x, y + h - k); c.lineTo(x, y + k); c.closePath();
+}
+function hazard(c, x, y, w, h, color) {   // 사선 줄무늬 띠
+  c.save(); c.beginPath(); c.rect(x, y, w, h); c.clip(); c.fillStyle = color;
+  for (let i = -h; i < w + h; i += 20) { c.beginPath(); c.moveTo(x + i, y + h); c.lineTo(x + i + 10, y + h); c.lineTo(x + i + 10 + h, y); c.lineTo(x + i + h, y); c.fill(); }
+  c.restore();
+}
+function specChips(st) {   // 볼트·공구·부품을 수치 칩으로 (문장보다 먼저 보이게)
+  const out = [];
+  const b = (st.bolts || [])[0];
+  const m = b && b.match(/(M\d+)\s*(?:약\s*)?([\d.]+\s*mm)?\s*×\s*(\d+)/);
+  if (m) { out.push(['BOLT', `${m[1]} ×${(st.bolts || []).reduce((s, x) => s + (+(x.match(/×\s*(\d+)/) || [0, 0])[1]), 0)}`]); if (m[2]) out.push(['LENGTH', '≈ ' + m[2].replace(/\s+/, ' ')]); }
+  else if ((st.parts || [])[0]) out.push(['PART', (agent.kb?.parts?.[st.parts[0]]?.name || st.parts[0]).replace(/\s*\(.*\)$/, '')]);
+  if ((st.tools || [])[0]) out.push(['TOOL', st.tools[0].replace('육각 렌치', '육각')]);
+  return out.slice(0, 3);
+}
 function drawInfo() {
-  const c = ictx, pad = 40, W = INFO_W - pad * 2;
+  const c = ictx, P = 52, W = INFO_W - P * 2;
   c.clearRect(0, 0, INFO_W, INFO_H);
-  c.fillStyle = 'rgba(15,23,42,0.88)';
-  c.beginPath(); c.roundRect(0, 0, INFO_W, INFO_H, 36); c.fill();
-  let y = 64;
-  const line = (t, font, color, maxLines = 3, gap = 8) => {
-    c.font = font; c.fillStyle = color;
-    const size = parseInt(font.match(/(\d+)px/)[1], 10);
-    for (const l of wrapText(c, t, W).slice(0, maxLines)) { c.fillText(l, pad, y); y += size + gap; }
+  c.textBaseline = 'alphabetic';
+  // 판: 잘린 모서리 + 바깥 선 + 왼쪽 위 빛줄기 + 구석 표시
+  chamfer(c, 2, 2, INFO_W - 4, INFO_H - 4, 40, true);
+  const bg = c.createLinearGradient(0, 0, 0, INFO_H); bg.addColorStop(0, 'rgba(20,28,36,0.95)'); bg.addColorStop(1, 'rgba(9,12,16,0.95)');
+  c.fillStyle = bg; c.fill(); c.lineWidth = 3; c.strokeStyle = HUD.line2; c.stroke();
+  c.fillStyle = HUD.acc; c.shadowColor = HUD.acc; c.shadowBlur = 16; c.fillRect(44, 0, 220, 5); c.shadowBlur = 0;
+  c.strokeStyle = HUD.acc; c.lineWidth = 3;
+  c.beginPath(); c.moveTo(16, 40); c.lineTo(16, 16); c.lineTo(40, 16); c.stroke();
+  c.beginPath(); c.moveTo(INFO_W - 16, INFO_H - 40); c.lineTo(INFO_W - 16, INFO_H - 16); c.lineTo(INFO_W - 40, INFO_H - 16); c.stroke();
+
+  const txt = (t, x, y, font, color, align = 'left', spacing = 0) => {
+    c.font = font; c.fillStyle = color; c.textAlign = align; c.letterSpacing = spacing + 'px'; c.fillText(t, x, y); c.letterSpacing = '0px'; c.textAlign = 'left';
   };
-  line(agent.status, '28px "Malgun Gothic", sans-serif', agent.on ? '#86efac' : '#fca5a5', 1);
-  if (VOICE.on) {
-    const st = VOICE.waitQ > 0 ? '🎤 네? 말씀하세요' : VOICE.speaking ? '🎤 듣는 중…' : VOICE.busy ? '🎤 알아듣는 중…'
-      : `🎤 ${VOICE.wake ? `질문은 "${VOICE.wake}"로 시작 · ` : ''}단계는 "다음/이전/다시"`;
-    line(st, '28px "Malgun Gothic", sans-serif', VOICE.speaking || VOICE.waitQ > 0 ? '#fde047' : '#fca5a5', 1);
-    if (VOICE.heard) line(`들은 말: ${VOICE.heard}`, '26px "Malgun Gothic", sans-serif', '#cbd5e1', 1);
+  const wrapDraw = (t, x, y, maxW, font, color, lh, maxLines) => {
+    c.font = font; const ls = wrapText(c, t, maxW).slice(0, maxLines);
+    ls.forEach((l, i) => txt(l, x, y + i * lh, font, color)); return y + ls.length * lh;
+  };
+
+  // 머리: 문서 이름, 연결 상태, 큰 단계 번호
+  txt('FOREARM', P, 86, `700 24px ${HUD.OR}`, HUD.ink2, 'left', 7);
+  c.font = `700 24px ${HUD.OR}`; c.letterSpacing = '7px'; const fw = c.measureText('FOREARM ').width; c.letterSpacing = '0px';
+  txt('//', P + fw, 86, `700 24px ${HUD.OR}`, HUD.acc, 'left', 4);
+  txt('ASSEMBLY', P + fw + 50, 86, `700 24px ${HUD.OR}`, HUD.ink2, 'left', 7);
+  c.fillStyle = agent.on ? HUD.acc : HUD.danger; c.beginPath(); c.arc(P + 7, 124, 6, 0, 7); c.fill();
+  txt(agent.status, P + 24, 132, `500 26px ${HUD.KR}`, HUD.ink3);
+
+  const card = agent.card, st = card?.step;
+  const total = card?.total || agent.kb?.steps?.length || 14, idx = card?.index || 0;
+  txt(String(idx).padStart(2, '0'), INFO_W - P - 74, 150, `900 118px ${HUD.OR}`, HUD.ink, 'right');
+  txt('/' + total, INFO_W - P, 150, `700 32px ${HUD.OR}`, HUD.ink3, 'right');
+  // 진행 칸
+  const gap = 6, cw = (W - gap * (total - 1)) / total;
+  for (let i = 0; i < total; i++) {
+    c.fillStyle = i < idx - 1 ? 'rgba(190,215,230,0.55)' : i === idx - 1 ? HUD.acc : 'rgba(190,215,230,0.12)';
+    if (i === idx - 1) { c.shadowColor = HUD.acc; c.shadowBlur = 14; }
+    const x = P + i * (cw + gap); c.beginPath(); c.moveTo(x + 6, 182); c.lineTo(x + cw, 182); c.lineTo(x + cw - 6, 190); c.lineTo(x, 190); c.fill(); c.shadowBlur = 0;
   }
-  const card = agent.card;
-  if (!card) {
-    y += 20;
-    line('처음부터 또는 다음을 누르면 단계 안내가 나와요', '36px "Malgun Gothic", sans-serif', '#e2e8f0');
+
+  let y = 262;
+  if (!st) {
+    y = wrapDraw('처음부터 또는 다음을 누르면 단계 안내가 나와요', P, y, W, `700 44px ${HUD.KR}`, HUD.ink, 58, 3);
   } else {
-    const st = card.step;
-    y += 16;
-    line(`${st.step_id} · ${card.index} / ${card.total} 단계`, '30px "Malgun Gothic", sans-serif', '#94a3b8', 1);
-    // 진행 막대
-    c.fillStyle = '#334155'; c.fillRect(pad, y - 10, W, 10);
-    c.fillStyle = '#60a5fa'; c.fillRect(pad, y - 10, W * card.index / card.total, 10);
-    y += 64;
-    line(st.name, 'bold 54px "Malgun Gothic", sans-serif', '#ffffff', 2, 12);
-    y += 10;
-    line('할 일', 'bold 30px "Malgun Gothic", sans-serif', '#93c5fd', 1);
-    for (const t of [...(st.instructions || []), ...(st.bolts || []).map((b) => '볼트 ' + b)].slice(0, 5)) line('• ' + t, '34px "Malgun Gothic", sans-serif', '#e2e8f0', 2);
-    if ((st.tools || []).length) line('공구: ' + st.tools.join(', '), '30px "Malgun Gothic", sans-serif', '#cbd5e1', 2);
-    if ((st.warnings || []).length) {
-      y += 10;
-      line('주의', 'bold 30px "Malgun Gothic", sans-serif', '#fca5a5', 1);
-      for (const t of st.warnings.slice(0, 3)) line('• ' + t, '32px "Malgun Gothic", sans-serif', '#fecaca', 3);
+    y = wrapDraw(st.name, P, y, W, `700 56px ${HUD.KR}`, HUD.ink, 66, 2) + 6;
+    // 수치 칩: 테두리 없이 왼쪽 선 + 옅은 판
+    let x = P;
+    for (const [k, v] of specChips(st)) {
+      c.font = `700 34px ${HUD.KR}`; const w = Math.max(170, c.measureText(v).width + 52);
+      const g = c.createLinearGradient(x, 0, x + w, 0); g.addColorStop(0, 'rgba(190,215,230,0.10)'); g.addColorStop(1, 'rgba(190,215,230,0.02)');
+      c.fillStyle = g; c.fillRect(x, y, w, 92); c.fillStyle = HUD.line2; c.fillRect(x, y, 4, 92);
+      txt(k, x + 22, y + 32, `500 19px ${HUD.MONO}`, HUD.ink3, 'left', 4);
+      txt(v, x + 22, y + 74, `700 34px ${HUD.KR}`, HUD.ink);
+      x += w + 16;
     }
-    for (const h of (card.hints || []).slice(0, 2)) line('· ' + h, '28px "Malgun Gothic", sans-serif', '#a5b4fc', 2);
+    y += 140;
+    // TO DO
+    txt('TO DO', P, y, `700 21px ${HUD.OR}`, HUD.ink2, 'left', 7);
+    const lg = c.createLinearGradient(P + 140, 0, INFO_W - P, 0); lg.addColorStop(0, HUD.line2); lg.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = lg; c.fillRect(P + 140, y - 8, W - 140, 2);
+    y += 22;
+    (st.instructions || []).slice(0, 4).forEach((t, i) => {
+      c.font = `500 32px ${HUD.KR}`; const ls = wrapText(c, t, W - 110).slice(0, 2), h = 30 + ls.length * 44;
+      const g = c.createLinearGradient(P, 0, INFO_W - P, 0); g.addColorStop(0, i === 0 ? HUD.accDim : 'rgba(190,215,230,0.05)'); g.addColorStop(1, 'rgba(190,215,230,0.01)');
+      c.fillStyle = g; c.fillRect(P, y, W, h); c.fillStyle = i === 0 ? HUD.acc : 'rgba(190,215,230,0.22)'; c.fillRect(P, y, 4, h);
+      txt(String(i + 1).padStart(2, '0'), P + 58, y + 50, `500 22px ${HUD.MONO}`, i === 0 ? HUD.acc : HUD.ink3, 'right');
+      ls.forEach((l, j) => txt(l, P + 84, y + 50 + j * 44, `500 32px ${HUD.KR}`, HUD.ink));
+      y += h + 12;
+    });
+    // 주의 / 안전: 줄무늬 + 그라데이션 띠
+    const warns = (st.warnings || []).slice(0, 2);
+    if (warns.length) {
+      const danger = !!st.flags?.danger, col = danger ? HUD.danger : HUD.warn;
+      c.font = `500 29px ${HUD.KR}`; const lines = warns.flatMap((t) => wrapText(c, t, W - 120).slice(0, 2)).slice(0, 4);
+      const h = 66 + lines.length * 40;
+      const g = c.createLinearGradient(P, 0, INFO_W - P, 0); g.addColorStop(0, danger ? 'rgba(255,93,108,0.2)' : 'rgba(255,181,71,0.15)'); g.addColorStop(1, 'rgba(0,0,0,0.02)');
+      c.fillStyle = g; c.fillRect(P, y + 6, W, h); hazard(c, P, y + 6, 64, h, col);
+      txt(danger ? 'SAFETY' : 'CAUTION', P + 92, y + 46, `700 21px ${HUD.OR}`, col, 'left', 6);
+      lines.forEach((l, j) => txt(l, P + 92, y + 90 + j * 40, `500 29px ${HUD.KR}`, danger ? '#ffd0d5' : '#ffe2b5'));
+      y += h + 6;
+    }
   }
-  // AI 답변 / 먼저 말 거는 알림
+
+  // ---------- JARVIS ----------
   const r = agent.reply;
+  const jy = Math.max(y + 34, 880);
+  c.fillStyle = HUD.line; c.fillRect(2, jy, INFO_W - 4, 2);
+  const jg = c.createLinearGradient(0, jy, 0, INFO_H); jg.addColorStop(0, 'rgba(92,230,255,0.05)'); jg.addColorStop(0.3, 'rgba(6,9,12,0.6)'); jg.addColorStop(1, 'rgba(6,9,12,0.6)');
+  c.save(); chamfer(c, 2, 2, INFO_W - 4, INFO_H - 4, 40, true); c.clip(); c.fillStyle = jg; c.fillRect(2, jy + 2, INFO_W - 4, INFO_H - jy); c.restore();
+  const talking = aiTalking(), listening = VOICE.speaking || VOICE.waitQ > 0, thinking = VOICE.busy > 0;
+  const state = talking ? 'SPEAKING' : thinking ? 'THINKING' : listening ? 'LISTENING' : VOICE.on ? 'STANDBY' : 'MIC OFF';
+  const live = talking || thinking || listening;
+  const oy = jy + 64;
+  c.strokeStyle = HUD.line2; c.lineWidth = 2; c.beginPath(); c.arc(P + 34, oy, 30, 0, 7); c.stroke();
+  c.setLineDash([5, 6]); c.strokeStyle = 'rgba(92,230,255,0.4)'; c.beginPath(); c.arc(P + 34, oy, 40, 0, 7); c.stroke(); c.setLineDash([]);
+  const og = c.createRadialGradient(P + 34, oy, 0, P + 34, oy, 22); og.addColorStop(0, '#dffaff'); og.addColorStop(0.45, HUD.acc); og.addColorStop(1, 'rgba(92,230,255,0)');
+  c.fillStyle = og; c.shadowColor = HUD.acc; c.shadowBlur = live ? 26 : 12; c.beginPath(); c.arc(P + 34, oy, live ? 22 : 16, 0, 7); c.fill(); c.shadowBlur = 0;
+  txt('JARVIS', P + 96, oy + 13, `900 36px ${HUD.OR}`, HUD.ink, 'left', 12);
+  c.fillStyle = live ? HUD.acc : HUD.ink3; c.beginPath(); c.arc(INFO_W - P - 168, oy - 4, 6, 0, 7); c.fill();
+  txt(state, INFO_W - P, oy + 4, `500 21px ${HUD.MONO}`, live ? HUD.acc : HUD.ink3, 'right', 3);
+
+  let ay = oy + 76;
+  const hint = VOICE.on ? `${VOICE.wake ? `"${VOICE.wake}" + 질문 · ` : ''}"다음" "이전" "다시"` : '마이크를 켜면 말로 물어볼 수 있어요';
+  if (VOICE.waitQ > 0) txt('네? 말씀하세요', P, ay, `700 32px ${HUD.KR}`, HUD.acc);
+  else if (VOICE.heard && listening) txt(VOICE.heard, P, ay, `500 28px ${HUD.KR}`, HUD.ink2);
+  else if (!r) txt(hint, P, ay, `500 24px ${HUD.MONO}`, HUD.ink3);
   if (r) {
-    y = Math.max(y + 20, 760);
-    c.fillStyle = r.kind === 'danger' ? 'rgba(220,38,38,0.35)' : r.kind === 'prompt' ? 'rgba(245,158,11,0.25)' : 'rgba(59,130,246,0.22)';
-    c.beginPath(); c.roundRect(pad - 16, y - 50, W + 32, INFO_H - y - 20, 24); c.fill();
-    if (r.q) line('Q. ' + r.q, '30px "Malgun Gothic", sans-serif', '#cbd5e1', 2);
-    line(r.text, '38px "Malgun Gothic", sans-serif', '#ffffff', 6, 10);
-    if (r.src?.length) { y = INFO_H - 40; line('출처: ' + r.src.join(' · '), '24px "Malgun Gothic", sans-serif', '#94a3b8', 1); }
+    if (r.q) {   // 질문: 오른쪽 말풍선
+      c.font = `500 28px ${HUD.KR}`; const q = wrapText(c, r.q, W * 0.7)[0] || '', qw = c.measureText(q).width + 44;
+      c.fillStyle = 'rgba(190,215,230,0.1)'; c.beginPath(); c.roundRect(INFO_W - P - qw, ay - 38, qw, 58, [24, 24, 4, 24]); c.fill();
+      txt(q, INFO_W - P - 22, ay, `500 28px ${HUD.KR}`, HUD.ink2, 'right'); ay += 54;
+    }
+    const col = r.kind === 'danger' ? HUD.danger : r.kind === 'prompt' ? HUD.warn : HUD.acc;
+    c.font = `500 33px ${HUD.KR}`; const ls = wrapText(c, r.text, W - 50).slice(0, 5);
+    const h = 34 + ls.length * 46 + (r.src?.length ? 36 : 0);
+    const g = c.createLinearGradient(P, 0, INFO_W - P, 0);
+    g.addColorStop(0, r.kind === 'danger' ? 'rgba(255,93,108,0.2)' : r.kind === 'prompt' ? 'rgba(255,181,71,0.15)' : HUD.accDim); g.addColorStop(1, 'rgba(0,0,0,0.02)');
+    c.fillStyle = g; c.fillRect(P, ay, W, h); c.fillStyle = col; c.fillRect(P, ay, 4, h);
+    ls.forEach((l, j) => txt(l, P + 26, ay + 48 + j * 46, `500 33px ${HUD.KR}`, HUD.ink));
+    if (r.src?.length) txt('SRC // ' + r.src.join(' · '), P + 26, ay + 48 + ls.length * 46, `500 20px ${HUD.MONO}`, HUD.ink3);
   }
-  if (agent.toast) {
-    c.fillStyle = 'rgba(34,197,94,0.9)';
-    c.beginPath(); c.roundRect(pad - 16, INFO_H - 120, W + 32, 84, 20); c.fill();
-    c.font = 'bold 32px "Malgun Gothic", sans-serif'; c.fillStyle = '#052e16';
-    c.fillText(wrapText(c, agent.toast, W)[0] || '', pad, INFO_H - 66);
+  if (agent.toast) {   // 잠깐 뜨는 안내: 아래쪽 청록 띠
+    c.font = `700 28px ${HUD.KR}`; const t = wrapText(c, agent.toast, W - 40)[0] || '';
+    c.fillStyle = 'rgba(92,230,255,0.92)'; c.beginPath(); c.moveTo(P + 12, INFO_H - 112); c.lineTo(INFO_W - P, INFO_H - 112); c.lineTo(INFO_W - P, INFO_H - 60); c.lineTo(INFO_W - P - 12, INFO_H - 48); c.lineTo(P, INFO_H - 48); c.lineTo(P, INFO_H - 100); c.fill();
+    txt(t, P + 22, INFO_H - 70, `700 28px ${HUD.KR}`, '#041016');
   }
   infoTex.needsUpdate = true;
 }
 drawInfo();
+document.fonts?.ready.then(() => drawInfo());   // 웹 글꼴을 받은 뒤 다시 그림
 connectAgent();
 
 // ======================= 매 프레임 =======================
