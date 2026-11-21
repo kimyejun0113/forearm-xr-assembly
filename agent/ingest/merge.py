@@ -3,7 +3,7 @@
 슬라이드: 기존 번호는 그대로. 같은 제목이면 더 또렷하게 읽힌 쪽으로 내용만 바꾸고, 처음 보는 슬라이드만 뒤에 붙인다
          (번호가 안 바뀌어야 기존 설계자 말의 슬라이드 연결이 안 깨진다).
 설계자 말: 새 녹음 문장을 LLM이 기존 말·단계·슬라이드와 비교해 문장마다 정한다.
-         add(새 요령) / replace(기존 문장을 더 구체적으로) / drop(잡담·맞장구·녹화 조작 말·이미 있는 내용).
+         add(새 요령) / replace(기존 문장을 더 구체적으로) / conflict(기존과 반대 — 넣지 않고 확인 요청) / drop(잡담·이미 있는 내용).
          음성 인식이 틀린 글자는 부품·단계 이름을 보고 고치고, 어느 단계 이야기인지도 붙인다. 기존 문장은 지우지 않는다.
 """
 import json
@@ -42,6 +42,11 @@ SYSTEM = """너는 로봇 조립 설명을 정리하는 편집자다. 설계자(
 - "add": 조립에 쓸모 있는 새 정보 (순서, 방향, 요령, 주의, 왜 그런지, 확인 방법, 실패 경험). 기존 말에 없는 내용.
 - "replace": 기존 문장 하나와 같은 이야기인데 새 문장에 기존에 없던 구체적인 정보(숫자, 방향, 이유, 확인법)가 더 있을 때만. target에 그 기존 번호.
              이때 text는 기존 문장의 정보를 하나도 빼지 않고 새 정보를 더한 한 문장이다. 새 정보가 없으면 replace가 아니라 drop이다.
+             기존 숫자·순서를 다른 값으로 바꾸는 것은 replace가 아니라 conflict다.
+- "conflict": 기존 문장과 맞지 않는 말 — 순서가 반대이거나("링크 1을 먼저" vs 기존 "링크 2를 먼저"), 숫자·규격·방향·개수가 다를 때.
+             지식에 넣지 않고 사람이 확인하게 따로 모은다. target에 부딪히는 기존 번호, why에 무엇이 다른지.
+             음성 인식이 틀려서 반대로 들렸을 수도 있으니, 고쳐서 기존과 맞게 되는 분명한 오류가 아니면 conflict다.
+             (새 문장 일부만 부딪혀도 conflict. 부딪히지 않는 새 정보가 따로 있으면 그 부분만 add로 따로 써도 안 된다 — 한 문장은 한 action)
 - "drop": 잡담·맞장구·혼잣말("괜찮아", "그냥 해봐", "네", "음?"), 녹화 조작 말("녹화 끝", "찍어"), 뜻을 알 수 없는 말,
           또는 기존 문장과 같은 내용이라 새로 배울 게 없는 말 (그때 target에 그 기존 번호).
 text: 음성 인식(헤드셋 옆에서 말한 작은 소리)이라 글자가 자주 틀린다. 앞뒤 문장, 그 슬라이드가 맡은 단계, 부품 목록을 보고
@@ -58,14 +63,14 @@ slide: 이 문장이 설명하는 슬라이드 번호. 녹음 시각으로 고�
 step: 특정 단계 이야기면 그 단계 id(예 "S08"), 여러 단계·전체 이야기면 null.
 why: 한 줄 이유.
 
-JSON으로만 답한다: {"items": [{"i": 새 문장 번호, "action": "add|replace|drop", "target": 기존 번호 또는 null, "text": "...", "slide": 번호 또는 null, "step": "S01" 또는 null, "why": "..."}]}"""
+JSON으로만 답한다: {"items": [{"i": 새 문장 번호, "action": "add|replace|conflict|drop", "target": 기존 번호 또는 null, "text": "...", "slide": 번호 또는 null, "step": "S01" 또는 null, "why": "..."}]}"""
 
 
 def merge_speech(old_segs, new_segs, slides, bid):
     """→ (합친 문장들, 결과 {"added": [...], "updated": [...], "dropped": [...]})"""
     from server import llm
     from ingest import build_kb
-    report = {"added": [], "updated": [], "dropped": []}
+    report = {"added": [], "updated": [], "conflicts": [], "dropped": []}
     if not new_segs:
         return old_segs, report
     steps_doc = json.loads((ROOT / "data/source/steps.json").read_text(encoding="utf-8"))
@@ -100,6 +105,9 @@ def merge_speech(old_segs, new_segs, slides, bid):
             merged[tgt].update({"text": text, "src": bid})
             if step:
                 merged[tgt]["step"] = step
+        elif act == "conflict":   # 기존 지식과 반대되는 말: 넣지 않고 사람에게 보여 준다
+            report["conflicts"].append({"text": text, "heard": g["text"], "old": merged[tgt]["text"] if tgt is not None else None,
+                                        "why": it.get("why", "")})
         elif act == "add" and text:
             seg = {"t": g.get("t", 0), "text": text, "src": bid}
             if slide:

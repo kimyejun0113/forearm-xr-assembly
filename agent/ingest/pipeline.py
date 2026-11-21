@@ -159,9 +159,12 @@ def run(d: Path):
             speech_merged, rep_ = merge.merge_speech(old_segs, segs, slides, d.name)
             (d / "merge_report.json").write_text(json.dumps(rep_, ensure_ascii=False, indent=2), encoding="utf-8")
             job.status.update({"added": len(rep_["added"]), "updated": len(rep_["updated"]), "dropped": len(rep_["dropped"]),
+                               "conflicts": [{"new": x["text"], "old": x["old"]} for x in rep_["conflicts"]][:4],
                                "segments": len(speech_merged),
                                "learned": [x["text"] for x in rep_["added"]][:6],
                                "changed": [{"old": x["old"], "new": x["text"]} for x in rep_["updated"]][:4]})
+            if rep_["conflicts"]:
+                job.step("speech", f"기존과 다른 말 {len(rep_['conflicts'])}개는 넣지 않았어요 (확인 필요): " + " / ".join(x["text"] for x in rep_["conflicts"]))
             job.step("speech", f"설계자 말: 새로 {len(rep_['added'])}문장 추가, {len(rep_['updated'])}문장 보완, "
                                f"{len(rep_['dropped'])}문장은 뺌 (잡담·이미 있는 내용) → 모두 {len(speech_merged)}문장")
 
