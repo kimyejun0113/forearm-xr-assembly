@@ -986,8 +986,16 @@ async function capSend(p) {
     if (st.ok) {
       agent.kb = await fetch('/api/kb', { cache: 'no-store' }).then((r) => r.json());
       if (shown >= 0) agentStep(shown);                       // 지금 단계 카드를 새 지식으로
-      agentToast(`설명 반영 완료 · 슬라이드 ${st.slides}장, 설계자 말 ${st.segments}문장`);
-      agent.reply = { kind: 'answer', q: '설명 녹화', text: `슬라이드 ${st.slides}장을 읽어 단계 안내를 다시 만들었어요. 설계자 말 ${st.segments}문장은 ${p.audio ? '이번 녹음에서 새로 받았어요' : '그대로예요'}.`, src: [] };
+      if (st.added !== undefined) {   // 기존 지식에 합침: 새로 배운 말·보완·뺀 말
+        agentToast(`설명 반영 완료 · 새로 배운 말 ${st.added}문장 · 보완 ${st.updated} · 뺀 말 ${st.dropped}`);
+        const learned = (st.learned || []).map((t) => `+ ${t}`), changed = (st.changed || []).map((c) => `~ ${c.new}`);
+        agent.reply = { kind: 'answer', q: '설명 녹화', src: [], text: (learned.length || changed.length)
+          ? [...learned, ...changed].join('\n') + `\n(잡담·이미 아는 내용 ${st.dropped}문장은 뺐어요. 설계자 말 모두 ${st.segments}문장)`
+          : `새로 배울 말이 없었어요. 들은 ${st.dropped}문장은 잡담이거나 이미 아는 내용이라 지식은 그대로예요.` };
+      } else {
+        agentToast(`설명 반영 완료 · 슬라이드 ${st.slides}장, 설계자 말 ${st.segments}문장`);
+        agent.reply = { kind: 'answer', q: '설명 녹화', text: `슬라이드 ${st.slides}장을 기존 지식과 맞췄어요. 설계자 말 ${st.segments}문장은 그대로예요.`, src: [] };
+      }
     } else agentToast('분석 실패: ' + ((st.log || []).slice(-1)[0] || '응답 없음'));
   } catch (e) { agentToast('결과를 못 받았어요: ' + e.message); }
   CAP.sending = false; CAP.busy = false; drawPanel(); drawInfo();
@@ -1202,6 +1210,7 @@ scene.add(infoPanel);
 function wrapText(c, text, maxW) {
   const out = []; let line = '';
   for (const ch of String(text || '')) {
+    if (ch === '\n') { out.push(line); line = ''; continue; }
     if (c.measureText(line + ch).width > maxW) { out.push(line); line = ch; } else line += ch;
   }
   if (line) out.push(line);
@@ -1348,7 +1357,7 @@ function drawInfo() {
       txt(q, INFO_W - P - 22, ay, `500 28px ${HUD.KR}`, HUD.ink2, 'right'); ay += 54;
     }
     const col = r.kind === 'danger' ? HUD.danger : r.kind === 'prompt' ? HUD.warn : HUD.acc;
-    c.font = `500 33px ${HUD.KR}`; const ls = wrapText(c, r.text, W - 50).slice(0, 5);
+    c.font = `500 33px ${HUD.KR}`; const ls = wrapText(c, r.text, W - 50).slice(0, r.q === '설명 녹화' ? 8 : 5);   // 녹화 결과는 배운 문장 목록이라 길다
     const h = 34 + ls.length * 46 + (r.src?.length ? 36 : 0);
     const g = c.createLinearGradient(P, 0, INFO_W - P, 0);
     g.addColorStop(0, r.kind === 'danger' ? 'rgba(255,93,108,0.2)' : r.kind === 'prompt' ? 'rgba(255,181,71,0.15)' : HUD.accDim); g.addColorStop(1, 'rgba(0,0,0,0.02)');

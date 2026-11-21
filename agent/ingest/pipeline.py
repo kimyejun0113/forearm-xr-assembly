@@ -124,6 +124,15 @@ def run(d: Path):
         for n, s in enumerate(slides, 1):
             s["slide_no"] = n
             s.setdefault("image", None)
+        sr_file, sp_file = ROOT / "data/kb/slides_read.json", ROOT / "data/source/speech.json"
+        # 사진으로 녹화했으면 기존 지식에 합친다 (통째로 갈아엎지 않음). 문서(PPT/PDF)를 올리면 그 문서로 새로 만든다.
+        merge_mode = not meta.get("doc") and sr_file.exists() and meta.get("mode") != "replace"
+        if merge_mode:
+            from ingest import merge
+            old_slides = json.loads(sr_file.read_text(encoding="utf-8")).get("slides", [])
+            slides, mapping, notes = merge.merge_slides(old_slides, slides)
+            flips = [{"t": f["t"], "slide": mapping.get(f["slide"] - 1)} for f in flips if mapping.get(f["slide"] - 1)]
+            job.step("slides", "슬라이드: " + ("; ".join(notes) if notes else f"기존 {len(old_slides)}장과 같아요 (바꾼 것 없음)"))
         job.status["slides"] = len(slides)
 
         # 2) 설계자 말
@@ -142,6 +151,19 @@ def run(d: Path):
                     segs.append({"t": t, "slide_hint": n, "text": sent if sent.endswith((".", "요", "다")) else sent + "."})
                     t += 6
         job.status["segments"] = len(segs)
+        speech_merged = None
+        if merge_mode and segs:
+            from ingest import merge
+            old_segs = json.loads(sp_file.read_text(encoding="utf-8")).get("segments", []) if sp_file.exists() else []
+            job.step("speech", f"새 문장 {len(segs)}개를 기존 설계자 말 {len(old_segs)}문장과 비교하는 중 (LLM)")
+            speech_merged, rep_ = merge.merge_speech(old_segs, segs, slides, d.name)
+            (d / "merge_report.json").write_text(json.dumps(rep_, ensure_ascii=False, indent=2), encoding="utf-8")
+            job.status.update({"added": len(rep_["added"]), "updated": len(rep_["updated"]), "dropped": len(rep_["dropped"]),
+                               "segments": len(speech_merged),
+                               "learned": [x["text"] for x in rep_["added"]][:6],
+                               "changed": [{"old": x["old"], "new": x["text"]} for x in rep_["updated"]][:4]})
+            job.step("speech", f"설계자 말: 새로 {len(rep_['added'])}문장 추가, {len(rep_['updated'])}문장 보완, "
+                               f"{len(rep_['dropped'])}문장은 뺌 (잡담·이미 있는 내용) → 모두 {len(speech_merged)}문장")
 
         # 3) 백업 후 지식 만들기
         job.step("build", "기존 지식 백업 후 새 지식 만드는 중")
@@ -151,9 +173,21 @@ def run(d: Path):
             if f.exists():
                 shutil.copy2(f, hist / f.name)
         reader = "doc" if meta.get("doc") else "vision"
-        (ROOT / "data/kb/slides_read.json").write_text(json.dumps(
-            {"source": f"briefing {d.name}", "reader": f"{reader}:{d.name}", "slides": slides}, ensure_ascii=False, indent=2), encoding="utf-8")
-        if segs or not (ROOT / "data/source/speech.json").exists():
+        sr = {"source": f"briefing {d.name}", "reader": f"{reader}:{d.name}"}
+        if merge_mode:   # 합친 것은 설계가 바뀐 게 아니다: 출처 표시를 그대로 둬야 '설명 자료가 바뀌었어요'(이전 작업자 팁 무시)가 안 뜬다
+            old = json.loads(sr_file.read_text(encoding="utf-8"))
+            sr = {"source": old.get("source", sr["source"]), "reader": old.get("reader", sr["reader"]),
+                  "merged": old.get("merged", []) + [d.name]}
+        (ROOT / "data/kb/slides_read.json").write_text(json.dumps({**sr, "slides": slides}, ensure_ascii=False, indent=2), encoding="utf-8")
+        if speech_merged is not None:
+            sp = json.loads(sp_file.read_text(encoding="utf-8")) if sp_file.exists() else {"speaker": "설계자"}
+            sp["segments"] = speech_merged
+            sp["note"] = (sp.get("note", "") + f" + briefing {d.name}").strip(" +")
+            sp_file.write_text(json.dumps(sp, ensure_ascii=False, indent=2), encoding="utf-8")
+        elif merge_mode:   # 녹음이 없거나 쓸 말이 없음: 설계자 말은 그대로 (슬라이드 번호를 지켰으니 연결도 그대로)
+            job.status["segments"] = len(json.loads(sp_file.read_text(encoding="utf-8")).get("segments", [])) if sp_file.exists() else 0
+            job.step("speech", f"설계자 말 {job.status['segments']}문장은 그대로 유지")
+        elif segs or not (ROOT / "data/source/speech.json").exists():
             (ROOT / "data/source/speech.json").write_text(json.dumps(
                 {"note": f"briefing {d.name}", "speaker": "설계자", "segments": segs}, ensure_ascii=False, indent=2), encoding="utf-8")
         else:   # 녹음 없이 슬라이드만 새로 읽음: 설계자 말은 그대로 두고, 슬라이드 번호가 안 맞으면 내용으로 다시 맞춘다

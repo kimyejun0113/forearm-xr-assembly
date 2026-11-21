@@ -148,6 +148,8 @@ def main():
         if sn != prev_slide:
             prev = None
         sid, also = speech_step(g["text"], s_steps.get(sn, []), by_order, instr_of, prev)
+        if g.get("step") in by_order.values():   # 설명 녹화를 합칠 때 LLM이 정한 단계가 있으면 그걸 쓴다
+            sid, also = g["step"], [x for x in also if x != g["step"]]
         add("speech", g["text"], sid, f"설계자 설명 {mmss(g['t'])}", slide_no=sn, t=g["t"], also=also)
         prev, prev_slide = (also[-1] if also else sid), sn
     for pid, p in parts.items():
