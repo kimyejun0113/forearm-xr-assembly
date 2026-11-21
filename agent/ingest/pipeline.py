@@ -74,11 +74,78 @@ def _same(a, b):
     return (a.get("step_label") == b.get("step_label")) and len(a.get("instructions") or []) == len(b.get("instructions") or [])
 
 
+CMD_RE = re.compile(r"^\s*((설명\s*)?녹화\s*(끝|종료|그만|꺼|멈춰)\w*|(사진\s*)?찍어\w*|캡처)[\s.!?]*$")
+
+
+def run_robot(d: Path, meta: dict, robot: str, job: "Job"):
+    """안내서로 만든 로봇(data/kb/robots/<robot>.json)에 설명 녹화를 합친다. 슬라이드가 없으니 녹음만 쓴다 (사진은 안 읽음).
+    배운 문장은 그 지식 chunks에 speech로 넣고, data/kb/robots/<robot>.speech.json 에 녹화마다 따로 남긴다
+    (tools/guide_to_robot.py 로 지식을 다시 만들어도 이 기록을 다시 붙일 수 있게)."""
+    from ingest import transcribe, merge
+    try:
+        kb_file = ROOT / f"data/kb/robots/{robot}.json"
+        log_file = ROOT / f"data/kb/robots/{robot}.speech.json"
+        if not meta.get("audio"):
+            raise RuntimeError(f"{robot} 은 녹음으로만 배워요. 녹음이 없어요")
+        kb = json.loads(kb_file.read_text(encoding="utf-8"))
+        steps = [{"id": s["step_id"], "order": s["order"], "name": s["name"]} for s in kb["steps"]]
+        names = list(dict.fromkeys(p["name"].split(" (")[0] for p in kb["parts"].values()))
+        hint = "자비스, 다음, 이전, 단계, " + ", ".join(names)[:400]
+        job.step("speech", "녹음 글자로 바꾸는 중")
+        segs = [g for g in transcribe.transcribe_file(d / meta["audio"], None, hint=hint)
+                if g.get("text", "").strip() and not CMD_RE.match(g["text"])]
+        old = [{"text": c["text"], "step": c.get("step_id"), "_cid": c["id"]} for c in kb["chunks"] if c["kind"] == "speech"]
+        job.step("speech", f"새 문장 {len(segs)}개를 기존 설계자 말 {len(old)}문장과 비교하는 중 (LLM)")
+        merged, rep = merge.merge_speech(old, segs, [], d.name, steps=steps, parts=kb["parts"])
+        (d / "merge_report.json").write_text(json.dumps(rep, ensure_ascii=False, indent=2), encoding="utf-8")
+        if rep["conflicts"]:
+            job.step("speech", f"기존과 다른 말 {len(rep['conflicts'])}개는 넣지 않았어요 (확인 필요): " + " / ".join(x["text"] for x in rep["conflicts"]))
+        # 지식에 반영: 보완은 그 chunk 글자를 바꾸고(전 문장은 was), 추가는 새 speech chunk
+        hist = ROOT / "data/kb/history" / time.strftime("%Y%m%d-%H%M%S")
+        hist.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(kb_file, hist / kb_file.name)
+        by_id = {c["id"]: c for c in kb["chunks"]}
+        n_id = max([int(c["id"][1:]) for c in kb["chunks"] if c["id"][1:].isdigit()] or [0]) + 1
+        new_chunks = []
+        for k, g in enumerate(x for x in merged if x.get("src") == d.name):
+            if g.get("_cid") in by_id:   # 보완된 기존 문장
+                c = by_id[g["_cid"]]
+                c.setdefault("was", []).append(c["text"]); c["text"] = g["text"]
+                if g.get("step"):
+                    c["step_id"] = g["step"]
+                continue
+            # slide_no는 문장마다 다르게: agent.py가 같은 slide_no의 다음 문장을 이어 붙이므로 엉뚱하게 붙지 않게
+            new_chunks.append({"id": f"c{n_id}", "kind": "speech", "text": g["text"], "step_id": g.get("step"),
+                               "source": f"설계자 설명 (녹화 {d.name})", "slide_no": f"rec-{d.name}-{k}", "t": g.get("t", 0), "also": []})
+            n_id += 1
+        kb["chunks"].extend(new_chunks)
+        kb_file.write_text(json.dumps(kb, ensure_ascii=False, indent=2), encoding="utf-8")
+        log = json.loads(log_file.read_text(encoding="utf-8")) if log_file.exists() else {"robot": robot, "recordings": []}
+        log["recordings"].append({"briefing": d.name, "added": new_chunks, "updated": rep["updated"], "conflicts": rep["conflicts"]})
+        log_file.write_text(json.dumps(log, ensure_ascii=False, indent=2), encoding="utf-8")
+        n_speech = sum(1 for c in kb["chunks"] if c["kind"] == "speech")
+        job.status.update({"slides": 0, "segments": n_speech, "added": len(rep["added"]), "updated": len(rep["updated"]),
+                           "dropped": len(rep["dropped"]), "learned": [x["text"] for x in rep["added"]][:6],
+                           "changed": [{"old": x["old"], "new": x["text"]} for x in rep["updated"]][:4],
+                           "conflicts": [{"new": x["text"], "old": x["old"]} for x in rep["conflicts"]][:4]})
+        job.step("speech", f"설계자 말: 새로 {len(rep['added'])}문장 추가, {len(rep['updated'])}문장 보완, "
+                           f"{len(rep['dropped'])}문장은 뺌 → 모두 {n_speech}문장")
+        job.status["ok"] = True
+        job.step("done", f"완료: {robot} 설계자 말 {n_speech}문장")
+    except Exception as e:
+        job.status["ok"] = False
+        job.step("error", f"실패: {e}")
+        (d / "error.txt").write_text(traceback.format_exc(), encoding="utf-8")
+    return job.status
+
+
 def run(d: Path):
     from ingest import read_slides, read_docs, transcribe, build_kb
     job = Job(d)
     try:
         meta = json.loads((d / "meta.json").read_text(encoding="utf-8"))
+        if meta.get("robot", "forearm") != "forearm":
+            return run_robot(d, meta, meta["robot"], job)
         slides, notes, flips = [], [], []
         # 1) 슬라이드
         if meta.get("doc"):

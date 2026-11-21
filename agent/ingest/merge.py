@@ -66,15 +66,16 @@ why: 한 줄 이유.
 JSON으로만 답한다: {"items": [{"i": 새 문장 번호, "action": "add|replace|conflict|drop", "target": 기존 번호 또는 null, "text": "...", "slide": 번호 또는 null, "step": "S01" 또는 null, "why": "..."}]}"""
 
 
-def merge_speech(old_segs, new_segs, slides, bid):
+def merge_speech(old_segs, new_segs, slides, bid, steps=None, parts=None):
     """→ (합친 문장들, 결과 {"added": [...], "updated": [...], "dropped": [...]})"""
     from server import llm
     from ingest import build_kb
     report = {"added": [], "updated": [], "conflicts": [], "dropped": []}
     if not new_segs:
         return old_segs, report
-    steps_doc = json.loads((ROOT / "data/source/steps.json").read_text(encoding="utf-8"))
-    steps, parts = steps_doc["steps"], steps_doc["parts"]
+    if steps is None:   # 포어암: data/source/steps.json. 다른 로봇은 그 지식의 단계·부품을 넘겨받는다
+        steps_doc = json.loads((ROOT / "data/source/steps.json").read_text(encoding="utf-8"))
+        steps, parts = steps_doc["steps"], steps_doc["parts"]
     by_order = {st["order"]: st["id"] for st in steps}
     if not llm.available():   # 판단할 LLM이 없으면 기존 지식을 지키고 새 말은 넣지 않는다
         report["dropped"] = [{"text": g["text"], "why": "LLM이 없어 판단 못 함"} for g in new_segs]
@@ -83,7 +84,8 @@ def merge_speech(old_segs, new_segs, slides, bid):
         "단계": [{"id": st["id"], "번호": st["order"], "이름": st["name"]} for st in steps],
         "부품": [p["name"] + (" / " + ", ".join(p.get("aliases", [])) if p.get("aliases") else "") for p in parts.values()],
         "슬라이드": [{"번호": s["slide_no"], "제목": s.get("title"), "단계표시": s.get("step_label"),
-                    "단계": build_kb.slide_steps(s, by_order, steps)} for s in slides],
+                    "단계": build_kb.slide_steps(s, by_order, steps)} for s in slides] or "없음 (이 로봇은 안내서로 만든 지식이라 슬라이드가 없다. slide는 null)",
+        "기존_설계자_말_단계": [g.get("step") for g in old_segs] if not slides else None,
         "기존_설계자_말": [{"번호": k, "slide": g.get("slide_hint"), "text": g["text"]} for k, g in enumerate(old_segs)],
         "새_문장": [{"i": i, "slide_hint": g.get("slide_hint"), "시각": g.get("t"), "text": g["text"]} for i, g in enumerate(new_segs)],
     }

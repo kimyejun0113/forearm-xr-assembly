@@ -12,13 +12,13 @@ sys.path.insert(0, str(ROOT))
 from server import llm  # noqa: E402
 
 
-def transcribe_file(path, flips=None):
+def transcribe_file(path, flips=None, hint=None):
     path = Path(path)
     if llm.can("stt"):
         res = llm.transcribe(path.read_bytes(), path.name, with_segments=True)
     else:  # 키가 없으면 이 PC의 Whisper
         from server import local_ai
-        res = {"segments": local_ai.stt_segments(path)}
+        res = {"segments": local_ai.stt_segments(path, hint)}   # hint: 로봇마다 부품 이름이 다르다
     segs = []
     for s in res.get("segments", []) or [{"start": 0, "text": res.get("text", "")}]:
         seg = {"t": round(float(s["start"]), 1), "text": s["text"].strip()}
