@@ -69,7 +69,8 @@ def image_part(path: Path) -> dict:
 
 
 def transcribe(audio: bytes, filename: str = "audio.webm", with_segments: bool = False) -> dict:
-    data = {"model": STT_MODEL, "language": "ko"}
+    from .local_ai import STT_HINT          # 부품 이름 힌트 (잘못 알아듣는 일 줄이기)
+    data = {"model": STT_MODEL, "language": "ko", "prompt": STT_HINT}
     if with_segments:
         data["response_format"] = "verbose_json"
     r = httpx.post(f"{BASE}/audio/transcriptions", headers=_headers(), data=data,

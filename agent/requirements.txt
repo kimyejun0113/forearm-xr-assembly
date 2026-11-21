@@ -6,3 +6,22 @@ pillow
 python-pptx
 pymupdf
 cryptography
+
+# 키 없이 쓰는 기능 (server/local_ai.py)
+ddgs                      # 인터넷 검색 (없으면 질문 답변 중 서버 오류)
+edge-tts                  # 음성 답
+winrt-runtime             # 슬라이드 사진 글자 인식 (Windows OCR)
+winrt-Windows.Media.Ocr
+winrt-Windows.Globalization
+winrt-Windows.Storage
+winrt-Windows.Storage.Streams
+winrt-Windows.Graphics.Imaging
+winrt-Windows.Foundation
+winrt-Windows.Foundation.Collections
+
+# 음성 인식 (faster-whisper). 아래 버전 고정은 Windows 에서 최신판이 비정상 종료돼서 맞춘 것
+faster-whisper
+ctranslate2==4.4.0        # 4.9.0 은 모델 불러올 때 접근 위반으로 종료
+onnxruntime==1.19.2       # 1.32.0 은 import 할 때 종료 (VAD 에서 사용)
+av>=13,<16                # 19.x 는 faster-whisper 가 쓰는 옵션이 없어짐
+setuptools<81             # ctranslate2 4.4.0 이 pkg_resources 를 씀

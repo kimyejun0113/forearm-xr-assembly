@@ -9,6 +9,9 @@ import asyncio, io, os, re, tempfile
 from pathlib import Path
 
 WHISPER_SIZE = os.environ.get("WHISPER_SIZE", "small")
+# 조립 현장 단어를 미리 알려 주면 잘못 알아듣는 일이 줄어든다 (예: 브래킷 → 브레키든)
+STT_HINT = os.environ.get("STT_HINT", "자비스, 다음, 이전, 다시, 처음, 단계, 브래킷, 액추에이터, 카본 튜브, 클램프, "
+                          "마운트, 하우징, 볼트, 렌치, 구동 링크, 끝단, 커넥터, XT30, M3, M4, M5")
 TTS_VOICE_KO = os.environ.get("EDGE_TTS_VOICE", "ko-KR-SunHiNeural")
 _whisper = None
 
@@ -27,7 +30,7 @@ def stt(audio: bytes, filename: str = "q.webm") -> str:
     with tempfile.NamedTemporaryFile(suffix=Path(filename).suffix or ".webm", delete=False) as f:
         f.write(audio); p = f.name
     try:
-        segs, _ = _model().transcribe(p, language="ko", beam_size=1, vad_filter=True)
+        segs, _ = _model().transcribe(p, language="ko", beam_size=1, vad_filter=True, initial_prompt=STT_HINT)
         return " ".join(s.text.strip() for s in segs).strip()
     finally:
         os.unlink(p)

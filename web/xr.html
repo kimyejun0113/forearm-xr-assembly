@@ -300,6 +300,7 @@ function updateLook(dt) {
     if (flashing.has(p)) { m.emissive.setHex(Math.floor(flashing.get(p) * 8) % 2 ? 0xdc2626 : 0); m.emissiveIntensity = 0.7; }
     else if (grabbed.has(p)) { m.emissive.setHex(0x16a34a); m.emissiveIntensity = 0.55; }
     else if (hovered.has(p)) { m.emissive.setHex(0x3b82f6); m.emissiveIntensity = 0.35; }
+    else if (agentHi.has(p)) { m.emissive.setHex(0xf59e0b); m.emissiveIntensity = 0.35 + 0.3 * Math.abs(Math.sin(performance.now() / 250)); }
     else if (p.step === shown && shown < steps.length - 1 + 1 && guideActive) { m.emissive.setHex(0x1d4ed8); m.emissiveIntensity = 0.25; }
     else { m.emissive.setHex(0); m.emissiveIntensity = 0; }
   }
@@ -349,7 +350,7 @@ function renderCard() {
 }
 
 // 기능 버튼만 있는 패널 (설명 창은 따로). 버튼 사이 빈 곳을 잡으면 패널이 옮겨짐
-const PANEL_W = 1024, PANEL_H = 260;
+const PANEL_W = 1024, PANEL_H = 376;
 const panelCanvas = document.createElement('canvas');
 panelCanvas.width = PANEL_W; panelCanvas.height = PANEL_H;
 const pctx = panelCanvas.getContext('2d');
@@ -375,7 +376,11 @@ const buttons = [
   { x: 272, y: 140, label: '모두 펼치기', act: () => animateAll(1) },
   { x: 520, y: 140, label: '모두 조립', act: () => animateAll(0) },
   { x: 768, y: 140, label: '기본 배치', act: () => { placeInFront = true; } },
+  { x: 24, y: 256, w: 976, label: () => (VOICE.on ? '🎤 듣는 중 · 누르면 끄기' : '🎤 음성 켜기'), on: () => VOICE.on,
+    act: () => (VOICE.on ? voiceStop() : voiceStart()) },
 ];
+const bw = (b) => b.w || BW;
+const blabel = (b) => (typeof b.label === 'function' ? b.label() : b.label);
 let dwell = { button: null, t: 0 };     // 시선으로 누르는 중인 버튼과 진행도(0~1)
 function drawPanel() {
   const c = pctx;
@@ -383,17 +388,17 @@ function drawPanel() {
   c.fillStyle = 'rgba(255,255,255,0.9)';
   c.beginPath(); c.roundRect(0, 0, PANEL_W, PANEL_H, 32); c.fill();
   for (const b of buttons) {
-    const off = b.off?.();
+    const off = b.off?.(), lit = b.primary || b.on?.(), w = bw(b), label = blabel(b);
     c.globalAlpha = off ? 0.35 : 1;
-    c.fillStyle = b.primary ? '#2563eb' : '#eef2ff';
-    c.beginPath(); c.roundRect(b.x, b.y, BW, BH, 22); c.fill();
+    c.fillStyle = b.on?.() ? '#dc2626' : lit ? '#2563eb' : '#eef2ff';
+    c.beginPath(); c.roundRect(b.x, b.y, w, BH, 22); c.fill();
     if (dwell.button === b && dwell.t > 0) {          // 시선 누르기 진행 막대
-      c.fillStyle = b.primary ? 'rgba(255,255,255,0.45)' : 'rgba(37,99,235,0.35)';
-      c.beginPath(); c.roundRect(b.x, b.y, BW * dwell.t, BH, 22); c.fill();
+      c.fillStyle = lit ? 'rgba(255,255,255,0.45)' : 'rgba(37,99,235,0.35)';
+      c.beginPath(); c.roundRect(b.x, b.y, w * dwell.t, BH, 22); c.fill();
     }
-    c.fillStyle = b.primary ? '#fff' : '#1d4ed8';
+    c.fillStyle = lit ? '#fff' : '#1d4ed8';
     c.font = 'bold 34px "Malgun Gothic", sans-serif';
-    c.fillText(b.label, b.x + (BW - c.measureText(b.label).width) / 2, b.y + 60);
+    c.fillText(label, b.x + (w - c.measureText(label).width) / 2, b.y + 60);
     c.globalAlpha = 1;
   }
   panelTex.needsUpdate = true;
@@ -401,7 +406,7 @@ function drawPanel() {
 // 패널 uv → 버튼, 버튼이 아니면 'bar'(잡아서 옮기는 빈 곳)
 function panelTarget(uv) {
   const x = uv.x * PANEL_W, y = (1 - uv.y) * PANEL_H;
-  return buttons.find((b) => x >= b.x && x <= b.x + BW && y >= b.y && y <= b.y + BH) || 'bar';
+  return buttons.find((b) => x >= b.x && x <= b.x + bw(b) && y >= b.y && y <= b.y + BH) || 'bar';
 }
 function pressPanel(uv) {
   const b = panelTarget(uv);
@@ -426,6 +431,7 @@ function goTo(k) {
   }
   setStatus('');
   renderCard();
+  agentStep(shown);           // AI 에이전트에 지금 단계를 알림
 }
 function showAll() { anims.length = 0; guideActive = false; shown = steps.length - 1; renderCard(); setStatus('아무 부품이나 잡아서 분해해 보세요'); }
 function animateAll(target) {
@@ -456,11 +462,12 @@ addEventListener('keydown', (e) => {
 const raycaster = new THREE.Raycaster();
 function hitFromRay(origin, dir) {
   raycaster.set(origin, dir);
-  const objs = [...parts.filter(visible).map((p) => p.mesh), panel];
+  const objs = [...parts.filter(visible).map((p) => p.mesh), panel, ...(infoPanel.visible ? [infoPanel] : [])];
   return raycaster.intersectObjects(objs, false)[0] || null;
 }
 function beginGrab(hit, pointWorld) {
   const obj = hit.object;
+  if (obj.userData.isInfo) return { movePanel: true, target: infoPanel };   // 설명 패널은 잡으면 옮겨짐
   if (obj.userData.isPanel) {
     if (panelTarget(hit.uv) === 'bar') return { movePanel: true };
     pressPanel(hit.uv); return null;
@@ -540,7 +547,7 @@ for (let i = 0; i < 2; i++) {
     if (!hit) { state.air = true; return; }          // 빈 공간 집기 → 양손 제스처 후보
     const g = beginGrab(hit, o);
     if (g?.moveModel) { startMove(model); return; }
-    if (g?.movePanel) { startMove(panel); return; }
+    if (g?.movePanel) { startMove(g.target || panel); return; }
     if (g?.blocked) { buzz(state, 1, 60); setTimeout(() => buzz(state, 1, 60), 120); return; }
     if (g?.part) buzz(state, 0.6, 50);
     state.grab = g;
@@ -550,7 +557,7 @@ for (let i = 0; i < 2; i++) {
   ctrl.addEventListener('squeezestart', () => {
     if (state.grab) return;
     const hit = hitFromRay(...rayOf());
-    startMove(hit?.object === panel ? panel : model);
+    startMove(hit?.object === panel ? panel : hit?.object === infoPanel ? infoPanel : model);
   });
   ctrl.addEventListener('squeezeend', stopMove);
   state.rayOf = rayOf;
@@ -662,8 +669,26 @@ renderer.xr.addEventListener('sessionstart', () => {
 renderer.xr.addEventListener('sessionend', () => {
   scene.background = desktopBg;
   $('help').style.display = $('card').style.display = '';
+  voiceStop();
 });
-document.body.appendChild(ARButton.createButton(renderer, { optionalFeatures: ['local-floor', 'hand-tracking', 'hit-test'] }));
+const arButton = ARButton.createButton(renderer, { optionalFeatures: ['local-floor', 'hand-tracking', 'hit-test'] });
+document.body.appendChild(arButton);
+// 마이크 권한은 페이지가 열릴 때 미리 받아 둠 (AR 시작 버튼과 같이 요청하면 AR 시작이 막힘).
+// 이미 허용돼 있으면 아무것도 묻지 않음.
+(async () => {
+  try {
+    const st = (await navigator.permissions?.query({ name: 'microphone' }))?.state;
+    if (st === 'granted' || !navigator.mediaDevices?.getUserMedia) return;
+    const s = await navigator.mediaDevices.getUserMedia({ audio: true });
+    s.getTracks().forEach((t) => t.stop());
+  } catch {}
+})();
+// AR 이 시작되면 음성 듣기도 자동으로 켬 (패널 🎤 버튼으로 끌 수 있음)
+renderer.xr.addEventListener('sessionstart', () => setTimeout(autoVoice, 600));
+async function autoVoice() {
+  for (let i = 0; i < 20 && !agent.on; i++) await new Promise((r) => setTimeout(r, 500));   // AI 연결 기다림
+  if (renderer.xr.isPresenting && !VOICE.on) voiceStart();
+}
 
 // ======================= PC 마우스 =======================
 let mouseGrab = null, mouseHover = null;
@@ -704,12 +729,278 @@ addEventListener('pointerup', () => {
   orbit.enabled = true;
 });
 
+// ======================= AI 에이전트 연결 (agent/ 서버) =======================
+// 약속 (agent/server/main.py): 3D → {"type":"step","step_id":"S03","by":"ui"}
+//                              서버 → {"type":"nav",cmd|to}, {"type":"highlight",part_ids}, step_card, answer, prompt, toast
+const agent = { on: false, kb: null, ws: null, card: null, reply: null, toast: '', toastT: 0, status: 'AI 연결 중…' };
+const agentHi = new Map();          // 부품 → 남은 강조 시간(초)
+
+// 에이전트 부품 id → 우리 3D 부품들
+function agentPartsFor(id) {
+  const unit = (n) => steps.find((s) => s.unit && s.title.includes(`액추에이터 ${n}`))?.parts || [];
+  if (id === 'actuator_1') return unit(1);
+  if (id === 'actuator_2') return unit(2);
+  const alias = { Part19_2: 'Part19#2', carbontube_2: 'carbontube#2', carbontube_main: 'carbontube' };
+  const name = sanitize(alias[id] || id);
+  return parts.filter((p) => p.mesh.name === name);
+}
+function agentHighlight(ids, sec = 6) {
+  for (const id of ids || []) for (const p of agentPartsFor(id)) agentHi.set(p, sec);
+}
+function tickAgent(dt) {
+  for (const [p, t] of agentHi) { if (t - dt <= 0) agentHi.delete(p); else agentHi.set(p, t - dt); }
+  if (agent.toastT > 0 && (agent.toastT -= dt) <= 0) { agent.toast = ''; drawInfo(); }
+  if (VOICE.waitQ > 0 && (VOICE.waitQ -= dt) <= 0) drawInfo();
+}
+function agentStep(k) {
+  if (!agent.on || k < 0) return;
+  const st = agent.kb.steps[k];
+  if (st) agent.ws.send(JSON.stringify({ type: 'step', step_id: st.step_id, by: 'ui' }));
+}
+function agentToast(t) { agent.toast = t; agent.toastT = 4; drawInfo(); }
+
+// 음성 답: 서버 TTS → 안 되면 브라우저 음성.
+// 지금은 꺼 둠 (답은 오른쪽 패널에 글로만). 다시 켜려면 주소에 ?tts=1
+const TTS_ON = new URLSearchParams(location.search).get('tts') === '1';
+let agentAudio = null;
+async function say(text) {
+  if (!text || !TTS_ON) return;
+  try {
+    const r = await fetch('/api/tts?text=' + encodeURIComponent(text));
+    if (r.status === 200) { agentAudio?.pause(); agentAudio = new Audio(URL.createObjectURL(await r.blob())); await agentAudio.play(); return; }
+  } catch {}
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text); u.lang = 'ko-KR'; speechSynthesis.speak(u);
+  }
+}
+
+function agentHandle(m) {
+  if (!m || !m.type) return;
+  if (m.type === 'step_card') { agent.card = m; agent.reply = null; }
+  else if (m.type === 'answer') { agent.reply = { kind: 'answer', q: m.question, text: m.text || m.speech, src: m.sources || [] }; say(m.speech); }
+  else if (m.type === 'prompt') { agent.reply = { kind: m.level === 'danger' ? 'danger' : 'prompt', text: m.text || m.speech }; say(m.speech); }
+  else if (m.type === 'highlight') agentHighlight(m.part_ids);
+  else if (m.type === 'nav') {
+    if (m.cmd === 'next') goTo(shown + 1);
+    else if (m.cmd === 'prev') goTo(shown - 1);
+    else if (m.cmd === 'first') goTo(0);
+    else if (m.cmd === 'replay') goTo(shown);
+    else if (m.to) goTo(m.to - 1);
+  }
+  else if (m.type === 'quiet') { say(m.speech); agentToast('조용히 모드: 안전 경고만'); }
+  else if (m.type === 'toast') agentToast(m.text);
+  else if (m.type === 'archive') agentToast('기록 보관함은 PC 화면에서 볼 수 있어요');
+  else if (m.type === 'error') agentToast(m.text);
+  drawInfo();
+}
+
+async function connectAgent() {
+  try {
+    const r = await fetch('/api/kb', { cache: 'no-store' });
+    if (!r.ok) throw new Error();
+    agent.kb = await r.json();
+  } catch { infoPanel.visible = false; return; }          // 에이전트 서버가 아니면 패널 없이 동작
+  if (agent.kb.steps.length !== steps.length) console.warn(`단계 수가 달라요: 3D ${steps.length}, 에이전트 ${agent.kb.steps.length}`);
+  const builder = new URLSearchParams(location.search).get('op') || 'worker1';
+  const s = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ builder }) }).then((r) => r.json());
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  agent.ws = new WebSocket(`${proto}://${location.host}/ws/${s.session_id}`);
+  agent.ws.onmessage = (e) => agentHandle(JSON.parse(e.data));
+  agent.ws.onopen = () => {
+    agent.on = true; agent.status = `AI 연결됨 · ${builder}${agent.kb.llm ? '' : ' · 키 없음(검색 답변)'}`;
+    if (s.resume) agentHandle(s.resume);
+    const i = s.resume?.step_id ? agent.kb.steps.findIndex((x) => x.step_id === s.resume.step_id) : -1;
+    if (i >= 0) goTo(i); else if (shown >= 0 && guideActive) agentStep(shown);
+    drawInfo();
+  };
+  agent.ws.onclose = () => { agent.on = false; agent.status = 'AI 연결 끊김'; drawInfo(); };
+}
+
+// ---------- 음성: 계속 듣다가 말 한 마디씩 잘라서 서버(/api/stt)로 ----------
+// 규칙 (팀원 문서): 단계 명령(다음·이전·다시·처음·N단계)은 바로, 질문은 호출어로 시작해야 받음.
+// 호출어만 말하면 "네?" 하고 5초 동안 질문을 기다림. 호출어 없는 주변 대화는 보내지도 저장하지도 않음.
+const VOICE = {
+  on: false, stream: null, ctx: null, proc: null,
+  wake: new URLSearchParams(location.search).get('wake') ?? '자비스',   // ?wake= 로 바꾸기, 빈 값이면 호출어 없이
+  floor: 0.01, speaking: false, frames: [], pre: [], loudT: 0, quietT: 0, len: 0, busy: 0, waitQ: 0, heard: '',
+};
+const NAV_RE = /^(다음|이전|뒤로|다시|처음|\d+\s*번?\s*단계|[일이삼사오육칠팔구십]+\s*단계)/;
+const aiTalking = () => (agentAudio && !agentAudio.paused) || (window.speechSynthesis?.speaking ?? false);
+
+const VOICE_AUDIO = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+async function voiceStart() {
+  if (VOICE.on) return;
+  if (!agent.on) { agentToast('AI 서버에 연결돼야 음성을 쓸 수 있어요'); return; }
+  try {
+    VOICE.stream = await navigator.mediaDevices.getUserMedia({ audio: VOICE_AUDIO });
+  } catch (e) { agentToast(`마이크를 열 수 없어요 (${e.name})`); return; }
+  VOICE.ctx = new AudioContext();
+  VOICE.ctx.resume?.();
+  const src = VOICE.ctx.createMediaStreamSource(VOICE.stream);
+  VOICE.proc = VOICE.ctx.createScriptProcessor(2048, 1, 1);
+  VOICE.proc.onaudioprocess = (e) => onFrame(new Float32Array(e.inputBuffer.getChannelData(0)));
+  src.connect(VOICE.proc);
+  VOICE.proc.connect(VOICE.ctx.destination);      // 연결해 둬야 처리가 돈다 (출력은 무음)
+  VOICE.on = true;
+  drawPanel(); drawInfo();
+}
+function voiceStop() {
+  VOICE.on = false; VOICE.speaking = false; VOICE.frames = [];
+  VOICE.proc?.disconnect(); VOICE.stream?.getTracks().forEach((t) => t.stop()); VOICE.ctx?.close();
+  drawPanel(); drawInfo();
+}
+// 한 조각(약 43ms)마다: 소리 크기로 말 시작·끝을 판단 (주변 소음 수준에 맞춰 기준이 움직임)
+function onFrame(d) {
+  if (!VOICE.on) return;
+  const dt = d.length / VOICE.ctx.sampleRate;
+  let s = 0; for (const v of d) s += v * v;
+  const rms = Math.sqrt(s / d.length);
+  const loud = rms > Math.max(0.02, VOICE.floor * 3) && !aiTalking();
+  if (!VOICE.speaking) {
+    VOICE.floor = VOICE.floor * 0.97 + rms * 0.03;
+    VOICE.pre.push(d); if (VOICE.pre.length > 8) VOICE.pre.shift();     // 말 시작 직전 0.35초도 함께
+    VOICE.loudT = loud ? VOICE.loudT + dt : 0;
+    if (VOICE.loudT > 0.12) { VOICE.speaking = true; VOICE.frames = [...VOICE.pre]; VOICE.len = 0; VOICE.quietT = 0; drawInfo(); }
+  } else {
+    VOICE.frames.push(d); VOICE.len += dt;
+    VOICE.quietT = loud ? 0 : VOICE.quietT + dt;
+    if (VOICE.quietT > 0.8 || VOICE.len > 8) {
+      const frames = VOICE.frames; VOICE.speaking = false; VOICE.frames = []; VOICE.pre = [];
+      if (VOICE.len > 0.35) sendUtterance(frames, VOICE.ctx.sampleRate);
+      drawInfo();
+    }
+  }
+}
+// 16kHz 모노 WAV 로 줄여서 보냄
+function toWav(frames, rate) {
+  const all = new Float32Array(frames.reduce((n, f) => n + f.length, 0));
+  let o = 0; for (const f of frames) { all.set(f, o); o += f.length; }
+  const step = rate / 16000, n = Math.floor(all.length / step);
+  const buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+  const str = (p, t) => [...t].forEach((ch, i) => v.setUint8(p + i, ch.charCodeAt(0)));
+  str(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); str(8, 'WAVEfmt ');
+  v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, 16000, true); v.setUint32(28, 32000, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+  str(36, 'data'); v.setUint32(40, n * 2, true);
+  for (let i = 0; i < n; i++) v.setInt16(44 + i * 2, Math.max(-1, Math.min(1, all[Math.floor(i * step)])) * 0x7fff, true);
+  return new Blob([buf], { type: 'audio/wav' });
+}
+async function sendUtterance(frames, rate) {
+  VOICE.busy++; drawInfo();
+  try {
+    const fd = new FormData(); fd.append('audio', toWav(frames, rate), 'q.wav');
+    const r = await fetch('/api/stt', { method: 'POST', body: fd }).then((x) => x.json());
+    if (r.text) onHeard(r.text);
+  } catch (e) { console.warn('stt', e); }
+  finally { VOICE.busy--; drawInfo(); }
+}
+function agentAsk(text) { if (agent.on) agent.ws.send(JSON.stringify({ type: 'ask', text })); }
+function onHeard(raw) {
+  const t = raw.trim().replace(/[.?!。]+$/, '');
+  if (!t) return;
+  const compact = t.replace(/[\s,]/g, '');
+  if (NAV_RE.test(compact) && compact.length <= 10) { VOICE.heard = t; agentAsk(t); return; }   // 단계 명령은 바로
+  const w = VOICE.wake;
+  if (!w) { VOICE.heard = t; agentAsk(t); return; }
+  if (VOICE.waitQ > 0) { VOICE.waitQ = 0; VOICE.heard = t; agentAsk(t); return; }              // "네?" 다음 5초 안의 말
+  const i = compact.indexOf(w);
+  if (i < 0 || i > 3) return;                                                                    // 호출어 없는 말은 무시
+  const q = t.slice(t.indexOf(w) + w.length).replace(/^[\s,야아님씨]+/, '').trim();
+  VOICE.heard = t;
+  if (!q) { say('네?'); VOICE.waitQ = 5; xrInputs.forEach((s) => buzz(s, 0.4, 40)); drawInfo(); return; }   // 패널에 "네? 말씀하세요"
+  agentAsk(q);
+}
+
+// ---------- 오른쪽 설명 패널 (헤드셋 안에서 보이는 에이전트 화면) ----------
+const INFO_W = 1024, INFO_H = 1240;
+const infoCanvas = document.createElement('canvas');
+infoCanvas.width = INFO_W; infoCanvas.height = INFO_H;
+const ictx = infoCanvas.getContext('2d');
+const infoTex = new THREE.CanvasTexture(infoCanvas);
+infoTex.colorSpace = THREE.SRGBColorSpace;
+const infoPanel = new THREE.Mesh(new THREE.PlaneGeometry(0.32, 0.32 * INFO_H / INFO_W), new THREE.MeshBasicMaterial({ map: infoTex, transparent: true }));
+infoPanel.userData.isInfo = true;
+infoPanel.position.set(0.48, 1.08, 0.05);         // PC 화면용 위치 (헤드셋은 기본 배치에서 다시 놓음)
+scene.add(infoPanel);
+
+function wrapText(c, text, maxW) {
+  const out = []; let line = '';
+  for (const ch of String(text || '')) {
+    if (c.measureText(line + ch).width > maxW) { out.push(line); line = ch; } else line += ch;
+  }
+  if (line) out.push(line);
+  return out;
+}
+function drawInfo() {
+  const c = ictx, pad = 40, W = INFO_W - pad * 2;
+  c.clearRect(0, 0, INFO_W, INFO_H);
+  c.fillStyle = 'rgba(15,23,42,0.88)';
+  c.beginPath(); c.roundRect(0, 0, INFO_W, INFO_H, 36); c.fill();
+  let y = 64;
+  const line = (t, font, color, maxLines = 3, gap = 8) => {
+    c.font = font; c.fillStyle = color;
+    const size = parseInt(font.match(/(\d+)px/)[1], 10);
+    for (const l of wrapText(c, t, W).slice(0, maxLines)) { c.fillText(l, pad, y); y += size + gap; }
+  };
+  line(agent.status, '28px "Malgun Gothic", sans-serif', agent.on ? '#86efac' : '#fca5a5', 1);
+  if (VOICE.on) {
+    const st = VOICE.waitQ > 0 ? '🎤 네? 말씀하세요' : VOICE.speaking ? '🎤 듣는 중…' : VOICE.busy ? '🎤 알아듣는 중…'
+      : `🎤 ${VOICE.wake ? `질문은 "${VOICE.wake}"로 시작 · ` : ''}단계는 "다음/이전/다시"`;
+    line(st, '28px "Malgun Gothic", sans-serif', VOICE.speaking || VOICE.waitQ > 0 ? '#fde047' : '#fca5a5', 1);
+    if (VOICE.heard) line(`들은 말: ${VOICE.heard}`, '26px "Malgun Gothic", sans-serif', '#cbd5e1', 1);
+  }
+  const card = agent.card;
+  if (!card) {
+    y += 20;
+    line('처음부터 또는 다음을 누르면 단계 안내가 나와요', '36px "Malgun Gothic", sans-serif', '#e2e8f0');
+  } else {
+    const st = card.step;
+    y += 16;
+    line(`${st.step_id} · ${card.index} / ${card.total} 단계`, '30px "Malgun Gothic", sans-serif', '#94a3b8', 1);
+    // 진행 막대
+    c.fillStyle = '#334155'; c.fillRect(pad, y - 10, W, 10);
+    c.fillStyle = '#60a5fa'; c.fillRect(pad, y - 10, W * card.index / card.total, 10);
+    y += 64;
+    line(st.name, 'bold 54px "Malgun Gothic", sans-serif', '#ffffff', 2, 12);
+    y += 10;
+    line('할 일', 'bold 30px "Malgun Gothic", sans-serif', '#93c5fd', 1);
+    for (const t of [...(st.instructions || []), ...(st.bolts || []).map((b) => '볼트 ' + b)].slice(0, 5)) line('• ' + t, '34px "Malgun Gothic", sans-serif', '#e2e8f0', 2);
+    if ((st.tools || []).length) line('공구: ' + st.tools.join(', '), '30px "Malgun Gothic", sans-serif', '#cbd5e1', 2);
+    if ((st.warnings || []).length) {
+      y += 10;
+      line('주의', 'bold 30px "Malgun Gothic", sans-serif', '#fca5a5', 1);
+      for (const t of st.warnings.slice(0, 3)) line('• ' + t, '32px "Malgun Gothic", sans-serif', '#fecaca', 3);
+    }
+    for (const h of (card.hints || []).slice(0, 2)) line('· ' + h, '28px "Malgun Gothic", sans-serif', '#a5b4fc', 2);
+  }
+  // AI 답변 / 먼저 말 거는 알림
+  const r = agent.reply;
+  if (r) {
+    y = Math.max(y + 20, 760);
+    c.fillStyle = r.kind === 'danger' ? 'rgba(220,38,38,0.35)' : r.kind === 'prompt' ? 'rgba(245,158,11,0.25)' : 'rgba(59,130,246,0.22)';
+    c.beginPath(); c.roundRect(pad - 16, y - 50, W + 32, INFO_H - y - 20, 24); c.fill();
+    if (r.q) line('Q. ' + r.q, '30px "Malgun Gothic", sans-serif', '#cbd5e1', 2);
+    line(r.text, '38px "Malgun Gothic", sans-serif', '#ffffff', 6, 10);
+    if (r.src?.length) { y = INFO_H - 40; line('출처: ' + r.src.join(' · '), '24px "Malgun Gothic", sans-serif', '#94a3b8', 1); }
+  }
+  if (agent.toast) {
+    c.fillStyle = 'rgba(34,197,94,0.9)';
+    c.beginPath(); c.roundRect(pad - 16, INFO_H - 120, W + 32, 84, 20); c.fill();
+    c.font = 'bold 32px "Malgun Gothic", sans-serif'; c.fillStyle = '#052e16';
+    c.fillText(wrapText(c, agent.toast, W)[0] || '', pad, INFO_H - 66);
+  }
+  infoTex.needsUpdate = true;
+}
+drawInfo();
+connectAgent();
+
 // ======================= 매 프레임 =======================
 const clock = new THREE.Clock();
 const ease = (t) => 1 - Math.pow(1 - t, 3);
 renderCard();
 setStatus('');
-window.__xr = { parts, steps, camera, membersOf, goTo, showAll, beginGrab, updateGrab, endGrab, axisWorld, blockerOf, isOut, renderer, gaze: () => ({ ...gazeInfo, dwell: dwell.t, cooldown: dwellCooldown }) };   // 디버그용
+window.__xr = { parts, steps, camera, membersOf, goTo, showAll, beginGrab, updateGrab, endGrab, axisWorld, blockerOf, isOut, renderer, gaze: () => ({ ...gazeInfo, dwell: dwell.t, cooldown: dwellCooldown }), agent, agentHi, VOICE, onHeard, sendUtterance };   // 디버그용
 
 renderer.setAnimationLoop(() => {
   const dt = Math.min(clock.getDelta(), 0.05);
@@ -730,6 +1021,10 @@ renderer.setAnimationLoop(() => {
       panel.position.copy(model.position);
       panel.position.y = model.position.y + LAYOUT.panelAbove;
       panel.lookAt(pos);                   // 패널이 나를 보게
+      // 오른쪽: AI 에이전트 설명 패널
+      infoPanel.position.copy(pos).addScaledVector(fwd, LAYOUT.depth).addScaledVector(right, LAYOUT.side);
+      infoPanel.position.y = pos.y - 0.10;
+      infoPanel.lookAt(pos);
       placeInFront = false;
     }
   }
@@ -773,6 +1068,7 @@ renderer.setAnimationLoop(() => {
     if (a.t >= 1) anims.splice(k, 1);
   }
 
+  tickAgent(dt);
   updateLook(dt);
   if (!renderer.xr.isPresenting) orbit.update();
   renderer.render(scene, camera);

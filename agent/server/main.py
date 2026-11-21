@@ -25,6 +25,9 @@ app.mount("/client", StaticFiles(directory=ROOT / "client"), name="client")
 app.mount("/data/captures", StaticFiles(directory=ROOT / "data/captures"), name="captures")
 (ROOT / "data/briefings").mkdir(parents=True, exist_ok=True)
 app.mount("/data/briefings", StaticFiles(directory=ROOT / "data/briefings"), name="briefings")
+# 3D/XR 화면 (저장소 루트의 web/): Quest 에서 http://localhost:8000/xr/xr.html
+if (ROOT.parent / "web").is_dir():
+    app.mount("/xr", StaticFiles(directory=ROOT.parent / "web", html=True), name="xr")
 
 from . import briefing_api  # noqa: E402
 app.include_router(briefing_api.router)

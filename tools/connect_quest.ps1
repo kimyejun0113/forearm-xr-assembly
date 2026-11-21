@@ -1,7 +1,7 @@
 ﻿# Quest 3 를 USB 로 연결한 뒤 실행: 포트를 잇고 헤드셋 브라우저에서 페이지를 연다.
 # 사용법:  powershell -ExecutionPolicy Bypass -File tools\connect_quest.ps1 [페이지]
-#   예)    powershell -ExecutionPolicy Bypass -File tools\connect_quest.ps1 xr.html
-param([string]$Page = "xr.html", [int]$Port = 8000)
+#   예)    powershell -ExecutionPolicy Bypass -File tools\connect_quest.ps1 xr/xr.html
+param([string]$Page = "xr/xr.html", [int]$Port = 8000)
 
 $root = Split-Path $PSScriptRoot -Parent
 $adb = Join-Path $PSScriptRoot "android\platform-tools\adb.exe"
