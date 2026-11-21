@@ -65,7 +65,7 @@ def chat_json(system: str, user: str | list, model: str | None = None, temperatu
 def image_part(path: Path) -> dict:
     mime = "image/png" if path.suffix.lower() == ".png" else "image/jpeg"
     b64 = base64.b64encode(path.read_bytes()).decode()
-    return {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
+    return {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}", "detail": "high"}}   # 작은 글자도 읽게 원본 해상도로
 
 
 def transcribe(audio: bytes, filename: str = "audio.webm", with_segments: bool = False) -> dict:

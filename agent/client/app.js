@@ -174,8 +174,13 @@ const Cap = {
         const mic = CAP_KEEP ? null : await navigator.mediaDevices.getUserMedia({ audio: true });
         this.stream = new MediaStream([...scr.getVideoTracks(), ...(mic ? mic.getAudioTracks() : [])]);
       } else {
-        this.stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" }, width: { ideal: 1280 }, height: { ideal: 720 } }, audio: !CAP_KEEP });
+        // Quest: 'ideal'로 달라고 하면 앞쪽 아바타 카메라(가짜 배경)가 잡힘 → 뒤쪽(패스스루) 카메라를 꼭 집어 요청
+        const v = { width: { ideal: 1280 }, height: { ideal: 960 } };
+        try {
+          this.stream = await navigator.mediaDevices.getUserMedia({ video: { ...v, facingMode: { exact: "environment" } }, audio: !CAP_KEEP });
+        } catch {
+          this.stream = await navigator.mediaDevices.getUserMedia({ video: { ...v, facingMode: { ideal: "environment" } }, audio: !CAP_KEEP });
+        }
       }
     } catch (e) { return toast("카메라·마이크를 열 수 없어요 (" + e.name + "). Quest는 https 주소가 필요해요"); }
     $("capVideo").srcObject = this.stream;
