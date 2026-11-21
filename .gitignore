@@ -1,0 +1,6 @@
+# 각자 설치 (README 참고)
+.venv/
+tools/android/
+__pycache__/
+*.pyc
+tools/models/

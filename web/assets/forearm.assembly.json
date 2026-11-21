@@ -1,0 +1,780 @@
+{
+ "model": "assets/forearm.glb",
+ "status": "CAD 형상으로 계산한 순서입니다 (볼트는 구멍 위치로 추정). 설계자가 확인해 주세요.",
+ "notes": "parts 의 이름은 forearm.parts.json 기준. '*' 는 아무 글자. '#2' 는 같은 부품의 두 번째 것(두 번째 액추에이터 쪽). dir 은 부품이 빠지는 방향(모델 좌표, 생략하면 자동). Y- 쪽이 액추에이터 바깥(덮개 쪽). unit: true 이면 그 단계 부품 전체가 한 덩어리로 움직입니다.",
+ "bolts": [
+  {
+   "id": "bolt_1",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.05203,
+    -0.13006,
+    1.18145
+   ],
+   "tail": [
+    0.05203,
+    -0.11756,
+    1.18145
+   ],
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_TOP_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_2",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.05203,
+    -0.08706,
+    1.18145
+   ],
+   "tail": [
+    0.05203,
+    -0.09806,
+    1.18145
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_BOTTOM_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_3",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.01505,
+    -0.13006,
+    1.1967
+   ],
+   "tail": [
+    0.01505,
+    -0.11756,
+    1.1967
+   ],
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_TOP_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_4",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.01505,
+    -0.08706,
+    1.1967
+   ],
+   "tail": [
+    0.01505,
+    -0.09806,
+    1.1967
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_BOTTOM_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_5",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.00977,
+    -0.13006,
+    1.23635
+   ],
+   "tail": [
+    0.00977,
+    -0.11756,
+    1.23635
+   ],
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_TOP_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_6",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.00977,
+    -0.08706,
+    1.23635
+   ],
+   "tail": [
+    0.00977,
+    -0.09806,
+    1.23635
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_BOTTOM_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_7",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.04147,
+    -0.13006,
+    1.26075
+   ],
+   "tail": [
+    0.04147,
+    -0.11756,
+    1.26075
+   ],
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_TOP_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_8",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.04147,
+    -0.08706,
+    1.26075
+   ],
+   "tail": [
+    0.04147,
+    -0.09806,
+    1.26075
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_BOTTOM_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_9",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.07845,
+    -0.13006,
+    1.24549
+   ],
+   "tail": [
+    0.07845,
+    -0.11756,
+    1.24549
+   ],
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_TOP_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_10",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.07845,
+    -0.08706,
+    1.24549
+   ],
+   "tail": [
+    0.07845,
+    -0.09806,
+    1.24549
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_BOTTOM_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_11",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.08373,
+    -0.13006,
+    1.20584
+   ],
+   "tail": [
+    0.08373,
+    -0.11756,
+    1.20584
+   ],
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_TOP_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_12",
+   "size": "M3",
+   "diameter": 0.0025,
+   "head": [
+    0.08373,
+    -0.08806,
+    1.20584
+   ],
+   "tail": [
+    0.08373,
+    -0.09806,
+    1.20584
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "Part18",
+    "PhAct-3_BOTTOM_HOUSING"
+   ]
+  },
+  {
+   "id": "bolt_13",
+   "size": "M5",
+   "diameter": 0.0027,
+   "head": [
+    -0.10494,
+    -0.08218,
+    1.41145
+   ],
+   "tail": [
+    -0.10494,
+    -0.09336,
+    1.41145
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "PhAct-3_BOTTOM_HOUSING#2",
+    "actmount_bicep"
+   ]
+  },
+  {
+   "id": "bolt_14",
+   "size": "M4",
+   "diameter": 0.0025,
+   "head": [
+    -0.08949,
+    -0.08236,
+    1.46587
+   ],
+   "tail": [
+    -0.08949,
+    -0.09336,
+    1.46587
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "PhAct-3_BOTTOM_HOUSING#2",
+    "actmount_bicep"
+   ]
+  },
+  {
+   "id": "bolt_15",
+   "size": "M4",
+   "diameter": 0.0025,
+   "head": [
+    -0.12382,
+    -0.08236,
+    1.48638
+   ],
+   "tail": [
+    -0.12382,
+    -0.09336,
+    1.48638
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "PhAct-3_BOTTOM_HOUSING#2",
+    "actmount_bicep"
+   ]
+  },
+  {
+   "id": "bolt_16",
+   "size": "M4",
+   "diameter": 0.0025,
+   "head": [
+    -0.09008,
+    -0.08236,
+    1.42587
+   ],
+   "tail": [
+    -0.09008,
+    -0.09336,
+    1.42587
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "PhAct-3_BOTTOM_HOUSING#2",
+    "actmount_bicep"
+   ]
+  },
+  {
+   "id": "bolt_17",
+   "size": "M4",
+   "diameter": 0.0025,
+   "head": [
+    -0.15936,
+    -0.08236,
+    1.42691
+   ],
+   "tail": [
+    -0.15936,
+    -0.09336,
+    1.42691
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "PhAct-3_BOTTOM_HOUSING#2",
+    "actmount_bicep"
+   ]
+  },
+  {
+   "id": "bolt_18",
+   "size": "M4",
+   "diameter": 0.0025,
+   "head": [
+    -0.15876,
+    -0.08236,
+    1.4669
+   ],
+   "tail": [
+    -0.15876,
+    -0.09336,
+    1.4669
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "PhAct-3_BOTTOM_HOUSING#2",
+    "actmount_bicep"
+   ]
+  },
+  {
+   "id": "bolt_19",
+   "size": "M4",
+   "diameter": 0.0025,
+   "head": [
+    -0.12502,
+    -0.08236,
+    1.40639
+   ],
+   "tail": [
+    -0.12502,
+    -0.09336,
+    1.40639
+   ],
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "through": [
+    "PhAct-3_BOTTOM_HOUSING#2",
+    "actmount_bicep"
+   ]
+  }
+ ],
+ "steps": [
+  {
+   "title": "액추에이터 1 (모듈)",
+   "unit": true,
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "parts": [
+    "XT30PW(2+2)-M.G.B_8",
+    "XT30PW(2+2)-M.G.B_9",
+    "XT30PW(2+2)-M.G.B_3",
+    "XT30PW(2+2)-M.G.B_2",
+    "XT30PW(2+2)-M.G.B",
+    "XT30PW(2+2)-M.G.B_7",
+    "XT30PW(2+2)-M.G.B_4",
+    "XT30PW(2+2)-M.G.B_6",
+    "XT30PW(2+2)-M.G.B_5",
+    "SAM30_MD_rev03",
+    "USB Type C Port (SMD Type)",
+    "PhAct-3_TOP_HOUSING",
+    "MD cover_2nd",
+    "PhAct-3_BOTTOM_HOUSING",
+    "PhAct-3_OUTPUT",
+    "C_E6709",
+    "PhAct-3_OUTPUT_Holder"
+   ],
+   "desc": "모터, 드라이버 보드, 커넥터가 한 몸인 액추에이터 모듈을 브래킷에 올립니다.",
+   "free_dirs": [
+    "+X",
+    "-X",
+    "+Y",
+    "-Y",
+    "+Z",
+    "-Z",
+    "hint:+",
+    "bolt:+",
+    "bolt:-"
+   ],
+   "blockers": [
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "title": "튜브 클램프",
+   "dir": [
+    -1.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "Part19"
+   ],
+   "desc": "튜브와 브래킷 사이 클램프를 고정합니다.",
+   "free_dirs": [
+    "+X",
+    "-X",
+    "+Y",
+    "-Y",
+    "+Z",
+    "-Z"
+   ],
+   "blockers": [
+    2,
+    10,
+    12
+   ]
+  },
+  {
+   "title": "액추에이터 1 브래킷",
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "parts": [
+    "Part18"
+   ],
+   "desc": "튜브 한쪽 끝에 첫 번째 액추에이터를 잡아 줄 브래킷을 끼웁니다.",
+   "free_dirs": [],
+   "warn": "형상 계산으로 빠지는 방향을 못 찾았어요. 실제 순서를 확인해 주세요.",
+   "blockers": [
+    3,
+    4,
+    7,
+    10,
+    12
+   ]
+  },
+  {
+   "title": "볼트 6개 조이기 (M3)",
+   "bolts": [
+    "bolt_2",
+    "bolt_4",
+    "bolt_6",
+    "bolt_8",
+    "bolt_10",
+    "bolt_12"
+   ],
+   "parts": [],
+   "desc": "고정: 액추에이터 1 브래킷, 액추에이터 1 (모듈)",
+   "blockers": []
+  },
+  {
+   "title": "볼트 6개 조이기 (M3)",
+   "bolts": [
+    "bolt_1",
+    "bolt_3",
+    "bolt_5",
+    "bolt_7",
+    "bolt_9",
+    "bolt_11"
+   ],
+   "parts": [],
+   "desc": "고정: 액추에이터 1 브래킷, 액추에이터 1 (모듈)",
+   "blockers": []
+  },
+  {
+   "title": "액추에이터 2 (모듈)",
+   "unit": true,
+   "dir": [
+    0.0,
+    -1.0,
+    0.0
+   ],
+   "parts": [
+    "XT30PW(2+2)-M.G.B_8#2",
+    "XT30PW(2+2)-M.G.B_9#2",
+    "XT30PW(2+2)-M.G.B_3#2",
+    "XT30PW(2+2)-M.G.B_2#2",
+    "XT30PW(2+2)-M.G.B#2",
+    "XT30PW(2+2)-M.G.B_7#2",
+    "XT30PW(2+2)-M.G.B_4#2",
+    "XT30PW(2+2)-M.G.B_6#2",
+    "XT30PW(2+2)-M.G.B_5#2",
+    "SAM30_MD_rev03#2",
+    "USB Type C Port (SMD Type)#2",
+    "PhAct-3_TOP_HOUSING#2",
+    "MD cover_2nd#2",
+    "PhAct-3_BOTTOM_HOUSING#2",
+    "PhAct-3_OUTPUT#2",
+    "C_E6709#2",
+    "PhAct-3_OUTPUT_Holder#2"
+   ],
+   "desc": "두 번째 액추에이터 모듈을 이두 쪽 마운트에 올립니다.",
+   "free_dirs": [
+    "+X",
+    "-X",
+    "+Y",
+    "-Y",
+    "+Z",
+    "-Z",
+    "hint:+",
+    "bolt:+",
+    "bolt:-"
+   ],
+   "blockers": [
+    9
+   ]
+  },
+  {
+   "title": "Part19#2",
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "Part19#2"
+   ],
+   "desc": "손목 쪽 튜브와 클램프, 끝단 부품을 연결합니다.",
+   "free_dirs": [
+    "+X",
+    "-X",
+    "+Y",
+    "-Y",
+    "+Z",
+    "-Z"
+   ],
+   "blockers": [
+    7,
+    13
+   ]
+  },
+  {
+   "title": "carbontube#2",
+   "dir": [
+    0.9244,
+    0.0,
+    -0.3814
+   ],
+   "parts": [
+    "carbontube#2"
+   ],
+   "desc": "손목 쪽 튜브와 클램프, 끝단 부품을 연결합니다.",
+   "free_dirs": [
+    "long:+"
+   ],
+   "blockers": [
+    11
+   ]
+  },
+  {
+   "title": "이두 쪽 액추에이터 마운트",
+   "dir": [
+    -0.0,
+    1.0,
+    -0.0
+   ],
+   "parts": [
+    "actmount_bicep"
+   ],
+   "desc": "튜브 반대쪽 끝에 두 번째 액추에이터 마운트를 끼웁니다.",
+   "free_dirs": [
+    "+Y",
+    "bolt:+"
+   ],
+   "blockers": [
+    9,
+    10
+   ]
+  },
+  {
+   "title": "볼트 7개 조이기 (M5)",
+   "bolts": [
+    "bolt_13",
+    "bolt_14",
+    "bolt_15",
+    "bolt_16",
+    "bolt_17",
+    "bolt_18",
+    "bolt_19"
+   ],
+   "parts": [],
+   "desc": "고정: 이두 쪽 액추에이터 마운트, 액추에이터 2 (모듈)",
+   "blockers": []
+  },
+  {
+   "title": "메인 카본 튜브",
+   "dir": [
+    0.487,
+    -0.0,
+    -0.8734
+   ],
+   "parts": [
+    "carbontube"
+   ],
+   "desc": "전완의 뼈대가 되는 카본 튜브를 놓습니다.",
+   "free_dirs": [
+    "long:+"
+   ],
+   "blockers": [
+    11
+   ]
+  },
+  {
+   "title": "drivenlink2",
+   "dir": [
+    0.982,
+    -0.0,
+    0.1888
+   ],
+   "parts": [
+    "drivenlink2"
+   ],
+   "desc": "두 액추에이터를 잇는 구동 링크를 마지막으로 연결합니다.",
+   "free_dirs": [
+    "+X",
+    "-X",
+    "+Y",
+    "-Y",
+    "-Z",
+    "long:+",
+    "long:-"
+   ],
+   "blockers": []
+  },
+  {
+   "title": "drivenlink",
+   "dir": [
+    -0.5843,
+    0.0,
+    0.8115
+   ],
+   "parts": [
+    "drivenlink"
+   ],
+   "desc": "두 액추에이터를 잇는 구동 링크를 마지막으로 연결합니다.",
+   "free_dirs": [
+    "-X",
+    "-Z",
+    "long:+",
+    "long:-"
+   ],
+   "blockers": []
+  },
+  {
+   "title": "Part21",
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "parts": [
+    "Part21"
+   ],
+   "desc": "손목 쪽 튜브와 클램프, 끝단 부품을 연결합니다.",
+   "free_dirs": [
+    "+X",
+    "+Z"
+   ],
+   "blockers": []
+  }
+ ]
+}
