@@ -378,8 +378,10 @@ const buttons = [
   { x: 272, y: 140, label: '모두 펼치기', act: () => animateAll(1) },
   { x: 520, y: 140, label: '모두 조립', act: () => animateAll(0) },
   { x: 768, y: 140, label: '기본 배치', act: () => { placeInFront = true; } },
-  { x: 24, y: 256, w: 976, label: () => (VOICE.on ? '🎤 듣는 중 · 누르면 끄기' : '🎤 음성 켜기'), on: () => VOICE.on,
+  { x: 24, y: 256, w: 600, label: () => (VOICE.on ? '🎤 듣는 중 · 누르면 끄기' : '🎤 음성 켜기'), on: () => VOICE.on,
     act: () => (VOICE.on ? voiceStop() : voiceStart()) },
+  { x: 640, y: 256, w: 360, label: () => (agent.phase === 'comment' ? '다음 사람 시작 ▶' : '✓ 조립 완료'),
+    primary: true, act: () => (agent.phase === 'comment' ? nextWorker() : finishWork()) },
 ];
 const bw = (b) => b.w || BW;
 const blabel = (b) => (typeof b.label === 'function' ? b.label() : b.label);
@@ -734,7 +736,8 @@ addEventListener('pointerup', () => {
 // ======================= AI 에이전트 연결 (agent/ 서버) =======================
 // 약속 (agent/server/main.py): 3D → {"type":"step","step_id":"S03","by":"ui"}
 //                              서버 → {"type":"nav",cmd|to}, {"type":"highlight",part_ids}, step_card, answer, prompt, toast
-const agent = { on: false, kb: null, ws: null, card: null, reply: null, toast: '', toastT: 0, status: 'AI 연결 중…' };
+const agent = { on: false, kb: null, ws: null, card: null, reply: null, toast: '', toastT: 0, status: 'AI 연결 중…',
+  phase: 'work', commentT: 0, builder: new URLSearchParams(location.search).get('op') || '' };
 const agentHi = new Map();          // 부품 → 남은 강조 시간(초)
 
 // 에이전트 부품 id → 우리 3D 부품들
@@ -753,6 +756,7 @@ function tickAgent(dt) {
   for (const [p, t] of agentHi) { if (t - dt <= 0) agentHi.delete(p); else agentHi.set(p, t - dt); }
   if (agent.toastT > 0 && (agent.toastT -= dt) <= 0) { agent.toast = ''; drawInfo(); }
   if (VOICE.waitQ > 0 && (VOICE.waitQ -= dt) <= 0) drawInfo();
+  if (agent.commentT > 0 && (agent.commentT -= dt) <= 0) drawInfo();
 }
 function agentStep(k) {
   if (!agent.on || k < 0) return;
@@ -797,14 +801,15 @@ function agentHandle(m) {
   drawInfo();
 }
 
-async function connectAgent() {
+async function connectAgent(builder = agent.builder) {
   try {
     const r = await fetch('/api/kb', { cache: 'no-store' });
     if (!r.ok) throw new Error();
     agent.kb = await r.json();
   } catch { infoPanel.visible = false; return; }          // 에이전트 서버가 아니면 패널 없이 동작
   if (agent.kb.steps.length !== steps.length) console.warn(`단계 수가 달라요: 3D ${steps.length}, 에이전트 ${agent.kb.steps.length}`);
-  const builder = new URLSearchParams(location.search).get('op') || 'worker1';
+  builder = builder || newWorkerName();
+  agent.builder = builder; agent.phase = 'work';
   const s = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ builder }) }).then((r) => r.json());
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   agent.ws = new WebSocket(`${proto}://${location.host}/ws/${s.session_id}`);
@@ -817,6 +822,38 @@ async function connectAgent() {
     drawInfo();
   };
   agent.ws.onclose = () => { agent.on = false; agent.status = 'AI 연결 끊김'; drawInfo(); };
+}
+
+// ---------- 조립 완료 → 한마디 → 다음 사람 ----------
+// 완료를 누르면 서버가 이 사람 기록을 저장하고 바로 공통 지식(aggregate)에 합친다. 다음 사람은 새 작업자로 시작해서
+// 앞사람들이 오래 걸린 곳·물어본 것·남긴 한마디를 단계 카드와 답변에서 바로 받는다.
+function newWorkerName() {
+  const d = new Date(), z = (n) => String(n).padStart(2, '0');
+  return `작업자-${z(d.getMonth() + 1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}${z(d.getSeconds())}`;
+}
+function finishWork() {
+  if (!agent.on) { agentToast('AI 서버에 연결돼야 기록을 저장할 수 있어요'); return; }
+  if (agent.phase === 'comment') return;
+  agent.ws.send(JSON.stringify({ type: 'finish' }));
+  agent.phase = 'comment'; agent.commentT = 25;                 // 25초 동안은 호출어 없이 한 말을 한마디로 받음
+  agentToast('기록 저장됨 · 막혔던 점을 말로 남기거나 "다음 사람"');
+  drawPanel();
+}
+function sendComment(text) {
+  agent.ws.send(JSON.stringify({ type: 'final_comment', text }));
+  agent.reply = { kind: 'answer', q: text, text: '고맙습니다. 다음 작업자에게 전달할게요.', src: [] };
+  agent.commentT = 0;
+  setTimeout(() => { if (agent.phase === 'comment') nextWorker(); }, 3500);
+}
+async function nextWorker() {
+  const old = agent.ws;
+  if (old) { old.onclose = null; old.onmessage = null; try { old.close(); } catch {} }
+  agent.on = false; agent.card = null; agent.reply = null; agent.status = 'AI 연결 중…';
+  agent.phase = 'work'; agent.commentT = 0;
+  goTo(-1); placeInFront = true;
+  await connectAgent(newWorkerName());
+  agentToast(`새 작업자 시작 · 앞사람 기록 반영됨`);
+  drawPanel();
 }
 
 // ---------- 음성: 계속 듣다가 말 한 마디씩 잘라서 서버(/api/stt)로 ----------
@@ -919,6 +956,8 @@ function navCommand(compact) {
 }
 // 아래 버튼과 같은 일 (서버를 거치지 않고 바로). 단계를 바꾸는 건 goTo가 서버에 알린다
 const VIEW_CMDS = [
+  [/^다음(사람|작업자)/, '다음 사람 시작', () => nextWorker()],
+  [/^(조립)?(완료|다했|끝났|끝$)/, '조립 완료', () => finishWork()],
   [/^처음(부터)?|^맨처음|^첫화면/, '처음부터', () => goTo(-1)],
   [/^(전체|다)(보기|봐|보여)/, '전체 보기', showAll],
   [/^(모두|전부|다)(펼|분해|풀어|벌려)|^펼쳐/, '모두 펼치기', () => animateAll(1)],
@@ -951,6 +990,10 @@ function onHeard(raw) {
   if (!t) return;
   const compact = t.replace(/[\s,.]/g, '');
   if (runCommand(t, compact)) return;                                         // 단계·화면 명령은 호출어 없이도 바로
+  if (agent.phase === 'comment' && agent.commentT > 0) {                       // 완료 뒤 25초: 호출어 없이 한마디
+    if (/^(없어|없음|없습니다|괜찮)/.test(compact)) { VOICE.heard = t; nextWorker(); return; }
+    VOICE.heard = t; sendComment(t); return;
+  }
   if (STUCK_RE.test(t) && compact.length <= 12) { VOICE.heard = t; agentAsk(t); return; }
   const w = VOICE.wake;
   if (!w) { VOICE.heard = t; agentAsk(t); return; }
@@ -1113,7 +1156,7 @@ function drawInfo() {
   txt(state, INFO_W - P, oy + 4, `500 21px ${HUD.MONO}`, live ? HUD.acc : HUD.ink3, 'right', 3);
 
   let ay = oy + 76;
-  const hint = VOICE.on ? `${VOICE.wake ? `"${VOICE.wake}" + 질문 · ` : ''}"다음" "이전" "7단계" "모두 펼치기"` : '마이크를 켜면 말로 물어볼 수 있어요';
+  const hint = agent.phase === 'comment' ? '막혔던 점을 그냥 말하세요 · "없어" · "다음 사람"' : VOICE.on ? `${VOICE.wake ? `"${VOICE.wake}" + 질문 · ` : ''}"다음" "이전" "7단계" "모두 펼치기"` : '마이크를 켜면 말로 물어볼 수 있어요';
   if (VOICE.waitQ > 0) txt('네? 말씀하세요', P, ay, `700 32px ${HUD.KR}`, HUD.acc);
   else if (VOICE.heard && listening) txt(VOICE.heard, P, ay, `500 28px ${HUD.KR}`, HUD.ink2);
   else if (!r) txt(hint, P, ay, `500 24px ${HUD.MONO}`, HUD.ink3);

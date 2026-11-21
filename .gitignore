@@ -12,3 +12,4 @@ agent/data/briefings/
 agent/data/kb/history/
 agent/data/kb/aggregate.json
 agent/data/sessions_backup/
+tools/quest_ip.txt

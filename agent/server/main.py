@@ -4,6 +4,7 @@
   3D → 서버: {"type":"step", "step_id":"S2", "by":"voice|ui"}
   서버 → 3D: {"type":"highlight", "part_ids":[...]}, {"type":"nav", "cmd":"next|prev|replay|first"} 또는 {"type":"nav","to":2}
 """
+import re
 import asyncio, json, os
 from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Body
@@ -99,6 +100,28 @@ def refresh_knowledge():
     kn.reload()
 
 
+def comment_steps(text: str, cur: str | None) -> list[str]:
+    """끝나고 남긴 한마디가 어느 단계 얘기인지: 말한 단계 번호 > 부품 이름(가장 구체적인 것) > 글 검색."""
+    by_order = {st["order"]: sid for sid, st in kn.steps.items()}
+    nums = [by_order[int(n)] for n in re.findall(r"(\d{1,2})\s*(?:번|단계)", text) if int(n) in by_order]
+    if nums:
+        return list(dict.fromkeys(nums))
+    t, best = text.lower(), {}
+    for pid, p in kn.kb["parts"].items():
+        L = max((len(x) for x in [pid, *p["aliases"]] if x.lower() in t), default=0)
+        if L:
+            best[pid] = L
+    if best:
+        top = max(best.values())
+        pids = [pid for pid, L in best.items() if L == top]            # "메인 카본 튜브"가 "카본 튜브"보다 우선
+        place = [sid for sid in kn.order if any(kn.steps[sid]["parts"] == [pid] for pid in pids)]   # 그 부품을 놓는 단계
+        anyst = [sid for sid in kn.order if any(pid in kn.steps[sid]["parts"] for pid in pids)]
+        if place or anyst:
+            return place or anyst
+    hits = kn.search(text, None)
+    return [hits[0][1].get("step_id") if hits and hits[0][1].get("step_id") else cur or kn.order[-1]]
+
+
 def card_payload(s: Session):
     c = kn.steps.get(s.step_id)
     if not c:
@@ -184,9 +207,8 @@ async def ws(websocket: WebSocket, sid: str):
                 s.log("bookmark", note=m.get("note", ""))
                 await websocket.send_json({"type": "toast", "text": "이 장면을 표시해 뒀어요"})
             elif t == "final_comment":
-                hits = kn.search(m.get("text", ""), None)
-                step = hits[0][1].get("step_id") if hits else s.step_id
-                s.log("final_comment", text=m.get("text", ""), about_step=step)
+                about = comment_steps(m.get("text", ""), s.step_id)
+                s.log("final_comment", text=m.get("text", ""), about_step=about[0], about_steps=about)
                 await asyncio.to_thread(refresh_knowledge)
                 await websocket.send_json({"type": "toast", "text": "다음 작업자에게 전달할게요. 고맙습니다!"})
             elif t == "finish":
