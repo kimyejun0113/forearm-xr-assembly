@@ -803,27 +803,43 @@ function agentHandle(m) {
   drawInfo();
 }
 
-async function connectAgent(builder = agent.builder) {
+async function connectAgent(builder = agent.builder, retry = false) {
   try {
     const r = await fetch('/api/kb', { cache: 'no-store' });
     if (!r.ok) throw new Error();
     agent.kb = await r.json();
-  } catch { infoPanel.visible = false; return; }          // 에이전트 서버가 아니면 패널 없이 동작
+  } catch {
+    if (retry) { agentReconnect(); return; }               // 다시 연결하는 중이면 계속 시도
+    infoPanel.visible = false; return;                     // 처음부터 에이전트 서버가 아니면 패널 없이 동작
+  }
   if (agent.kb.steps.length !== steps.length) console.warn(`단계 수가 달라요: 3D ${steps.length}, 에이전트 ${agent.kb.steps.length}`);
   builder = builder || newWorkerName();
-  agent.builder = builder; agent.phase = 'work';
-  const s = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ builder }) }).then((r) => r.json());
+  agent.builder = builder; if (!retry) agent.phase = 'work';
+  let s;
+  try { s = await fetch('/api/session', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ builder }) }).then((r) => r.json()); }
+  catch { agentReconnect(); return; }
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  agent.ws = new WebSocket(`${proto}://${location.host}/ws/${s.session_id}`);
-  agent.ws.onmessage = (e) => agentHandle(JSON.parse(e.data));
-  agent.ws.onopen = () => {
+  const ws = agent.ws = new WebSocket(`${proto}://${location.host}/ws/${s.session_id}`);
+  ws.onmessage = (e) => agentHandle(JSON.parse(e.data));
+  ws.onopen = () => {
+    agent.tries = 0; if (retry) agentToast('AI 다시 연결됐어요');
     agent.on = true; agent.status = `AI 연결됨 · ${builder}${agent.kb.llm ? '' : ' · 키 없음(검색 답변)'}`;
     if (s.resume) agentHandle(s.resume);
     const i = s.resume?.step_id ? agent.kb.steps.findIndex((x) => x.step_id === s.resume.step_id) : -1;
     if (i >= 0) goTo(i); else if (shown >= 0 && guideActive) agentStep(shown);
     drawInfo();
   };
-  agent.ws.onclose = () => { agent.on = false; agent.status = 'AI 연결 끊김'; drawInfo(); };
+  // 헤드셋이 잠들거나 와이파이·adb 연결이 잠깐 끊기면 소켓이 닫힌다 → 같은 작업자 이름으로 알아서 다시 붙는다
+  ws.onclose = () => {
+    if (agent.ws !== ws) return;
+    agent.on = false; agent.status = 'AI 연결 끊김 · 다시 연결하는 중…'; drawInfo();
+    agentReconnect();
+  };
+}
+function agentReconnect() {
+  clearTimeout(agent.retryT);
+  agent.tries = (agent.tries || 0) + 1;
+  agent.retryT = setTimeout(() => connectAgent(agent.builder, true), Math.min(10, 1 + 2 * agent.tries) * 1000);
 }
 
 // ---------- 설계자 설명 녹화 (헤드셋 카메라로 슬라이드 찍기) ----------
@@ -924,6 +940,7 @@ function sendComment(text) {
 }
 async function nextWorker() {
   const old = agent.ws;
+  clearTimeout(agent.retryT);
   if (old) { old.onclose = null; old.onmessage = null; try { old.close(); } catch {} }
   agent.on = false; agent.card = null; agent.reply = null; agent.status = 'AI 연결 중…';
   agent.phase = 'work'; agent.commentT = 0;
