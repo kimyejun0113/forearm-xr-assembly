@@ -69,8 +69,10 @@ async def main():
     import uvicorn
     from server.main import app
     ips, made = ensure_cert()
-    plain = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=8000, log_level="info"))
-    secure = uvicorn.Server(uvicorn.Config(Guard(app), host="0.0.0.0", port=8443, log_level="info",
+    # 헤드셋이 잠깐 응답을 못 해도(와이파이 절전·CPU가 바쁠 때) 바로 끊지 않게: 기본 20초 → 60초 기다림
+    ws = dict(ws_ping_interval=20, ws_ping_timeout=60)
+    plain = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=8000, log_level="info", **ws))
+    secure = uvicorn.Server(uvicorn.Config(Guard(app), host="0.0.0.0", port=8443, log_level="info", **ws,
                                            ssl_certfile=str(CERT), ssl_keyfile=str(KEY), lifespan="off"))
     print("노트북: http://localhost:8000")
     for i in ips:

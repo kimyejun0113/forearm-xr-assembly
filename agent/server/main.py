@@ -268,5 +268,8 @@ async def ws(websocket: WebSocket, sid: str):
                                            "text": "막혔던 점 한마디 남기기", "ask_comment": True})
     except WebSocketDisconnect:
         pass
+    except RuntimeError as e:   # 답을 만드는 사이 헤드셋이 끊겼으면 닫힌 연결에 보내려다 난다 → 끊김과 같게 (헤드셋은 알아서 다시 붙음)
+        if "websocket" not in str(e).lower():
+            raise
     finally:
         task.cancel()

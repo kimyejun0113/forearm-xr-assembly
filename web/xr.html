@@ -895,6 +895,7 @@ async function connectAgent(builder = agent.builder, retry = false) {
   ws.onmessage = (e) => agentHandle(JSON.parse(e.data));
   ws.onopen = () => {
     agent.tries = 0; if (retry) agentToast('AI 다시 연결됐어요');
+    if (agent.pendingAsk) { const q = agent.pendingAsk; agent.pendingAsk = null; setTimeout(() => agentAsk(q), 300); }   // 끊긴 사이 한 질문
     agent.on = true; agent.status = `AI 연결됨 · ${builder}${agent.kb.llm ? '' : ' · 키 없음(검색 답변)'}`;
     if (s.resume) agentHandle(s.resume);
     const i = s.resume?.step_id ? agent.kb.steps.findIndex((x) => x.step_id === s.resume.step_id) : -1;
@@ -1182,7 +1183,11 @@ async function sendUtterance(frames, rate) {
   } catch (e) { console.warn('stt', e); }
   finally { VOICE.busy--; drawInfo(); }
 }
-function agentAsk(text) { if (agent.on) agent.ws.send(JSON.stringify({ type: 'ask', text })); }
+// 연결이 잠깐 끊긴 사이 한 질문은 버리지 않고, 다시 붙으면 보낸다 (안 그러면 답을 끝없이 기다리게 된다)
+function agentAsk(text) {
+  if (agent.on && agent.ws?.readyState === 1) { agent.ws.send(JSON.stringify({ type: 'ask', text })); return; }
+  agent.pendingAsk = text; agentToast('AI 다시 연결하는 중… 붙으면 바로 물어볼게요');
+}
 // 단계 명령을 에이전트가 확실히 알아듣는 모양으로 ("3단계로 가죠" → "3단계", "다섯 번째 단계" → "5단계")
 const KO_NUM = { 일: 1, 이: 2, 삼: 3, 사: 4, 오: 5, 육: 6, 칠: 7, 팔: 8, 구: 9, 십: 10, 십일: 11, 십이: 12, 십삼: 13, 십사: 14,
   한: 1, 하나: 1, 첫: 1, 첫번: 1, 두: 2, 둘: 2, 세: 3, 셋: 3, 네: 4, 넷: 4, 다섯: 5, 여섯: 6, 일곱: 7, 여덟: 8, 아홉: 9, 열: 10,

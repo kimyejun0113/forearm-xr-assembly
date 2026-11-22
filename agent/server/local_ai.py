@@ -23,8 +23,11 @@ _whisper = None
 # 짧은 말(단계 명령)은 빠른 base, 긴 말(질문)은 정확한 small. CPU 코어를 전부 쓴다.
 # 측정 (Core Ultra 5 125H): base 약 0.9초, small 약 2.7초 (예전 설정 small 3~3.8초)
 FAST_SIZE = os.environ.get("WHISPER_FAST_SIZE", "base")
-SHORT_SEC = float(os.environ.get("STT_SHORT_SEC", "1.6"))
+# 4초 이하 질문·명령은 base: 조립 질문에서 small과 알아듣는 정도가 비슷하고 3배 빠르다 (0.5초 vs 1.5초, 배터리면 더 벌어짐)
+SHORT_SEC = float(os.environ.get("STT_SHORT_SEC", "4.0"))
 _models = {}
+import threading as _thr  # noqa: E402
+_stt_lock = _thr.Lock()   # 음성 인식은 한 번에 하나: 여러 개를 같이 돌리면 CPU를 나눠 써서 모두 느려진다 (THINKING에서 멈춘 듯 보임)
 
 
 def _model(size: str | None = None):
@@ -51,9 +54,10 @@ def stt(audio: bytes, filename: str = "q.webm") -> str:
         wav = decode_audio(p)                                  # 16 kHz
         size = FAST_SIZE if len(wav) / 16000 <= SHORT_SEC else WHISPER_SIZE
         # 말 앞뒤는 화면 쪽에서 이미 잘라서 보내므로 VAD 는 끔 (더 빠름)
-        segs, _ = _model(size).transcribe(wav, language="ko", beam_size=1, vad_filter=False, initial_prompt=STT_HINT,
-                                          without_timestamps=True, condition_on_previous_text=False)
-        return " ".join(s.text.strip() for s in segs).strip()
+        with _stt_lock:
+            segs, _ = _model(size).transcribe(wav, language="ko", beam_size=1, vad_filter=False, initial_prompt=STT_HINT,
+                                              without_timestamps=True, condition_on_previous_text=False)
+            return " ".join(s.text.strip() for s in segs).strip()
     finally:
         os.unlink(p)
 
