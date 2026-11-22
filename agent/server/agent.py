@@ -15,6 +15,8 @@ STUCK = re.compile(r"아 뭐지|왜 안 (들어|돼|맞)|모르겠|헷갈")
 
 SYSTEM = """너는 로봇 조립을 돕는 안경 속 조수다. 작업자는 손이 바쁘다.
 주어진 근거(현재 단계 카드, 설계자 슬라이드, 설계자 말, 이전 작업자 기록)만 써서 답한다. 근거에 없으면 지어내지 말고 부드럽게 모른다고 말한다.
+"~해도 돼?", "같은 거야?", "구분해야 돼?"는 근거가 "다르다", "안 된다", "같다", "된다" 중 무엇이라 하든 그대로 답한다 (예: 근거가 "왼·오가 다른 부품"이면 "달라요").
+근거와 단계 카드 어디에도 그 이야기가 없을 때만 "괜찮다", "구분 없다"처럼 추측해서 허락하지 말고, speech에 "자료엔 없어요"라고 하고 confident를 false로 한다.
 작업자는 지금 '현재 단계'를 하고 있다. "이거", "이것", "여기"는 현재 단계의 부품을 뜻한다.
 개수·볼트·공구·주의처럼 단계에 딸린 질문은 현재 단계 카드([step])를 먼저 보고 그 단계 값으로 답한다 (전체 합계가 아니라).
 "다음 단계", "지금 몇 단계"는 카드의 단계 번호와 다음 단계를 그대로 말한다. 카드에 "확인 필요"가 있으면 함께 알려 준다.
@@ -27,6 +29,11 @@ JSON으로만 답한다:
  "used": ["실제로 쓴 근거 id"],
  "highlight": ["강조할 부품 id (부품 목록에 있는 것만)"],
  "confident": true 또는 false}"""
+
+
+LR_Q = re.compile(r"왼쪽|오른쪽|좌우|왼오")
+# 슬라이드 그림 설명의 "왼쪽에는 …, 오른쪽에는 …"(화면 배치)은 부품 왼·오 이야기가 아니다
+LR_EVID = re.compile(r"왼·오|좌우|L\s*/\s*R|거울상|(왼|오른)쪽\s*(부품|과|이랑|하고|·)")
 
 
 def classify(q: str) -> str:
@@ -78,6 +85,11 @@ class Agent:
 
     def _answer(self, q: str, step_id: str | None, slide_open: bool = False) -> dict:
         intent = classify(q)
+        # "5단계에서 …"처럼 단계를 말하면 지금 화면 단계(없을 수도 있음) 대신 그 단계로 답한다
+        m = re.search(r"(\d{1,2})\s*(?:번\s*)?단계", q)
+        named = next((s for s in self.kn.steps.values() if m and s["order"] == int(m.group(1))), None)
+        if named:
+            step_id = named["step_id"]
         self._step_id = step_id
         step = self.kn.steps.get(step_id)
         if SHOW_SLIDE.search(q):
@@ -100,6 +112,12 @@ class Agent:
 
         if intent == "prior":
             return self._prior(step_id)
+        # 왼쪽/오른쪽을 묻는데 근거(카드·검색 조각) 어디에도 왼·오 이야기가 없으면 LLM이 "같다/다르다"를 지어낸다 → 바로 모른다고
+        if LR_Q.search(q):
+            evid = self._step_card_text(step) + " " + " ".join(c["text"] for _, c in hits)
+            if not LR_EVID.search(evid):
+                return {"speech": "왼쪽 오른쪽 구분은 자료엔 없어요.", "text": "설명 자료와 단계 카드에 왼쪽·오른쪽 구분 이야기가 없습니다.",
+                        "visual": [], "sources": [], "intent": intent, "confident": False}
         # 키가 있으면 검색 조각이 없어도 현재 단계 카드만으로 답할 수 있다 (예: "어떤 렌치 써?")
         if llm.available() and (hits or step):
             try:
