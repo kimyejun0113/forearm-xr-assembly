@@ -2,6 +2,7 @@
 import json, re, time, uuid, statistics
 from pathlib import Path
 from .textutil import similarity
+from . import llm
 from .knowledge import Knowledge
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -127,6 +128,8 @@ class Session:
 
     # ---------- 알림 공통 ----------
     def _prompt(self, rule, level, speech, text, counts=True, **kw):
+        if speech:   # 알림도 들리는 말은 짧게 (전문은 화면에)
+            speech = llm.spoken(speech, 50)
         if self.quiet and level != "danger":
             if speech is None:  # 화면만 쓰는 조용한 알림은 허용
                 pass

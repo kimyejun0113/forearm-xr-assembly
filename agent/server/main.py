@@ -57,6 +57,25 @@ app.include_router(briefing_api.router)
 briefing_api.on_done(reload_all)   # 설명을 새로 넣으면 지식을 다시 불러온다 (포어암·안내서 로봇 모두 녹화를 받는다)
 
 
+def warm_spoken():
+    """단계 주의 알림의 '들을 말'(LLM이 짧게 다시 쓴 것)을 미리 만들어 둔다 → 단계에 들어갈 때 안 기다리게"""
+    for k in kns.values():
+        for st in k.steps.values():
+            f = st.get("flags") or {}
+            if not isinstance(f, dict):
+                continue
+            for pre, key in (("안전 주의예요. ", "danger"), ("이 단계는 되돌리기 어려워요. ", "irreversible")):
+                for x in (f.get(key) or [])[:1]:
+                    try:
+                        llm.spoken(pre + x, 50)
+                    except Exception:
+                        pass
+
+
+import threading  # noqa: E402
+threading.Thread(target=warm_spoken, daemon=True).start()
+
+
 @app.get("/")
 def index():
     return FileResponse(ROOT / "client/index.html")
@@ -174,7 +193,7 @@ async def ws(websocket: WebSocket, sid: str):
     async def ticker():
         while True:
             await asyncio.sleep(2)
-            await send_all(s.tick())
+            await send_all(await asyncio.to_thread(s.tick))
 
     task = asyncio.create_task(ticker())
     try:
@@ -183,7 +202,7 @@ async def ws(websocket: WebSocket, sid: str):
             t = m.get("type")
             if t == "step":
                 if m.get("step_id") in kn.steps and m["step_id"] != s.step_id:
-                    prompts = s.enter_step(m["step_id"], m.get("by", "3d"))
+                    prompts = await asyncio.to_thread(s.enter_step, m["step_id"], m.get("by", "3d"))   # 알림 말을 줄이느라 LLM을 부를 수 있어 따로
                     await websocket.send_json(card_payload(s))
                     await send_all(prompts)
             elif t == "ask":

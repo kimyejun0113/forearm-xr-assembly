@@ -3,6 +3,7 @@ import re
 from . import llm
 from .knowledge import Knowledge
 
+
 NAV = re.compile(r"^\s*(다음|이전|뒤로|다시|처음|(\d+)\s*단계)\s*(단계)?\s*(으로|로)?\s*(가|가줘|가자|넘겨|보여줘)?\s*[.!?]?\s*$")
 SHOW_SLIDE = re.compile(r"슬라이드.*(보여|띄워|열어)|PPT.*(보여|띄워)")
 QUIET = re.compile(r"조용히|그만 말|말 걸지 마")
@@ -21,8 +22,8 @@ SYSTEM = """너는 로봇 조립을 돕는 안경 속 조수다. 작업자는 �
 설계자 말(speech)에 있는 이유와 결과(예: "나사산이 뭉개진다", "다 풀어야 한다", "보드를 태운 적 있다")를 반드시 그대로 담아 답한다.
 카드의 지시만 되풀이하지 않는다. 질문과 관계없는 다른 단계 이야기는 섞지 않는다.
 JSON으로만 답한다:
-{"speech": "소리로 읽을 답. 두 문장 이내, 존댓말, 출처는 말하지 않는다",
- "text": "화면에 보일 조금 더 자세한 설명 (세 줄 이내)",
+{"speech": "귀로 들을 핵심 한 문장 (길어도 두 문장, 40자 안팎). 손이 바로 할 것만: 숫자·방향·순서·주의 하나. 말하듯 짧은 존댓말. 이유·출처·인사·'설계자 설명으로는' 같은 머리말은 빼고 화면(text)에 둔다",
+ "text": "화면에 보일 자세한 설명 (네 줄 이내): 핵심 + 이유·결과 + 확인 방법",
  "used": ["실제로 쓴 근거 id"],
  "highlight": ["강조할 부품 id (부품 목록에 있는 것만)"],
  "confident": true 또는 false}"""
@@ -67,6 +68,15 @@ class Agent:
         return {"type": "question"}
 
     def answer(self, q: str, step_id: str | None, slide_open: bool = False) -> dict:
+        """들리는 말(speech)은 핵심만 짧게, 화면(text)은 자세히. LLM을 안 거친 답도 들리는 말은 줄인다."""
+        r = self._answer(q, step_id, slide_open)
+        if r.get("speech"):
+            if not r.get("text"):
+                r["text"] = r["speech"]
+            r["speech"] = llm.spoken(r["speech"], 60)
+        return r
+
+    def _answer(self, q: str, step_id: str | None, slide_open: bool = False) -> dict:
         intent = classify(q)
         self._step_id = step_id
         step = self.kn.steps.get(step_id)

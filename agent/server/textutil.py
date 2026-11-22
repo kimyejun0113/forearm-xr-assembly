@@ -74,3 +74,18 @@ class BM25:
                     s += self.idf[w] * f * (self.k1 + 1) / (f + self.k1 * (1 - self.b + self.b * len(tk) / self.avg))
             out.append(s)
         return out
+
+
+def brief(s: str, n: int = 48) -> str:
+    """소리로 읽을 말: 핵심만 짧게. 첫 문장만 쓰고, 그래도 길면 n자 안에서 쉼표·띄어쓰기 자리에서 자른다.
+    자세한 설명·이유·출처는 화면(패널)에 그대로 둔다."""
+    s = re.sub(r"\s+", " ", (s or "")).strip()
+    s = re.sub(r"^(설계자 설명으로는|이전 작업자 팁이에요\.|주의할 점이에요\.)[, ]*", "", s)
+    if len(s) <= n:
+        return s
+    m = re.match(r"(.+?[.!?。])\s", s + " ")
+    first = m.group(1) if m else s
+    if len(first) <= n * 1.6:          # 한 문장은 조금 길어도 통째로 (중간에서 자르면 더 어색하다)
+        return first
+    cut = max(first.rfind(",", 0, n), first.rfind(" ", 0, n))
+    return (first[:cut] if cut > n // 2 else first[:n]).rstrip(" ,") + "."

@@ -12,7 +12,9 @@ WHISPER_SIZE = os.environ.get("WHISPER_SIZE", "small")
 # 조립 현장 단어를 미리 알려 주면 잘못 알아듣는 일이 줄어든다 (예: 브래킷 → 브레키든)
 STT_HINT = os.environ.get("STT_HINT", "자비스, 다음, 이전, 다시, 처음부터, 단계, 전체 보기, 모두 펼치기, 모두 조립, 기본 배치, 마지막, 브래킷, 액추에이터, 카본 튜브, 클램프, "
                           "마운트, 하우징, 볼트, 렌치, 구동 링크, 끝단, 커넥터, XT30, M3, M4, M5")
-TTS_VOICE_KO = os.environ.get("EDGE_TTS_VOICE", "ko-KR-SunHiNeural")
+# 한국어 신경망 음성 중 가장 자연스러운 것(현수 Multilingual). 조금 빠르게 (손이 바쁜 사람에게 짧게)
+TTS_VOICE_KO = os.environ.get("EDGE_TTS_VOICE", "ko-KR-HyunsuMultilingualNeural")
+TTS_RATE = os.environ.get("EDGE_TTS_RATE", "+8%")
 _whisper = None
 
 
@@ -123,7 +125,7 @@ def tts(text: str) -> bytes:
 
     async def run():
         buf = io.BytesIO()
-        async for ch in edge_tts.Communicate(text, TTS_VOICE_KO).stream():
+        async for ch in edge_tts.Communicate(text, TTS_VOICE_KO, rate=TTS_RATE).stream():
             if ch["type"] == "audio":
                 buf.write(ch["data"])
         return buf.getvalue()

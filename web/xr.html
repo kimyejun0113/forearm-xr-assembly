@@ -814,7 +814,7 @@ function agentToast(t) { agent.toast = t; agent.toastT = 4; drawInfo(); }
 
 // 음성 답: 서버 TTS → 안 되면 브라우저 음성.
 // 지금은 꺼 둠 (답은 오른쪽 패널에 글로만). 다시 켜려면 주소에 ?tts=1
-const TTS_ON = new URLSearchParams(location.search).get('tts') === '1';
+const TTS_ON = new URLSearchParams(location.search).get('tts') !== '0';   // 기본으로 말한다 (?tts=0 이면 끔)
 let agentAudio = null;
 async function say(text) {
   if (!text || !TTS_ON) return;
@@ -822,10 +822,7 @@ async function say(text) {
     const r = await fetch('/api/tts?text=' + encodeURIComponent(text));
     if (r.status === 200) { agentAudio?.pause(); agentAudio = new Audio(URL.createObjectURL(await r.blob())); await agentAudio.play(); return; }
   } catch {}
-  if ('speechSynthesis' in window) {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text); u.lang = 'ko-KR'; speechSynthesis.speak(u);
-  }
+  // 서버 음성(신경망)이 안 되면 조용히 둔다: 브라우저 기본 음성은 너무 기계적이라 쓰지 않는다
 }
 
 function agentHandle(m) {

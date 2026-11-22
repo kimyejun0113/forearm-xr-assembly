@@ -84,3 +84,30 @@ def speak(text: str) -> bytes:
                    json={"model": TTS_MODEL, "voice": TTS_VOICE, "input": text, "response_format": "mp3"})
     r.raise_for_status()
     return r.content
+
+
+_SPOKEN = {}
+
+
+def spoken(text: str, n: int = 50) -> str:
+    """화면용 글 → 귀로 들을 핵심 한 문장. 짧은 글은 그대로, 긴 글은 LLM이 다시 쓰고(같은 글은 기억), 안 되면 앞부분만."""
+    from .textutil import brief
+    t = " ".join((text or "").split())
+    if len(t) <= n and not t.startswith(("설계자 설명으로는", "이전 작업자 팁이에요", "주의할 점이에요")):
+        return t
+    if t in _SPOKEN:
+        return _SPOKEN[t]
+    out = brief(t, n)
+    if available():
+        try:
+            r = chat_json("조립 중인 사람에게 이어폰으로 들려줄 말로 바꾼다. 손이 바쁘니 핵심 한 문장(40자 안팎, 길어도 60자), "
+                          "말하듯 자연스러운 존댓말. 숫자·방향·순서·주의는 그대로 지키고 없는 내용은 보태지 않는다. "
+                          "'설계자 설명으로는' 같은 머리말·출처·인사는 뺀다. 안전·되돌리기 어려움 알림이면 그 핵심 행동을 말한다. "
+                          'JSON: {"speech": "..."}', t, temperature=0)
+            s = (r.get("speech") or "").strip()
+            if s and len(s) <= 80:
+                out = s
+        except Exception:
+            pass
+    _SPOKEN[t] = out
+    return out
