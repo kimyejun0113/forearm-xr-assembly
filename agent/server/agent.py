@@ -20,6 +20,8 @@ SYSTEM = """너는 로봇 조립을 돕는 안경 속 조수다. 작업자는 �
 작업자는 지금 '현재 단계'를 하고 있다. "이거", "이것", "여기"는 현재 단계의 부품을 뜻한다.
 개수·볼트·공구·주의처럼 단계에 딸린 질문은 현재 단계 카드([step])를 먼저 보고 그 단계 값으로 답한다 (전체 합계가 아니라).
 "다음 단계", "지금 몇 단계"는 카드의 단계 번호와 다음 단계를 그대로 말한다. 카드에 "확인 필요"가 있으면 함께 알려 준다.
+"어느/몇/무슨 단계", "~ 쓰는 단계", "~는 언제 넣어"처럼 단계를 묻는 질문은 [전체 단계]를 보고 해당하는 단계를 번호와 이름으로 모두 답한다
+(예: "카본 튜브는 8단계(두 번째 카본 튜브)와 11단계(메인 카본 튜브)에서 써요"). 현재 단계 카드만 보고 두루뭉술하게 답하지 않는다.
 "왜", "~하면 어떻게 돼", "~해도 돼?", "주의할 거", "요령", "안 될 때"처럼 이유·결과·요령을 묻는 질문은
 설계자 말(speech)에 있는 이유와 결과(예: "나사산이 뭉개진다", "다 풀어야 한다", "보드를 태운 적 있다")를 반드시 그대로 담아 답한다.
 카드의 지시만 되풀이하지 않는다. 질문과 관계없는 다른 단계 이야기는 섞지 않는다.
@@ -149,7 +151,10 @@ class Agent:
     def _llm_answer(self, q, step, hits, intent, parts_q):
         card = self._step_card_text(step)
         ctx = "\n".join(f"[{c['id']}] ({c['kind']}, {c['source']}) {c['text']}" for _, c in hits)
-        user = (f"[step] (현재 단계 카드)\n{card or '현재 단계 모름'}\n\n부품 목록: {', '.join(self.kn.kb['parts'])}\n"
+        part_names = ", ".join(f"{k}: {v.get('name', k)}" for k, v in self.kn.kb["parts"].items())
+        user = (f"[step] (현재 단계 카드)\n{card or '현재 단계 모름'}\n\n"
+                f"[전체 단계] (번호 · 이름 · 그 단계에서 들어오는 부품)\n{self._step_overview()}\n\n"
+                f"부품 목록 (id: 이름): {part_names}\n"
                 f"근거:\n{ctx or '(검색된 조각 없음)'}\n\n작업자 질문: {q}")
         r = llm.chat_json(SYSTEM, user)
         ids = r.get("used", [])
@@ -162,6 +167,24 @@ class Agent:
                 "visual": [{"type": "highlight", "part_ids": hl}] if hl else [],
                 "sources": sorted(sources), "intent": intent,
                 "confident": bool(r.get("confident", True))}
+
+    def _step_overview(self) -> str:
+        """'카본 튜브 쓰는 단계가 뭐야?'처럼 전체를 봐야 답할 수 있는 질문용: 단계마다 번호·이름·부품 이름·볼트"""
+        cache = getattr(self, "_overview", None)
+        if cache is None or cache[0] is not self.kn.kb:          # 지식을 다시 불러오면 새로 만든다
+            parts = self.kn.kb["parts"]
+            lines = []
+            for sid in self.kn.order:
+                st = self.kn.steps[sid]
+                names = [parts.get(p, {}).get("name", p) for p in st.get("parts", [])]
+                line = f"{st['order']}단계 ({sid}) {st['name']}"
+                if names:
+                    line += f" · 부품: {', '.join(names[:6])}"
+                if st.get("bolts"):
+                    line += f" · 볼트: {', '.join(st['bolts'][:2])}"
+                lines.append(line)
+            self._overview = (self.kn.kb, "\n".join(lines))
+        return self._overview[1]
 
     def _prior(self, step_id):
         """'다들 어떻게 했어?' → 이 단계의 이전 작업자 기록을 그대로."""
