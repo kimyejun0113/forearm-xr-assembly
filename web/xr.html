@@ -379,8 +379,14 @@ function renderCard() {
   drawPanel();
 }
 
+// 패널 공통 색·글꼴 (오른쪽 설명 창과 같은 HUD 무드)
+const HUD = {
+  acc: '#5ce6ff', accDim: 'rgba(92,230,255,0.16)', ink: '#eef3f6', ink2: '#a9b4bc', ink3: '#6b7780',
+  line: 'rgba(190,215,230,0.16)', line2: 'rgba(190,215,230,0.34)', warn: '#ffb547', danger: '#ff5d6c',
+  KR: 'Pretendard, "Malgun Gothic", sans-serif', OR: 'Orbitron, "Arial Black", sans-serif', MONO: '"JetBrains Mono", Consolas, monospace',
+};
 // 기능 버튼만 있는 패널 (설명 창은 따로). 버튼 사이 빈 곳을 잡으면 패널이 옮겨짐
-const PANEL_W = 1024, PANEL_H = 376;
+const PANEL_W = 1024, PANEL_H = 440;
 const panelCanvas = document.createElement('canvas');
 panelCanvas.width = PANEL_W; panelCanvas.height = PANEL_H;
 const pctx = panelCanvas.getContext('2d');
@@ -400,41 +406,78 @@ placePanel();
 
 const BW = 232, BH = 96;
 const buttons = [
-  { x: 24, y: 24, label: '처음부터', act: () => goTo(-1) },
-  { x: 272, y: 24, label: '◀ 이전', act: () => goTo(shown - 1), off: () => shown < 0 },
-  { x: 520, y: 24, label: '↻ 다시', act: () => goTo(shown), off: () => shown < 0 },
-  { x: 768, y: 24, label: '다음 ▶', act: () => goTo(shown + 1), off: () => shown >= steps.length - 1, primary: true },
-  { x: 24, y: 140, label: '전체 보기', act: showAll },
-  { x: 272, y: 140, label: '모두 펼치기', act: () => animateAll(1) },
-  { x: 520, y: 140, label: '모두 조립', act: () => animateAll(0) },
-  { x: 768, y: 140, label: '기본 배치', act: () => { placeInFront = true; } },
-  { x: 24, y: 256, w: 400, label: () => (VOICE.on ? '🎤 듣는 중 · 끄기' : '🎤 음성 켜기'), on: () => VOICE.on,
+  { x: 24, y: 88, label: '처음부터', act: () => goTo(-1) },
+  { x: 272, y: 88, label: '◀ 이전', act: () => goTo(shown - 1), off: () => shown < 0 },
+  { x: 520, y: 88, label: '↻ 다시', act: () => goTo(shown), off: () => shown < 0 },
+  { x: 768, y: 88, label: '다음 ▶', act: () => goTo(shown + 1), off: () => shown >= steps.length - 1, primary: true },
+  { x: 24, y: 204, label: '전체 보기', act: showAll },
+  { x: 272, y: 204, label: '모두 펼치기', act: () => animateAll(1) },
+  { x: 520, y: 204, label: '모두 조립', act: () => animateAll(0) },
+  { x: 768, y: 204, label: '기본 배치', act: () => { placeInFront = true; } },
+  { x: 24, y: 320, w: 400, label: () => (VOICE.on ? '🎤 듣는 중 · 끄기' : '🎤 음성 켜기'), on: () => VOICE.on,
     act: () => (VOICE.on ? voiceStop() : voiceStart()) },
-  { x: 440, y: 256, w: 270, label: () => (CAP.pending ? '◌ 보내기 대기' : CAP.busy ? '◌ 읽는 중…' : CAP.on ? '■ 녹화 끝' : '● 설명 녹화'), on: () => CAP.on,
+  { x: 440, y: 320, w: 270, label: () => (CAP.pending ? '◌ 보내기 대기' : CAP.busy ? '◌ 읽는 중…' : CAP.on ? '■ 녹화 끝' : '● 설명 녹화'), on: () => CAP.on,
     off: () => CAP.busy || !!CAP.pending, act: () => (CAP.on ? capStop() : capStart()) },
-  { x: 726, y: 256, w: 274, label: () => (agent.phase === 'comment' ? '다음 사람 ▶' : '✓ 조립 완료'),
+  { x: 726, y: 320, w: 274, label: () => (agent.phase === 'comment' ? '다음 사람 ▶' : '✓ 조립 완료'),
     primary: true, act: () => (agent.phase === 'comment' ? nextWorker() : finishWork()) },
 ];
 const bw = (b) => b.w || BW;
 const blabel = (b) => (typeof b.label === 'function' ? b.label() : b.label);
 let dwell = { button: null, t: 0 };     // 시선으로 누르는 중인 버튼과 진행도(0~1)
 function drawPanel() {
-  const c = pctx;
-  c.clearRect(0, 0, PANEL_W, PANEL_H);
-  c.fillStyle = 'rgba(255,255,255,0.9)';
-  c.beginPath(); c.roundRect(0, 0, PANEL_W, PANEL_H, 32); c.fill();
+  const c = pctx, W = PANEL_W, H = PANEL_H;
+  c.clearRect(0, 0, W, H);
+  c.textBaseline = 'alphabetic';
+  // 판: 잘린 모서리 + 어두운 그라데이션 + 옅은 테두리 (설명 창과 같은 모양)
+  chamfer(c, 2, 2, W - 4, H - 4, 32, true);
+  const bg = c.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, 'rgba(20,28,36,0.95)'); bg.addColorStop(1, 'rgba(9,12,16,0.95)');
+  c.fillStyle = bg; c.fill(); c.lineWidth = 3; c.strokeStyle = HUD.line2; c.stroke();
+  // 빛줄기·구석 표시
+  c.fillStyle = HUD.acc; c.shadowColor = HUD.acc; c.shadowBlur = 16; c.fillRect(40, 0, 180, 5); c.shadowBlur = 0;
+  c.strokeStyle = HUD.acc; c.lineWidth = 3;
+  c.beginPath(); c.moveTo(14, 36); c.lineTo(14, 14); c.lineTo(36, 14); c.stroke();
+  c.beginPath(); c.moveTo(W - 14, H - 36); c.lineTo(W - 14, H - 14); c.lineTo(W - 36, H - 14); c.stroke();
+  // 머리: CONTROL // 로봇 이름, 오른쪽에 지금 상태 한 줄
+  const txt = (t, x, y, font, color, align = 'left', spacing = 0) => {
+    c.font = font; c.fillStyle = color; c.textAlign = align; c.letterSpacing = spacing + 'px'; c.fillText(t, x, y); c.letterSpacing = '0px'; c.textAlign = 'left';
+  };
+  txt('CONTROL', 40, 58, `700 22px ${HUD.OR}`, HUD.ink2, 'left', 6);
+  c.font = `700 22px ${HUD.OR}`; c.letterSpacing = '6px'; const hw = c.measureText('CONTROL ').width; c.letterSpacing = '0px';
+  txt('//', 40 + hw, 58, `700 22px ${HUD.OR}`, HUD.acc, 'left', 4);
+  txt(assembly?.label || 'FOREARM', 40 + hw + 44, 58, `700 22px ${HUD.OR}`, HUD.ink3, 'left', 6);
+  if (statusText) {
+    c.font = `500 24px ${HUD.KR}`; let t = statusText;
+    while (t.length > 1 && c.measureText(t).width > 470) t = t.slice(0, -1);
+    txt(t === statusText ? t : t + '…', W - 40, 58, `500 24px ${HUD.KR}`, HUD.ink3, 'right');
+  }
+  const lg = c.createLinearGradient(24, 0, W - 24, 0); lg.addColorStop(0, HUD.line2); lg.addColorStop(1, 'rgba(0,0,0,0)');
+  c.fillStyle = lg; c.fillRect(24, 74, W - 48, 2);
+
   for (const b of buttons) {
-    const off = b.off?.(), lit = b.primary || b.on?.(), w = bw(b), label = blabel(b);
-    c.globalAlpha = off ? 0.35 : 1;
-    c.fillStyle = b.on?.() ? '#dc2626' : lit ? '#2563eb' : '#eef2ff';
-    c.beginPath(); c.roundRect(b.x, b.y, w, BH, 22); c.fill();
-    if (dwell.button === b && dwell.t > 0) {          // 시선 누르기 진행 막대
-      c.fillStyle = lit ? 'rgba(255,255,255,0.45)' : 'rgba(37,99,235,0.35)';
-      c.beginPath(); c.roundRect(b.x, b.y, w * dwell.t, BH, 22); c.fill();
+    const off = b.off?.(), on = b.on?.(), w = bw(b), label = blabel(b);
+    const rec = on && b === buttons[9];                 // 녹화 중은 빨강, 음성 켬은 청록으로 채움
+    const col = rec ? HUD.danger : HUD.acc;
+    c.globalAlpha = off ? 0.32 : 1;
+    // 칸: 잘린 모서리, 테두리 없이 그라데이션 + 왼쪽 선
+    chamfer(c, b.x, b.y, w, BH, 14);
+    const g = c.createLinearGradient(b.x, 0, b.x + w, 0);
+    if (on) { g.addColorStop(0, rec ? 'rgba(255,93,108,0.34)' : 'rgba(92,230,255,0.32)'); g.addColorStop(1, rec ? 'rgba(255,93,108,0.08)' : 'rgba(92,230,255,0.08)'); }
+    else if (b.primary) { g.addColorStop(0, HUD.accDim); g.addColorStop(1, 'rgba(92,230,255,0.03)'); }
+    else { g.addColorStop(0, 'rgba(190,215,230,0.10)'); g.addColorStop(1, 'rgba(190,215,230,0.02)'); }
+    c.fillStyle = g; c.fill();
+    if (b.primary || on) { c.lineWidth = 2; c.strokeStyle = on ? col : 'rgba(92,230,255,0.55)'; c.stroke(); }
+    c.fillStyle = on ? col : b.primary ? HUD.acc : HUD.line2;
+    if (on || b.primary) { c.shadowColor = col; c.shadowBlur = 12; }
+    c.fillRect(b.x, b.y + 14, 4, BH - 28); c.shadowBlur = 0;
+    if (dwell.button === b && dwell.t > 0) {          // 시선 누르기 진행: 옅은 채움 + 아래 빛 막대
+      c.save(); chamfer(c, b.x, b.y, w, BH, 14); c.clip();
+      c.fillStyle = 'rgba(92,230,255,0.16)'; c.fillRect(b.x, b.y, w * dwell.t, BH);
+      c.fillStyle = HUD.acc; c.shadowColor = HUD.acc; c.shadowBlur = 12; c.fillRect(b.x, b.y + BH - 6, w * dwell.t, 6); c.shadowBlur = 0;
+      c.restore();
     }
-    c.fillStyle = lit ? '#fff' : '#1d4ed8';
-    c.font = 'bold 34px "Malgun Gothic", sans-serif';
-    c.fillText(label, b.x + (w - c.measureText(label).width) / 2, b.y + 60);
+    const tc = on ? (rec ? '#ffd0d5' : '#dffaff') : b.primary ? HUD.acc : HUD.ink;
+    c.font = `700 33px ${HUD.KR}`;
+    txt(label, b.x + (w - c.measureText(label).width) / 2 + 2, b.y + 60, `700 33px ${HUD.KR}`, tc);
     c.globalAlpha = 1;
   }
   panelTex.needsUpdate = true;
@@ -1336,11 +1379,6 @@ function wrapText(c, text, maxW) {
   return out;
 }
 // 디자인: jarvis-previews/redesign (잘린 모서리 판 + 청록 강조, 안쪽은 테두리 없이 선·그라데이션만)
-const HUD = {
-  acc: '#5ce6ff', accDim: 'rgba(92,230,255,0.16)', ink: '#eef3f6', ink2: '#a9b4bc', ink3: '#6b7780',
-  line: 'rgba(190,215,230,0.16)', line2: 'rgba(190,215,230,0.34)', warn: '#ffb547', danger: '#ff5d6c',
-  KR: 'Pretendard, "Malgun Gothic", sans-serif', OR: 'Orbitron, "Arial Black", sans-serif', MONO: '"JetBrains Mono", Consolas, monospace',
-};
 function chamfer(c, x, y, w, h, k, notch) {
   c.beginPath(); c.moveTo(x + k, y);
   if (notch) { c.lineTo(x + w - 180, y); c.lineTo(x + w - 164, y + 12); c.lineTo(x + w - k, y + 12); c.lineTo(x + w, y + k + 12); }
@@ -1506,7 +1544,7 @@ function drawInfo() {
   infoTex.needsUpdate = true;
 }
 drawInfo();
-document.fonts?.ready.then(() => drawInfo());   // 웹 글꼴을 받은 뒤 다시 그림
+document.fonts?.ready.then(() => { drawInfo(); drawPanel(); });   // 웹 글꼴을 받은 뒤 다시 그림
 connectAgent();
 capLoad().then((p) => { if (p?.frames?.length) { agentToast('지난번에 못 보낸 녹화를 보내요'); capSend(p); } });   // 새로고침 전에 못 보낸 녹화
 

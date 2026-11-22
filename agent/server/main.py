@@ -40,6 +40,16 @@ def readers():
 
 sessions: dict[str, Session] = {}
 app = FastAPI(title="robot assembly agent")
+
+
+@app.middleware("http")
+async def no_stale_pages(request, call_next):
+    """헤드셋 브라우저가 예전 화면을 저장해 두고 계속 쓰지 않게: 화면 파일은 매번 바뀌었는지 묻게 한다
+    (안 바뀌었으면 304라 다시 받지 않음)."""
+    resp = await call_next(request)
+    if request.url.path.startswith(("/xr", "/client")):
+        resp.headers["Cache-Control"] = "no-cache"
+    return resp
 app.mount("/client", StaticFiles(directory=ROOT / "client"), name="client")
 app.mount("/data/captures", StaticFiles(directory=ROOT / "data/captures"), name="captures")
 (ROOT / "data/briefings").mkdir(parents=True, exist_ok=True)
