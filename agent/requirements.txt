@@ -9,7 +9,9 @@ cryptography
 
 # 키 없이 쓰는 기능 (server/local_ai.py)
 ddgs                      # 인터넷 검색 (없으면 질문 답변 중 서버 오류)
-edge-tts                  # 음성 답
+edge-tts                  # 음성 답 (Supertonic이 안 될 때)
+supertonic                # 음성 답: 노트북에서 도는 신경망 한국어 음성 (처음 쓸 때 모델 약 400MB 받음)
+soundfile
 winrt-runtime             # 슬라이드 사진 글자 인식 (Windows OCR)
 winrt-Windows.Media.Ocr
 winrt-Windows.Globalization

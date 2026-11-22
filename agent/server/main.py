@@ -74,6 +74,7 @@ def warm_spoken():
 
 import threading  # noqa: E402
 threading.Thread(target=warm_spoken, daemon=True).start()
+threading.Thread(target=local_ai.warm_tts, daemon=True).start()
 
 
 @app.get("/")
@@ -127,7 +128,8 @@ async def tts(text: str):
     try:
         if llm.can("tts"):
             return Response(await asyncio.to_thread(llm.speak, text), media_type="audio/mpeg")
-        return Response(await asyncio.to_thread(local_ai.tts, text), media_type="audio/mpeg")
+        audio, mime = await asyncio.to_thread(local_ai.tts_audio, text)
+        return Response(audio, media_type=mime)
     except Exception as e:  # 인터넷이 없으면 화면 쪽 speechSynthesis로 대신 읽는다
         print("tts error:", e)
         return Response(status_code=204)

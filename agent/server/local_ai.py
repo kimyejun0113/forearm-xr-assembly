@@ -120,7 +120,51 @@ def stt_segments(path, hint: str | None = None) -> list[dict]:
 
 
 # ---------- 음성 합성 ----------
+# 기본은 Supertonic(노트북에서 도는 신경망 음성, 한국어 자연스러움). 안 되면 Edge 신경망 음성.
+TTS_ENGINE = os.environ.get("TTS_ENGINE", "supertonic")
+SUPERTONIC_VOICE = os.environ.get("SUPERTONIC_VOICE", "F1")     # F1~F5, M1~M5
+SUPERTONIC_SPEED = float(os.environ.get("SUPERTONIC_SPEED", "1.1"))
+_st = {}
+import threading as _th  # noqa: E402
+_st_lock = _th.Lock()
+
+
+def _supertonic():
+    if "tts" not in _st:
+        from supertonic import TTS
+        t = TTS()
+        _st.update(tts=t, style=t.get_voice_style(SUPERTONIC_VOICE))
+    return _st["tts"], _st["style"]
+
+
+def tts_audio(text: str) -> tuple[bytes, str]:
+    """글 → (소리 바이트, 형식). 숫자는 한글로 바꿔 읽힌다 ('4번'을 '세 번'으로 읽는 문제)."""
+    if TTS_ENGINE == "supertonic":
+        try:
+            import soundfile as sf
+            from .ko_num import ko_numbers
+            with _st_lock:   # 한 모델을 여러 요청이 동시에 쓰지 않게
+                t, style = _supertonic()
+                wav, _ = t.synthesize(ko_numbers(text), voice_style=style, lang="ko", speed=SUPERTONIC_SPEED)
+            buf = io.BytesIO()
+            sf.write(buf, wav.squeeze(), t.sample_rate, format="WAV", subtype="PCM_16")
+            return buf.getvalue(), "audio/wav"
+        except Exception as e:
+            print("supertonic 실패, Edge 음성으로:", e, flush=True)
+    return tts(text), "audio/mpeg"
+
+
+def warm_tts():
+    """서버 켤 때 모델을 미리 올려 둔다 (첫 말이 늦지 않게)"""
+    if TTS_ENGINE == "supertonic":
+        try:
+            tts_audio("준비됐어요.")
+        except Exception:
+            pass
+
+
 def tts(text: str) -> bytes:
+    """Edge 신경망 음성 (인터넷 필요)"""
     import edge_tts
 
     async def run():
