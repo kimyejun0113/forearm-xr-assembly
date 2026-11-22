@@ -422,6 +422,28 @@
     }
   ],
   "parts": {
+    "thigh": {
+      "name": "허벅지",
+      "aliases": [
+        "허벅지",
+        "허벅지 본체 (판·GIM 뒷받침·보·무릎 고리 608 x 2)",
+        "thigh"
+      ]
+    },
+    "brg_K1": {
+      "name": "608 베어링 (무릎 고리 안쪽)",
+      "aliases": [
+        "608 베어링 (무릎 고리 안쪽)",
+        "brg_K1"
+      ]
+    },
+    "brg_K2": {
+      "name": "608 베어링 (무릎 고리 바깥)",
+      "aliases": [
+        "608 베어링 (무릎 고리 바깥)",
+        "brg_K2"
+      ]
+    },
     "sleeve_knee": {
       "name": "무릎 슬리브 20 mm",
       "aliases": [
@@ -430,12 +452,11 @@
         "sleeve_knee"
       ]
     },
-    "ring_D": {
-      "name": "링 D 4 mm",
+    "hip": {
+      "name": "고관절 모터 묶음 (그대로)",
       "aliases": [
-        "링 D 4 mm",
-        "핀 D 608 안쪽 링 받침 4 mm",
-        "ring_D"
+        "고관절 모터 묶음 (그대로)",
+        "hip"
       ]
     },
     "knee_gim": {
@@ -443,22 +464,6 @@
       "aliases": [
         "무릎 모터 GIM8115 (그대로)",
         "knee_gim"
-      ]
-    },
-    "motor_crank": {
-      "name": "모터 크랭크",
-      "aliases": [
-        "모터 크랭크",
-        "RS02 출력 허브 + 모터 크랭크",
-        "motor_crank"
-      ]
-    },
-    "ankle_spacer": {
-      "name": "발목 스페이서",
-      "aliases": [
-        "발목 스페이서",
-        "발 안 예전 풀리 자리 채움",
-        "ankle_spacer"
       ]
     },
     "thigh_front": {
@@ -469,36 +474,12 @@
         "thigh_front"
       ]
     },
-    "knee_axle": {
-      "name": "무릎 축 M6×90",
+    "input_crank": {
+      "name": "입력 크랭크",
       "aliases": [
-        "무릎 축 M6×90",
-        "M6 x 90 십자 둥근머리",
-        "knee_axle"
-      ]
-    },
-    "pushrod": {
-      "name": "푸시로드",
-      "aliases": [
-        "푸시로드",
-        "발목 푸시로드 98 mm, 10 mm, 608 x 2",
-        "pushrod"
-      ]
-    },
-    "knee_shield": {
-      "name": "무릎 바깥 덮개",
-      "aliases": [
-        "무릎 바깥 덮개",
-        "무릎 바깥 덮개 (4 절 링크 위) — 기둥 3 개, M3 x 40 x 3 → 허벅지 앞 링",
-        "knee_shield"
-      ]
-    },
-    "ring_ankle_in": {
-      "name": "발목 링 2.1 mm",
-      "aliases": [
-        "발목 링 2.1 mm",
-        "발목 688 안쪽 링 받침 2.1 mm",
-        "ring_ankle_in"
+        "입력 크랭크",
+        "무릎 입력 크랭크 15.5 mm (+ 볼 A 자리)",
+        "input_crank"
       ]
     },
     "shin_outer": {
@@ -509,130 +490,6 @@
         "shin_outer"
       ]
     },
-    "thigh": {
-      "name": "허벅지",
-      "aliases": [
-        "허벅지",
-        "허벅지 본체 (판·GIM 뒷받침·보·무릎 고리 608 x 2)",
-        "thigh"
-      ]
-    },
-    "screwA": {
-      "name": "볼 A 나사 M4×30",
-      "aliases": [
-        "볼 A 나사 M4×30",
-        "M4 x 30 육각 렌치",
-        "screwA"
-      ]
-    },
-    "ankle_axle": {
-      "name": "발목 축 M6×65",
-      "aliases": [
-        "발목 축 M6×65",
-        "M6 x 65 십자 둥근머리",
-        "ankle_axle"
-      ]
-    },
-    "brg_AIN": {
-      "name": "608 베어링 (커플러 핀 A 쪽)",
-      "aliases": [
-        "608 베어링 (커플러 핀 A 쪽)",
-        "brg_AIN"
-      ]
-    },
-    "shin_posts": {
-      "name": "정강이 기둥",
-      "aliases": [
-        "정강이 기둥",
-        "정강이 연결 기둥 x 2",
-        "shin_posts"
-      ]
-    },
-    "hip": {
-      "name": "고관절 모터 묶음 (그대로)",
-      "aliases": [
-        "고관절 모터 묶음 (그대로)",
-        "hip"
-      ]
-    },
-    "pinD": {
-      "name": "핀 D M6×35",
-      "aliases": [
-        "핀 D M6×35",
-        "M6 x 35 십자 둥근머리",
-        "pinD"
-      ]
-    },
-    "screwC": {
-      "name": "볼 C 나사 M4×20",
-      "aliases": [
-        "볼 C 나사 M4×20",
-        "M4 x 20 육각 렌치",
-        "screwC"
-      ]
-    },
-    "shin_inner": {
-      "name": "정강이 안쪽 판",
-      "aliases": [
-        "정강이 안쪽 판",
-        "정강이 안쪽 판 10 mm (+ 무릎 나사 돌기 + 무릎 멈춤 돌기 2)",
-        "shin_inner"
-      ]
-    },
-    "brg_D": {
-      "name": "608 베어링 (푸시로드 핀 D 쪽)",
-      "aliases": [
-        "608 베어링 (푸시로드 핀 D 쪽)",
-        "brg_D"
-      ]
-    },
-    "pinA": {
-      "name": "핀 A M6×35",
-      "aliases": [
-        "핀 A M6×35",
-        "M6 x 35 십자 둥근머리",
-        "pinA"
-      ]
-    },
-    "sleeve_ankle": {
-      "name": "발목 슬리브 20.4 mm",
-      "aliases": [
-        "발목 슬리브 20.4 mm",
-        "M6 슬리브 Ø8/6.0 x 20.4 mm",
-        "sleeve_ankle"
-      ]
-    },
-    "foot": {
-      "name": "발과 신발 (그대로)",
-      "aliases": [
-        "발과 신발 (그대로)",
-        "foot"
-      ]
-    },
-    "cheek_C": {
-      "name": "볼 C",
-      "aliases": [
-        "볼 C",
-        "볼 C (핀 C 반대편 받침)",
-        "cheek_C"
-      ]
-    },
-    "ring_knee_in": {
-      "name": "무릎 링 2 mm",
-      "aliases": [
-        "무릎 링 2 mm",
-        "무릎 608 안쪽 링 받침 2 mm",
-        "ring_knee_in"
-      ]
-    },
-    "pinC": {
-      "name": "핀 C M6×35",
-      "aliases": [
-        "핀 C M6×35",
-        "M6 x 35 십자 둥근머리",
-        "pinC"
-      ]
-    },
     "ankle_rs": {
       "name": "발목 모터 RobStride02 (그대로)",
       "aliases": [
@@ -640,51 +497,12 @@
         "ankle_rs"
       ]
     },
-    "ring_B": {
-      "name": "링 B 1 mm",
+    "motor_crank": {
+      "name": "모터 크랭크",
       "aliases": [
-        "링 B 1 mm",
-        "핀 B 608 안쪽 링 받침 1 mm",
-        "ring_B"
-      ]
-    },
-    "input_crank": {
-      "name": "입력 크랭크",
-      "aliases": [
-        "입력 크랭크",
-        "무릎 입력 크랭크 15.5 mm (+ 볼 A 자리)",
-        "input_crank"
-      ]
-    },
-    "cheek_A": {
-      "name": "볼 A",
-      "aliases": [
-        "볼 A",
-        "볼 A (핀 A 반대편 받침 + 기둥)",
-        "cheek_A"
-      ]
-    },
-    "coupler": {
-      "name": "커플러",
-      "aliases": [
-        "커플러",
-        "무릎 커플러 130 mm, 9 x 22 mm, 608 x 2",
-        "coupler"
-      ]
-    },
-    "sleeve_B": {
-      "name": "슬리브 B 7 mm",
-      "aliases": [
-        "슬리브 B 7 mm",
-        "M6 슬리브 Ø8/6.0 x 7.0 mm",
-        "sleeve_B"
-      ]
-    },
-    "brg_C": {
-      "name": "608 베어링 (푸시로드 핀 C 쪽)",
-      "aliases": [
-        "608 베어링 (푸시로드 핀 C 쪽)",
-        "brg_C"
+        "모터 크랭크",
+        "RS02 출력 허브 + 모터 크랭크",
+        "motor_crank"
       ]
     },
     "cheek_D": {
@@ -695,19 +513,43 @@
         "cheek_D"
       ]
     },
-    "brg_K2": {
-      "name": "608 베어링 (무릎 고리 바깥)",
+    "screwD": {
+      "name": "볼 D 나사 M4×30",
       "aliases": [
-        "608 베어링 (무릎 고리 바깥)",
-        "brg_K2"
+        "볼 D 나사 M4×30",
+        "M4 x 30 육각 렌치",
+        "screwD"
       ]
     },
-    "spacer_D_head": {
-      "name": "핀 D 머리 받침 6 mm",
+    "shin_posts": {
+      "name": "정강이 기둥",
       "aliases": [
-        "핀 D 머리 받침 6 mm",
-        "핀 D 머리 받침 6 mm (M6 x 35 끝이 정강이 판에 안 닿게)",
-        "spacer_D_head"
+        "정강이 기둥",
+        "정강이 연결 기둥 x 2",
+        "shin_posts"
+      ]
+    },
+    "shin_inner": {
+      "name": "정강이 안쪽 판",
+      "aliases": [
+        "정강이 안쪽 판",
+        "정강이 안쪽 판 10 mm (+ 무릎 나사 돌기 + 무릎 멈춤 돌기 2)",
+        "shin_inner"
+      ]
+    },
+    "foot": {
+      "name": "발과 신발 (그대로)",
+      "aliases": [
+        "발과 신발 (그대로)",
+        "foot"
+      ]
+    },
+    "ankle_spacer": {
+      "name": "발목 스페이서",
+      "aliases": [
+        "발목 스페이서",
+        "발 안 예전 풀리 자리 채움",
+        "ankle_spacer"
       ]
     },
     "foot_outer_new": {
@@ -718,18 +560,34 @@
         "foot_outer_new"
       ]
     },
-    "brg_K1": {
-      "name": "608 베어링 (무릎 고리 안쪽)",
+    "brg_A1": {
+      "name": "688 베어링 (발목 안쪽)",
       "aliases": [
-        "608 베어링 (무릎 고리 안쪽)",
-        "brg_K1"
+        "688 베어링 (발목 안쪽)",
+        "brg_A1"
       ]
     },
-    "foot_plate_crown_sole": {
-      "name": "발판 밑창",
+    "brg_A2": {
+      "name": "688 베어링 (발목 바깥)",
       "aliases": [
-        "발판 밑창",
-        "foot_plate_crown_sole"
+        "688 베어링 (발목 바깥)",
+        "brg_A2"
+      ]
+    },
+    "sleeve_ankle": {
+      "name": "발목 슬리브 20.4 mm",
+      "aliases": [
+        "발목 슬리브 20.4 mm",
+        "M6 슬리브 Ø8/6.0 x 20.4 mm",
+        "sleeve_ankle"
+      ]
+    },
+    "ring_knee_in": {
+      "name": "무릎 링 2 mm",
+      "aliases": [
+        "무릎 링 2 mm",
+        "무릎 608 안쪽 링 받침 2 mm",
+        "ring_knee_in"
       ]
     },
     "cheek_B": {
@@ -740,6 +598,45 @@
         "cheek_B"
       ]
     },
+    "knee_axle": {
+      "name": "무릎 축 M6×90",
+      "aliases": [
+        "무릎 축 M6×90",
+        "M6 x 90 십자 둥근머리",
+        "knee_axle"
+      ]
+    },
+    "ring_ankle_in": {
+      "name": "발목 링 2.1 mm",
+      "aliases": [
+        "발목 링 2.1 mm",
+        "발목 688 안쪽 링 받침 2.1 mm",
+        "ring_ankle_in"
+      ]
+    },
+    "ankle_axle": {
+      "name": "발목 축 M6×65",
+      "aliases": [
+        "발목 축 M6×65",
+        "M6 x 65 십자 둥근머리",
+        "ankle_axle"
+      ]
+    },
+    "coupler": {
+      "name": "커플러",
+      "aliases": [
+        "커플러",
+        "무릎 커플러 130 mm, 9 x 22 mm, 608 x 2",
+        "coupler"
+      ]
+    },
+    "brg_AIN": {
+      "name": "608 베어링 (커플러 핀 A 쪽)",
+      "aliases": [
+        "608 베어링 (커플러 핀 A 쪽)",
+        "brg_AIN"
+      ]
+    },
     "brg_B": {
       "name": "608 베어링 (커플러 핀 B 쪽)",
       "aliases": [
@@ -747,42 +644,12 @@
         "brg_B"
       ]
     },
-    "foot_plate_crown_upper": {
-      "name": "발판 윗판",
+    "ring_B": {
+      "name": "링 B 1 mm",
       "aliases": [
-        "발판 윗판",
-        "foot_plate_crown_upper"
-      ]
-    },
-    "pinB": {
-      "name": "핀 B M6×35",
-      "aliases": [
-        "핀 B M6×35",
-        "M6 x 35 십자 둥근머리",
-        "pinB"
-      ]
-    },
-    "screwD": {
-      "name": "볼 D 나사 M4×30",
-      "aliases": [
-        "볼 D 나사 M4×30",
-        "M4 x 30 육각 렌치",
-        "screwD"
-      ]
-    },
-    "brg_A2": {
-      "name": "688 베어링 (발목 바깥)",
-      "aliases": [
-        "688 베어링 (발목 바깥)",
-        "brg_A2"
-      ]
-    },
-    "sleeve_C": {
-      "name": "슬리브 C 7 mm",
-      "aliases": [
-        "슬리브 C 7 mm",
-        "M6 슬리브 Ø8/6.0 x 7.0 mm",
-        "sleeve_C"
+        "링 B 1 mm",
+        "핀 B 608 안쪽 링 받침 1 mm",
+        "ring_B"
       ]
     },
     "sleeve_A": {
@@ -793,6 +660,76 @@
         "sleeve_A"
       ]
     },
+    "sleeve_B": {
+      "name": "슬리브 B 7 mm",
+      "aliases": [
+        "슬리브 B 7 mm",
+        "M6 슬리브 Ø8/6.0 x 7.0 mm",
+        "sleeve_B"
+      ]
+    },
+    "cheek_A": {
+      "name": "볼 A",
+      "aliases": [
+        "볼 A",
+        "볼 A (핀 A 반대편 받침 + 기둥)",
+        "cheek_A"
+      ]
+    },
+    "screwA": {
+      "name": "볼 A 나사 M4×30",
+      "aliases": [
+        "볼 A 나사 M4×30",
+        "M4 x 30 육각 렌치",
+        "screwA"
+      ]
+    },
+    "pinA": {
+      "name": "핀 A M6×35",
+      "aliases": [
+        "핀 A M6×35",
+        "M6 x 35 십자 둥근머리",
+        "pinA"
+      ]
+    },
+    "pinB": {
+      "name": "핀 B M6×35",
+      "aliases": [
+        "핀 B M6×35",
+        "M6 x 35 십자 둥근머리",
+        "pinB"
+      ]
+    },
+    "pushrod": {
+      "name": "푸시로드",
+      "aliases": [
+        "푸시로드",
+        "발목 푸시로드 98 mm, 10 mm, 608 x 2",
+        "pushrod"
+      ]
+    },
+    "brg_D": {
+      "name": "608 베어링 (푸시로드 핀 D 쪽)",
+      "aliases": [
+        "608 베어링 (푸시로드 핀 D 쪽)",
+        "brg_D"
+      ]
+    },
+    "brg_C": {
+      "name": "608 베어링 (푸시로드 핀 C 쪽)",
+      "aliases": [
+        "608 베어링 (푸시로드 핀 C 쪽)",
+        "brg_C"
+      ]
+    },
+    "ring_D": {
+      "name": "링 D 4 mm",
+      "aliases": [
+        "링 D 4 mm",
+        "핀 D 608 안쪽 링 받침 4 mm",
+        "ring_D"
+      ]
+    },
     "sleeve_D": {
       "name": "슬리브 D 7 mm",
       "aliases": [
@@ -801,11 +738,74 @@
         "sleeve_D"
       ]
     },
-    "brg_A1": {
-      "name": "688 베어링 (발목 안쪽)",
+    "sleeve_C": {
+      "name": "슬리브 C 7 mm",
       "aliases": [
-        "688 베어링 (발목 안쪽)",
-        "brg_A1"
+        "슬리브 C 7 mm",
+        "M6 슬리브 Ø8/6.0 x 7.0 mm",
+        "sleeve_C"
+      ]
+    },
+    "spacer_D_head": {
+      "name": "핀 D 머리 받침 6 mm",
+      "aliases": [
+        "핀 D 머리 받침 6 mm",
+        "핀 D 머리 받침 6 mm (M6 x 35 끝이 정강이 판에 안 닿게)",
+        "spacer_D_head"
+      ]
+    },
+    "pinD": {
+      "name": "핀 D M6×35",
+      "aliases": [
+        "핀 D M6×35",
+        "M6 x 35 십자 둥근머리",
+        "pinD"
+      ]
+    },
+    "cheek_C": {
+      "name": "볼 C",
+      "aliases": [
+        "볼 C",
+        "볼 C (핀 C 반대편 받침)",
+        "cheek_C"
+      ]
+    },
+    "screwC": {
+      "name": "볼 C 나사 M4×20",
+      "aliases": [
+        "볼 C 나사 M4×20",
+        "M4 x 20 육각 렌치",
+        "screwC"
+      ]
+    },
+    "pinC": {
+      "name": "핀 C M6×35",
+      "aliases": [
+        "핀 C M6×35",
+        "M6 x 35 십자 둥근머리",
+        "pinC"
+      ]
+    },
+    "knee_shield": {
+      "name": "무릎 바깥 덮개",
+      "aliases": [
+        "무릎 바깥 덮개",
+        "무릎 바깥 덮개 (4 절 링크 위) — 기둥 3 개, M3 x 40 x 3 → 허벅지 앞 링",
+        "knee_shield"
+      ]
+    },
+    "foot_plate_crown_upper": {
+      "name": "발판 윗판",
+      "aliases": [
+        "발판 윗판",
+        "foot_plate_crown_upper"
+      ]
+    },
+    "foot_plate_crown_sole": {
+      "name": "발판 밑창",
+      "aliases": [
+        "발판 밑창",
+        "foot_plate_crown_sole"
       ]
     }
   },
@@ -1434,309 +1434,13 @@
     {
       "id": "c82",
       "kind": "part",
-      "text": "무릎 슬리브 20 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 20.0 mm, sleeve_knee · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
-      "step_id": "L01",
-      "source": "부품 목록",
-      "part_id": "sleeve_knee"
-    },
-    {
-      "id": "c83",
-      "kind": "part",
-      "text": "링 D 4 mm — 다른 이름: 핀 D 608 안쪽 링 받침 4 mm, ring_D · 출력: 채움 100 % · 왼·오 같은 부품",
-      "step_id": "L13",
-      "source": "부품 목록",
-      "part_id": "ring_D"
-    },
-    {
-      "id": "c84",
-      "kind": "part",
-      "text": "무릎 모터 GIM8115 (그대로) — 다른 이름: knee_gim",
-      "step_id": "L03",
-      "source": "부품 목록",
-      "part_id": "knee_gim"
-    },
-    {
-      "id": "c85",
-      "kind": "part",
-      "text": "모터 크랭크 — 다른 이름: RS02 출력 허브 + 모터 크랭크, motor_crank · 출력: 채움 100 %, PETG, X 152.5 면 바닥 · 왼·오 다른 부품",
-      "step_id": "L07",
-      "source": "부품 목록",
-      "part_id": "motor_crank"
-    },
-    {
-      "id": "c86",
-      "kind": "part",
-      "text": "발목 스페이서 — 다른 이름: 발 안 예전 풀리 자리 채움, ankle_spacer · 출력: 벽 3, 채움 40 % · 왼·오 같은 부품",
-      "step_id": "L09",
-      "source": "부품 목록",
-      "part_id": "ankle_spacer"
-    },
-    {
-      "id": "c87",
-      "kind": "part",
-      "text": "허벅지 앞 링 — 다른 이름: 무릎 GIM 앞면 링 + 보로 내려가는 다리, thigh_front · 출력: 벽 6, 채움 50 %, X 159 면 바닥 · 왼·오 다른 부품",
-      "step_id": "L04",
-      "source": "부품 목록",
-      "part_id": "thigh_front"
-    },
-    {
-      "id": "c88",
-      "kind": "part",
-      "text": "무릎 축 M6×90 — 다른 이름: M6 x 90 십자 둥근머리, knee_axle",
-      "step_id": "L10",
-      "source": "부품 목록",
-      "part_id": "knee_axle"
-    },
-    {
-      "id": "c89",
-      "kind": "part",
-      "text": "푸시로드 — 다른 이름: 발목 푸시로드 98 mm, 10 mm, 608 x 2, pushrod · 출력: 채움 100 %, PETG · 왼·오 같은 부품",
-      "step_id": "L13",
-      "source": "부품 목록",
-      "part_id": "pushrod"
-    },
-    {
-      "id": "c90",
-      "kind": "part",
-      "text": "무릎 바깥 덮개 — 다른 이름: 무릎 바깥 덮개 (4 절 링크 위) — 기둥 3 개, M3 x 40 x 3 → 허벅지 앞 링, knee_shield · 출력: 벽 3, 채움 20 %, 판(바깥면) 바닥, 기둥 위로 · 왼·오 다른 부품",
-      "step_id": "L14",
-      "source": "부품 목록",
-      "part_id": "knee_shield"
-    },
-    {
-      "id": "c91",
-      "kind": "part",
-      "text": "발목 링 2.1 mm — 다른 이름: 발목 688 안쪽 링 받침 2.1 mm, ring_ankle_in · 출력: 채움 100 % · 왼·오 같은 부품",
-      "step_id": "L11",
-      "source": "부품 목록",
-      "part_id": "ring_ankle_in"
-    },
-    {
-      "id": "c92",
-      "kind": "part",
-      "text": "정강이 바깥 판 — 다른 이름: 정강이 바깥 판 + 출력 크랭크 + RS02 고정 + 무릎·발목 허브, shin_outer · 출력: 벽 6, 채움 50 %, X 170.5 면 바닥 · 왼·오 다른 부품",
-      "step_id": "L06",
-      "source": "부품 목록",
-      "part_id": "shin_outer"
-    },
-    {
-      "id": "c93",
-      "kind": "part",
       "text": "허벅지 — 다른 이름: 허벅지 본체 (판·GIM 뒷받침·보·무릎 고리 608 x 2), thigh · 출력: 벽 6, 채움 50 % 자이로이드 (무릎 고리 쪽 1/3 은 수정자 100 %), X 93 면 바닥 · 왼·오 다른 부품",
       "step_id": "L01",
       "source": "부품 목록",
       "part_id": "thigh"
     },
     {
-      "id": "c94",
-      "kind": "part",
-      "text": "볼 A 나사 M4×30 — 다른 이름: M4 x 30 육각 렌치, screwA",
-      "step_id": "L12",
-      "source": "부품 목록",
-      "part_id": "screwA"
-    },
-    {
-      "id": "c95",
-      "kind": "part",
-      "text": "발목 축 M6×65 — 다른 이름: M6 x 65 십자 둥근머리, ankle_axle",
-      "step_id": "L11",
-      "source": "부품 목록",
-      "part_id": "ankle_axle"
-    },
-    {
-      "id": "c96",
-      "kind": "part",
-      "text": "608 베어링 (커플러 핀 A 쪽) — 다른 이름: brg_AIN",
-      "step_id": "L12",
-      "source": "부품 목록",
-      "part_id": "brg_AIN"
-    },
-    {
-      "id": "c97",
-      "kind": "part",
-      "text": "정강이 기둥 — 다른 이름: 정강이 연결 기둥 x 2, shin_posts · 출력: 벽 5, 채움 50 %, 세워서 · 왼·오 같은 부품",
-      "step_id": "L08",
-      "source": "부품 목록",
-      "part_id": "shin_posts"
-    },
-    {
-      "id": "c98",
-      "kind": "part",
-      "text": "고관절 모터 묶음 (그대로) — 다른 이름: hip",
-      "step_id": "L02",
-      "source": "부품 목록",
-      "part_id": "hip"
-    },
-    {
-      "id": "c99",
-      "kind": "part",
-      "text": "핀 D M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinD",
-      "step_id": "L13",
-      "source": "부품 목록",
-      "part_id": "pinD"
-    },
-    {
-      "id": "c100",
-      "kind": "part",
-      "text": "볼 C 나사 M4×20 — 다른 이름: M4 x 20 육각 렌치, screwC",
-      "step_id": "L13",
-      "source": "부품 목록",
-      "part_id": "screwC"
-    },
-    {
-      "id": "c101",
-      "kind": "part",
-      "text": "정강이 안쪽 판 — 다른 이름: 정강이 안쪽 판 10 mm (+ 무릎 나사 돌기 + 무릎 멈춤 돌기 2), shin_inner · 출력: 벽 6, 채움 60 % (멈춤 돌기 둘레 수정자 100 %), 116 면 바닥 (돌기는 위로 12 mm) · 왼·오 다른 부품",
-      "step_id": "L08",
-      "source": "부품 목록",
-      "part_id": "shin_inner"
-    },
-    {
-      "id": "c102",
-      "kind": "part",
-      "text": "608 베어링 (푸시로드 핀 D 쪽) — 다른 이름: brg_D",
-      "step_id": "L13",
-      "source": "부품 목록",
-      "part_id": "brg_D"
-    },
-    {
-      "id": "c103",
-      "kind": "part",
-      "text": "핀 A M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinA",
-      "step_id": "L12",
-      "source": "부품 목록",
-      "part_id": "pinA"
-    },
-    {
-      "id": "c104",
-      "kind": "part",
-      "text": "발목 슬리브 20.4 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 20.4 mm, sleeve_ankle · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
-      "step_id": "L09",
-      "source": "부품 목록",
-      "part_id": "sleeve_ankle"
-    },
-    {
-      "id": "c105",
-      "kind": "part",
-      "text": "발과 신발 (그대로) — 다른 이름: foot",
-      "step_id": "L09",
-      "source": "부품 목록",
-      "part_id": "foot"
-    },
-    {
-      "id": "c106",
-      "kind": "part",
-      "text": "볼 C — 다른 이름: 볼 C (핀 C 반대편 받침), cheek_C · 출력: 채움 100 %, PETG, 158.5 면 바닥 · 왼·오 같은 부품",
-      "step_id": "L13",
-      "source": "부품 목록",
-      "part_id": "cheek_C"
-    },
-    {
-      "id": "c107",
-      "kind": "part",
-      "text": "무릎 링 2 mm — 다른 이름: 무릎 608 안쪽 링 받침 2 mm, ring_knee_in · 출력: 채움 100 % · 왼·오 같은 부품",
-      "step_id": "L10",
-      "source": "부품 목록",
-      "part_id": "ring_knee_in"
-    },
-    {
-      "id": "c108",
-      "kind": "part",
-      "text": "핀 C M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinC",
-      "step_id": "L13",
-      "source": "부품 목록",
-      "part_id": "pinC"
-    },
-    {
-      "id": "c109",
-      "kind": "part",
-      "text": "발목 모터 RobStride02 (그대로) — 다른 이름: ankle_rs",
-      "step_id": "L06",
-      "source": "부품 목록",
-      "part_id": "ankle_rs"
-    },
-    {
-      "id": "c110",
-      "kind": "part",
-      "text": "링 B 1 mm — 다른 이름: 핀 B 608 안쪽 링 받침 1 mm, ring_B · 출력: 채움 100 % · 왼·오 같은 부품",
-      "step_id": "L12",
-      "source": "부품 목록",
-      "part_id": "ring_B"
-    },
-    {
-      "id": "c111",
-      "kind": "part",
-      "text": "입력 크랭크 — 다른 이름: 무릎 입력 크랭크 15.5 mm (+ 볼 A 자리), input_crank · 출력: 채움 100 %, PETG, 155 면 바닥 · 왼·오 다른 부품",
-      "step_id": "L05",
-      "source": "부품 목록",
-      "part_id": "input_crank"
-    },
-    {
-      "id": "c112",
-      "kind": "part",
-      "text": "볼 A — 다른 이름: 볼 A (핀 A 반대편 받침 + 기둥), cheek_A · 출력: 채움 100 %, PETG, 189.5 면 바닥 · 왼·오 같은 부품",
-      "step_id": "L12",
-      "source": "부품 목록",
-      "part_id": "cheek_A"
-    },
-    {
-      "id": "c113",
-      "kind": "part",
-      "text": "커플러 — 다른 이름: 무릎 커플러 130 mm, 9 x 22 mm, 608 x 2, coupler · 출력: 채움 100 %, PETG, 넓은 면 바닥 · 왼·오 같은 부품",
-      "step_id": "L12",
-      "source": "부품 목록",
-      "part_id": "coupler"
-    },
-    {
-      "id": "c114",
-      "kind": "part",
-      "text": "슬리브 B 7 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 7.0 mm, sleeve_B · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
-      "step_id": "L12",
-      "source": "부품 목록",
-      "part_id": "sleeve_B"
-    },
-    {
-      "id": "c115",
-      "kind": "part",
-      "text": "608 베어링 (푸시로드 핀 C 쪽) — 다른 이름: brg_C",
-      "step_id": "L13",
-      "source": "부품 목록",
-      "part_id": "brg_C"
-    },
-    {
-      "id": "c116",
-      "kind": "part",
-      "text": "볼 D — 다른 이름: 볼 D (핀 D 반대편 받침 + 가운데 기둥), cheek_D · 출력: 채움 100 %, PETG, 133.5 면 바닥 · 왼·오 같은 부품",
-      "step_id": "L07",
-      "source": "부품 목록",
-      "part_id": "cheek_D"
-    },
-    {
-      "id": "c117",
-      "kind": "part",
-      "text": "608 베어링 (무릎 고리 바깥) — 다른 이름: brg_K2",
-      "step_id": "L01",
-      "source": "부품 목록",
-      "part_id": "brg_K2"
-    },
-    {
-      "id": "c118",
-      "kind": "part",
-      "text": "핀 D 머리 받침 6 mm — 다른 이름: 핀 D 머리 받침 6 mm (M6 x 35 끝이 정강이 판에 안 닿게), spacer_D_head · 출력: 채움 100 % · 왼·오 같은 부품",
-      "step_id": "L13",
-      "source": "부품 목록",
-      "part_id": "spacer_D_head"
-    },
-    {
-      "id": "c119",
-      "kind": "part",
-      "text": "발 바깥 판 (발목 크랭크) — 다른 이름: 발 바깥 판 #59 + 발목 크랭크 + 볼 C 기둥 (새로 출력), foot_outer_new · 출력: 벽 6, 채움 100 %, 133.5 면 바닥 · 왼·오 다른 부품",
-      "step_id": "L09",
-      "source": "부품 목록",
-      "part_id": "foot_outer_new"
-    },
-    {
-      "id": "c120",
+      "id": "c83",
       "kind": "part",
       "text": "608 베어링 (무릎 고리 안쪽) — 다른 이름: brg_K1",
       "step_id": "L01",
@@ -1744,47 +1448,87 @@
       "part_id": "brg_K1"
     },
     {
-      "id": "c121",
+      "id": "c84",
       "kind": "part",
-      "text": "발판 밑창 — 다른 이름: foot_plate_crown_sole · 출력: TPU 95A 또는 PLA + 미끄럼 방지 시트, 땅 닿는 면 아래 (턱 위로) · 왼·오 같은 부품",
-      "step_id": "L15",
+      "text": "608 베어링 (무릎 고리 바깥) — 다른 이름: brg_K2",
+      "step_id": "L01",
       "source": "부품 목록",
-      "part_id": "foot_plate_crown_sole"
+      "part_id": "brg_K2"
     },
     {
-      "id": "c122",
+      "id": "c85",
       "kind": "part",
-      "text": "볼 B — 다른 이름: 볼 B (핀 B 반대편 받침 + 무릎 축 기둥), cheek_B · 출력: 채움 100 %, PETG, 189.5 면 바닥 · 왼·오 같은 부품",
-      "step_id": "L10",
+      "text": "무릎 슬리브 20 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 20.0 mm, sleeve_knee · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
+      "step_id": "L01",
       "source": "부품 목록",
-      "part_id": "cheek_B"
+      "part_id": "sleeve_knee"
     },
     {
-      "id": "c123",
+      "id": "c86",
       "kind": "part",
-      "text": "608 베어링 (커플러 핀 B 쪽) — 다른 이름: brg_B",
-      "step_id": "L12",
+      "text": "고관절 모터 묶음 (그대로) — 다른 이름: hip",
+      "step_id": "L02",
       "source": "부품 목록",
-      "part_id": "brg_B"
+      "part_id": "hip"
     },
     {
-      "id": "c124",
+      "id": "c87",
       "kind": "part",
-      "text": "발판 윗판 — 다른 이름: foot_plate_crown_upper · 출력: PETG/PLA, 넓은 바닥면 아래 (돌기 위로) · 왼·오 다른 부품",
-      "step_id": "L15",
+      "text": "무릎 모터 GIM8115 (그대로) — 다른 이름: knee_gim",
+      "step_id": "L03",
       "source": "부품 목록",
-      "part_id": "foot_plate_crown_upper"
+      "part_id": "knee_gim"
     },
     {
-      "id": "c125",
+      "id": "c88",
       "kind": "part",
-      "text": "핀 B M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinB",
-      "step_id": "L12",
+      "text": "허벅지 앞 링 — 다른 이름: 무릎 GIM 앞면 링 + 보로 내려가는 다리, thigh_front · 출력: 벽 6, 채움 50 %, X 159 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L04",
       "source": "부품 목록",
-      "part_id": "pinB"
+      "part_id": "thigh_front"
     },
     {
-      "id": "c126",
+      "id": "c89",
+      "kind": "part",
+      "text": "입력 크랭크 — 다른 이름: 무릎 입력 크랭크 15.5 mm (+ 볼 A 자리), input_crank · 출력: 채움 100 %, PETG, 155 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L05",
+      "source": "부품 목록",
+      "part_id": "input_crank"
+    },
+    {
+      "id": "c90",
+      "kind": "part",
+      "text": "정강이 바깥 판 — 다른 이름: 정강이 바깥 판 + 출력 크랭크 + RS02 고정 + 무릎·발목 허브, shin_outer · 출력: 벽 6, 채움 50 %, X 170.5 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L06",
+      "source": "부품 목록",
+      "part_id": "shin_outer"
+    },
+    {
+      "id": "c91",
+      "kind": "part",
+      "text": "발목 모터 RobStride02 (그대로) — 다른 이름: ankle_rs",
+      "step_id": "L06",
+      "source": "부품 목록",
+      "part_id": "ankle_rs"
+    },
+    {
+      "id": "c92",
+      "kind": "part",
+      "text": "모터 크랭크 — 다른 이름: RS02 출력 허브 + 모터 크랭크, motor_crank · 출력: 채움 100 %, PETG, X 152.5 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L07",
+      "source": "부품 목록",
+      "part_id": "motor_crank"
+    },
+    {
+      "id": "c93",
+      "kind": "part",
+      "text": "볼 D — 다른 이름: 볼 D (핀 D 반대편 받침 + 가운데 기둥), cheek_D · 출력: 채움 100 %, PETG, 133.5 면 바닥 · 왼·오 같은 부품",
+      "step_id": "L07",
+      "source": "부품 목록",
+      "part_id": "cheek_D"
+    },
+    {
+      "id": "c94",
       "kind": "part",
       "text": "볼 D 나사 M4×30 — 다른 이름: M4 x 30 육각 렌치, screwD",
       "step_id": "L07",
@@ -1792,7 +1536,55 @@
       "part_id": "screwD"
     },
     {
-      "id": "c127",
+      "id": "c95",
+      "kind": "part",
+      "text": "정강이 기둥 — 다른 이름: 정강이 연결 기둥 x 2, shin_posts · 출력: 벽 5, 채움 50 %, 세워서 · 왼·오 같은 부품",
+      "step_id": "L08",
+      "source": "부품 목록",
+      "part_id": "shin_posts"
+    },
+    {
+      "id": "c96",
+      "kind": "part",
+      "text": "정강이 안쪽 판 — 다른 이름: 정강이 안쪽 판 10 mm (+ 무릎 나사 돌기 + 무릎 멈춤 돌기 2), shin_inner · 출력: 벽 6, 채움 60 % (멈춤 돌기 둘레 수정자 100 %), 116 면 바닥 (돌기는 위로 12 mm) · 왼·오 다른 부품",
+      "step_id": "L08",
+      "source": "부품 목록",
+      "part_id": "shin_inner"
+    },
+    {
+      "id": "c97",
+      "kind": "part",
+      "text": "발과 신발 (그대로) — 다른 이름: foot",
+      "step_id": "L09",
+      "source": "부품 목록",
+      "part_id": "foot"
+    },
+    {
+      "id": "c98",
+      "kind": "part",
+      "text": "발목 스페이서 — 다른 이름: 발 안 예전 풀리 자리 채움, ankle_spacer · 출력: 벽 3, 채움 40 % · 왼·오 같은 부품",
+      "step_id": "L09",
+      "source": "부품 목록",
+      "part_id": "ankle_spacer"
+    },
+    {
+      "id": "c99",
+      "kind": "part",
+      "text": "발 바깥 판 (발목 크랭크) — 다른 이름: 발 바깥 판 #59 + 발목 크랭크 + 볼 C 기둥 (새로 출력), foot_outer_new · 출력: 벽 6, 채움 100 %, 133.5 면 바닥 · 왼·오 다른 부품",
+      "step_id": "L09",
+      "source": "부품 목록",
+      "part_id": "foot_outer_new"
+    },
+    {
+      "id": "c100",
+      "kind": "part",
+      "text": "688 베어링 (발목 안쪽) — 다른 이름: brg_A1",
+      "step_id": "L09",
+      "source": "부품 목록",
+      "part_id": "brg_A1"
+    },
+    {
+      "id": "c101",
       "kind": "part",
       "text": "688 베어링 (발목 바깥) — 다른 이름: brg_A2",
       "step_id": "L09",
@@ -1800,15 +1592,87 @@
       "part_id": "brg_A2"
     },
     {
-      "id": "c128",
+      "id": "c102",
       "kind": "part",
-      "text": "슬리브 C 7 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 7.0 mm, sleeve_C · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
-      "step_id": "L13",
+      "text": "발목 슬리브 20.4 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 20.4 mm, sleeve_ankle · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
+      "step_id": "L09",
       "source": "부품 목록",
-      "part_id": "sleeve_C"
+      "part_id": "sleeve_ankle"
     },
     {
-      "id": "c129",
+      "id": "c103",
+      "kind": "part",
+      "text": "무릎 링 2 mm — 다른 이름: 무릎 608 안쪽 링 받침 2 mm, ring_knee_in · 출력: 채움 100 % · 왼·오 같은 부품",
+      "step_id": "L10",
+      "source": "부품 목록",
+      "part_id": "ring_knee_in"
+    },
+    {
+      "id": "c104",
+      "kind": "part",
+      "text": "볼 B — 다른 이름: 볼 B (핀 B 반대편 받침 + 무릎 축 기둥), cheek_B · 출력: 채움 100 %, PETG, 189.5 면 바닥 · 왼·오 같은 부품",
+      "step_id": "L10",
+      "source": "부품 목록",
+      "part_id": "cheek_B"
+    },
+    {
+      "id": "c105",
+      "kind": "part",
+      "text": "무릎 축 M6×90 — 다른 이름: M6 x 90 십자 둥근머리, knee_axle",
+      "step_id": "L10",
+      "source": "부품 목록",
+      "part_id": "knee_axle"
+    },
+    {
+      "id": "c106",
+      "kind": "part",
+      "text": "발목 링 2.1 mm — 다른 이름: 발목 688 안쪽 링 받침 2.1 mm, ring_ankle_in · 출력: 채움 100 % · 왼·오 같은 부품",
+      "step_id": "L11",
+      "source": "부품 목록",
+      "part_id": "ring_ankle_in"
+    },
+    {
+      "id": "c107",
+      "kind": "part",
+      "text": "발목 축 M6×65 — 다른 이름: M6 x 65 십자 둥근머리, ankle_axle",
+      "step_id": "L11",
+      "source": "부품 목록",
+      "part_id": "ankle_axle"
+    },
+    {
+      "id": "c108",
+      "kind": "part",
+      "text": "커플러 — 다른 이름: 무릎 커플러 130 mm, 9 x 22 mm, 608 x 2, coupler · 출력: 채움 100 %, PETG, 넓은 면 바닥 · 왼·오 같은 부품",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "coupler"
+    },
+    {
+      "id": "c109",
+      "kind": "part",
+      "text": "608 베어링 (커플러 핀 A 쪽) — 다른 이름: brg_AIN",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "brg_AIN"
+    },
+    {
+      "id": "c110",
+      "kind": "part",
+      "text": "608 베어링 (커플러 핀 B 쪽) — 다른 이름: brg_B",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "brg_B"
+    },
+    {
+      "id": "c111",
+      "kind": "part",
+      "text": "링 B 1 mm — 다른 이름: 핀 B 608 안쪽 링 받침 1 mm, ring_B · 출력: 채움 100 % · 왼·오 같은 부품",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "ring_B"
+    },
+    {
+      "id": "c112",
       "kind": "part",
       "text": "슬리브 A 7 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 7.0 mm, sleeve_A · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
       "step_id": "L12",
@@ -1816,7 +1680,79 @@
       "part_id": "sleeve_A"
     },
     {
-      "id": "c130",
+      "id": "c113",
+      "kind": "part",
+      "text": "슬리브 B 7 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 7.0 mm, sleeve_B · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "sleeve_B"
+    },
+    {
+      "id": "c114",
+      "kind": "part",
+      "text": "볼 A — 다른 이름: 볼 A (핀 A 반대편 받침 + 기둥), cheek_A · 출력: 채움 100 %, PETG, 189.5 면 바닥 · 왼·오 같은 부품",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "cheek_A"
+    },
+    {
+      "id": "c115",
+      "kind": "part",
+      "text": "볼 A 나사 M4×30 — 다른 이름: M4 x 30 육각 렌치, screwA",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "screwA"
+    },
+    {
+      "id": "c116",
+      "kind": "part",
+      "text": "핀 A M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinA",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "pinA"
+    },
+    {
+      "id": "c117",
+      "kind": "part",
+      "text": "핀 B M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinB",
+      "step_id": "L12",
+      "source": "부품 목록",
+      "part_id": "pinB"
+    },
+    {
+      "id": "c118",
+      "kind": "part",
+      "text": "푸시로드 — 다른 이름: 발목 푸시로드 98 mm, 10 mm, 608 x 2, pushrod · 출력: 채움 100 %, PETG · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "pushrod"
+    },
+    {
+      "id": "c119",
+      "kind": "part",
+      "text": "608 베어링 (푸시로드 핀 D 쪽) — 다른 이름: brg_D",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "brg_D"
+    },
+    {
+      "id": "c120",
+      "kind": "part",
+      "text": "608 베어링 (푸시로드 핀 C 쪽) — 다른 이름: brg_C",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "brg_C"
+    },
+    {
+      "id": "c121",
+      "kind": "part",
+      "text": "링 D 4 mm — 다른 이름: 핀 D 608 안쪽 링 받침 4 mm, ring_D · 출력: 채움 100 % · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "ring_D"
+    },
+    {
+      "id": "c122",
       "kind": "part",
       "text": "슬리브 D 7 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 7.0 mm, sleeve_D · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
       "step_id": "L13",
@@ -1824,12 +1760,76 @@
       "part_id": "sleeve_D"
     },
     {
+      "id": "c123",
+      "kind": "part",
+      "text": "슬리브 C 7 mm — 다른 이름: M6 슬리브 Ø8/6.0 x 7.0 mm, sleeve_C · 출력: 채움 100 %, 세워서, PETG 권장 · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "sleeve_C"
+    },
+    {
+      "id": "c124",
+      "kind": "part",
+      "text": "핀 D 머리 받침 6 mm — 다른 이름: 핀 D 머리 받침 6 mm (M6 x 35 끝이 정강이 판에 안 닿게), spacer_D_head · 출력: 채움 100 % · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "spacer_D_head"
+    },
+    {
+      "id": "c125",
+      "kind": "part",
+      "text": "핀 D M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinD",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "pinD"
+    },
+    {
+      "id": "c126",
+      "kind": "part",
+      "text": "볼 C — 다른 이름: 볼 C (핀 C 반대편 받침), cheek_C · 출력: 채움 100 %, PETG, 158.5 면 바닥 · 왼·오 같은 부품",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "cheek_C"
+    },
+    {
+      "id": "c127",
+      "kind": "part",
+      "text": "볼 C 나사 M4×20 — 다른 이름: M4 x 20 육각 렌치, screwC",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "screwC"
+    },
+    {
+      "id": "c128",
+      "kind": "part",
+      "text": "핀 C M6×35 — 다른 이름: M6 x 35 십자 둥근머리, pinC",
+      "step_id": "L13",
+      "source": "부품 목록",
+      "part_id": "pinC"
+    },
+    {
+      "id": "c129",
+      "kind": "part",
+      "text": "무릎 바깥 덮개 — 다른 이름: 무릎 바깥 덮개 (4 절 링크 위) — 기둥 3 개, M3 x 40 x 3 → 허벅지 앞 링, knee_shield · 출력: 벽 3, 채움 20 %, 판(바깥면) 바닥, 기둥 위로 · 왼·오 다른 부품",
+      "step_id": "L14",
+      "source": "부품 목록",
+      "part_id": "knee_shield"
+    },
+    {
+      "id": "c130",
+      "kind": "part",
+      "text": "발판 윗판 — 다른 이름: foot_plate_crown_upper · 출력: PETG/PLA, 넓은 바닥면 아래 (돌기 위로) · 왼·오 다른 부품",
+      "step_id": "L15",
+      "source": "부품 목록",
+      "part_id": "foot_plate_crown_upper"
+    },
+    {
       "id": "c131",
       "kind": "part",
-      "text": "688 베어링 (발목 안쪽) — 다른 이름: brg_A1",
-      "step_id": "L09",
+      "text": "발판 밑창 — 다른 이름: foot_plate_crown_sole · 출력: TPU 95A 또는 PLA + 미끄럼 방지 시트, 땅 닿는 면 아래 (턱 위로) · 왼·오 같은 부품",
+      "step_id": "L15",
       "source": "부품 목록",
-      "part_id": "brg_A1"
+      "part_id": "foot_plate_crown_sole"
     },
     {
       "id": "c132",

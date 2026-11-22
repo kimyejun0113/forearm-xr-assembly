@@ -6,6 +6,8 @@
 
 - 3D 는 원본 CAD 그대로 쓴다. 안내서에서는 조립 순서·설명·주의·나사 수·부품이 들어오는 방향만 가져온다.
 - 원본 CAD 에 없는 베어링만 안내서 수치(위치·바깥지름·폭)로 만들어 넣는다.
+- 끝에서 설명 녹화 기록(<robot>.speech.json)을 지식에 다시 붙이고, cad/<robot>/<robot>_assembly.step 이 있으면
+  tools/add_bolts.py 로 볼트도 다시 넣는다 (다시 돌려도 녹화로 배운 말과 볼트가 사라지지 않게).
 - 결과:
     web/assets/<robot>.glb, web/assets/<robot>.assembly.json   (XR 화면용, 포어암과 같은 형식)
     agent/data/kb/robots/<robot>.json                         (에이전트 지식, kb.json 과 같은 형식)
@@ -171,7 +173,7 @@ def main(guide_path, full_glb, robot):
         report.append({"name": gid, "triangles": int(len(m.faces)),
                        "size_mm": [round(float(v) * 1000, 1) for v in hi - lo],
                        "center_mm": [round(float(v) * 1000, 1) for v in (lo + hi) / 2]})
-    have = {r["name"] for r in report}
+    have = {r["name"]: None for r in report}     # 단계 순서를 지키는 집합 (다시 돌려도 파일 내용 순서가 같게)
 
     out_web = ROOT / "web/assets"
     glb = out_web / f"{robot}.glb"
@@ -336,6 +338,14 @@ def main(guide_path, full_glb, robot):
     out_kb.parent.mkdir(parents=True, exist_ok=True)
     out_kb.write_text(json.dumps(kb, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"단계 {len(a_steps)}개 → {out_kb.relative_to(ROOT)}, 지식 조각 {len(chunks)}개, 위쪽 {up}")
+
+    # assembly.json 을 새로 썼으니 볼트도 다시 넣는다 (그 로봇만의 STEP 이 cad/<robot>/<robot>_assembly.step 에 있을 때)
+    bolt_step = ROOT / "cad" / robot / f"{robot}_assembly.step"
+    if bolt_step.exists():
+        import add_bolts
+        add_bolts.main(str(bolt_step), str(out_web / f"{robot}.assembly.json"), str(out_web / f"{robot}.parts.json"))
+    else:
+        print(f"볼트 건너뜀: {bolt_step.relative_to(ROOT)} 없음")
 
 
 if __name__ == "__main__":
