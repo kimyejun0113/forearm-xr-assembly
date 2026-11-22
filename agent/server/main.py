@@ -5,7 +5,7 @@
   서버 → 3D: {"type":"highlight", "part_ids":[...]}, {"type":"nav", "cmd":"next|prev|replay|first"} 또는 {"type":"nav","to":2}
 """
 import re
-import asyncio, json, os
+import asyncio, json, os, time
 from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, UploadFile, File, Body
 from fastapi.responses import FileResponse, Response, JSONResponse
@@ -118,7 +118,10 @@ async def stt(audio: UploadFile = File(...)):
         if llm.can("stt"):
             res = await asyncio.to_thread(llm.transcribe, data, name)
             return {"text": res.get("text", "").strip(), "engine": "api"}
-        return {"text": await asyncio.to_thread(local_ai.stt, data, name), "engine": "local"}
+        t0 = time.time()
+        text = await asyncio.to_thread(local_ai.stt, data, name)
+        print(f"[음성 인식] {time.time() - t0:.1f}s · {len(data) // 32000:.0f}초쯤 → {text}", flush=True)   # 잘못 알아들으면 여기서 확인
+        return {"text": text, "engine": "local"}
     except Exception as e:
         return JSONResponse({"error": f"음성 인식 실패: {e}"}, status_code=500)
 

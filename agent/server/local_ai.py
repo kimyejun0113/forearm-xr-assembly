@@ -23,8 +23,9 @@ _whisper = None
 # 짧은 말(단계 명령)은 빠른 base, 긴 말(질문)은 정확한 small. CPU 코어를 전부 쓴다.
 # 측정 (Core Ultra 5 125H): base 약 0.9초, small 약 2.7초 (예전 설정 small 3~3.8초)
 FAST_SIZE = os.environ.get("WHISPER_FAST_SIZE", "base")
-# 4초 이하 질문·명령은 base: 조립 질문에서 small과 알아듣는 정도가 비슷하고 3배 빠르다 (0.5초 vs 1.5초, 배터리면 더 벌어짐)
-SHORT_SEC = float(os.environ.get("STT_SHORT_SEC", "4.0"))
+# 1.6초 이하(“다음”, “7단계” 같은 짧은 명령)만 base. 질문까지 base로 하면 헤드셋 마이크 소리에서 크게 틀린다
+# (합성 음성 시험에선 비슷했지만 실제로는 '자비스, 시판, 이거 어떡해'처럼 들음)
+SHORT_SEC = float(os.environ.get("STT_SHORT_SEC", "1.6"))
 _models = {}
 import threading as _thr  # noqa: E402
 _stt_lock = _thr.Lock()   # 음성 인식은 한 번에 하나: 여러 개를 같이 돌리면 CPU를 나눠 써서 모두 느려진다 (THINKING에서 멈춘 듯 보임)

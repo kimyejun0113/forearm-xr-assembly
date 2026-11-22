@@ -835,15 +835,17 @@ async function say(text) {
   const gen = ++sayGen;
   agentAudio?.pause();
   saying = true;
-  const reqs = sayChunks(text).map((c) => fetch('/api/tts?text=' + encodeURIComponent(c)).then((r) => (r.status === 200 ? r.blob() : null)).catch(() => null));
+  const reqs = sayChunks(text).map((c) => fetch('/api/tts?text=' + encodeURIComponent(c), { signal: AbortSignal.timeout(15000) })
+    .then((r) => (r.status === 200 ? r.blob() : null)).catch(() => null));
   try {
     for (const req of reqs) {
       const blob = await req;
       if (gen !== sayGen) return;          // 그사이 새 말이 왔다
       if (!blob) continue;                 // 서버 음성이 안 되면 조용히 (브라우저 기본 음성은 너무 기계적이라 안 씀)
       agentAudio = new Audio(URL.createObjectURL(blob));
-      await agentAudio.play();
-      await new Promise((ok) => { agentAudio.onended = ok; agentAudio.onpause = ok; });
+      try { await agentAudio.play(); } catch { continue; }
+      // 끝·멈춤·오류 중 하나, 아니면 15초 뒤엔 무조건 넘어간다 (말하는 중 표시가 남으면 마이크가 계속 귀를 막는다)
+      await new Promise((ok) => { agentAudio.onended = ok; agentAudio.onpause = ok; agentAudio.onerror = ok; setTimeout(ok, 15000); });
       if (gen !== sayGen) return;
     }
   } finally {
@@ -1166,7 +1168,7 @@ function onFrame(d) {
   } else {
     VOICE.frames.push(d); VOICE.len += dt;
     VOICE.quietT = loud ? 0 : VOICE.quietT + dt;
-    if (VOICE.quietT > 0.6 || VOICE.len > 8) {          // 0.6초 조용하면 말 끝
+    if (VOICE.quietT > 1.0 || VOICE.len > 10) {         // 1초 조용하면 말 끝 (0.6초는 질문 중간에 잠깐 쉬어도 잘렸다)
       const frames = VOICE.frames; VOICE.speaking = false; VOICE.frames = []; VOICE.pre = [];
       if (VOICE.len > 0.35) sendUtterance(frames, VOICE.ctx.sampleRate);
       drawInfo();
@@ -1255,9 +1257,17 @@ function runCommand(t, compact) {
 }
 // 막힌 듯한 짧은 혼잣말은 호출어 없이도 보냄 (팀원 문서 예외 6번. 서버가 "어떤 부분이 막히셨어요?" 한 번만)
 const STUCK_RE = /아\s*뭐지|왜\s*안\s*(들어|돼|맞)|모르겠|헷갈/;
+let heldQ = null, heldTimer = 0;
+function holdQuestion(q) {
+  heldQ = q; clearTimeout(heldTimer);
+  heldTimer = setTimeout(() => { const x = heldQ; heldQ = null; if (x) agentAsk(x); }, 1800);
+}
 function onHeard(raw) {
   const t = raw.trim().replace(/[.?!。]+$/, '');
   if (!t) return;
+  if (heldQ) {   // 앞에서 잠깐 멈춘 질문의 뒷부분: 합쳐서 보낸다
+    clearTimeout(heldTimer); const q = heldQ + ' ' + t; heldQ = null; VOICE.heard = q; agentAsk(q); return;
+  }
   const compact = t.replace(/[\s,.]/g, '');
   if (CAP.on) {   // 녹화 중엔 설계자가 설명하는 말이 계속 들린다 → 녹화 명령만 받고 나머지(단계 이동·완료·질문)는 무시
     const c = compact.length > 10 ? null : /^(설명)?녹화(끝|종료|그만|꺼|멈춰)/.test(compact) ? ['설명 녹화 끝', capStop]
@@ -1280,6 +1290,9 @@ function onHeard(raw) {
   if (q && runCommand(t, q.replace(/[\s,.]/g, ''))) return;                     // "자비스, 7단계로 가" · "자비스 모두 펼쳐"
   VOICE.heard = t;
   if (!q) { say('네?'); VOICE.waitQ = 5; xrInputs.forEach((s) => buzz(s, 0.4, 40)); drawInfo(); return; }   // 패널에 "네? 말씀하세요"
+  // "자비스, 10단계에서…(멈칫) 볼트 몇 개야?"처럼 질문이 쪼개지면 앞부분만 가고 뒷부분은 호출어가 없어 버려졌다
+  // → 짧고 아직 안 끝난 듯한 질문이면 잠깐 기다렸다가 이어지는 말과 합쳐서 보낸다
+  if (q.replace(/\s/g, '').length < 10 && !/[?？]$|[요까니죠야어]$/.test(q)) { holdQuestion(q); return; }
   agentAsk(q);
 }
 
