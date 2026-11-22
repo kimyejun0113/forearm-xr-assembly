@@ -14,7 +14,8 @@ def kb_file(robot: str) -> Path:
 
 
 def robots() -> list[str]:
-    return ["forearm"] + sorted(p.stem for p in (ROOT / "data/kb/robots").glob("*.json"))
+    # <robot>.json 만 지식. <robot>.speech.json 같은 딸린 기록(설명 녹화로 배운 문장)은 로봇이 아니다
+    return ["forearm"] + sorted(p.stem for p in (ROOT / "data/kb/robots").glob("*.json") if "." not in p.stem)
 
 
 AGG_FILE = ROOT / "data/kb/aggregate.json"
