@@ -25,38 +25,38 @@
   "knee_shield": "#9db4c0",
   "foot_plate_crown_upper": "#7a8a9a",
   "foot_plate_crown_sole": "#3b4048",
+  "brg_K1": "#b8bec6",
+  "brg_K2": "#b8bec6",
   "sleeve_knee": "#d8c9a0",
-  "ring_D": "#d8c9a0",
+  "hip": "#9aa1a6",
   "knee_gim": "#9aa1a6",
+  "ankle_rs": "#9aa1a6",
+  "screwD": "#b8bec6",
+  "foot": "#9aa1a6",
+  "brg_A1": "#b8bec6",
+  "brg_A2": "#b8bec6",
+  "sleeve_ankle": "#d8c9a0",
+  "ring_knee_in": "#d8c9a0",
   "knee_axle": "#b8bec6",
   "ring_ankle_in": "#d8c9a0",
-  "screwA": "#b8bec6",
   "ankle_axle": "#b8bec6",
   "brg_AIN": "#b8bec6",
-  "hip": "#9aa1a6",
+  "brg_B": "#b8bec6",
+  "ring_B": "#d8c9a0",
+  "sleeve_A": "#d8c9a0",
+  "sleeve_B": "#d8c9a0",
+  "screwA": "#b8bec6",
+  "pinA": "#b8bec6",
+  "pinB": "#b8bec6",
+  "brg_D": "#b8bec6",
+  "brg_C": "#b8bec6",
+  "ring_D": "#d8c9a0",
+  "sleeve_D": "#d8c9a0",
+  "sleeve_C": "#d8c9a0",
+  "spacer_D_head": "#d8c9a0",
   "pinD": "#b8bec6",
   "screwC": "#b8bec6",
-  "brg_D": "#b8bec6",
-  "pinA": "#b8bec6",
-  "sleeve_ankle": "#d8c9a0",
-  "foot": "#9aa1a6",
-  "ring_knee_in": "#d8c9a0",
-  "pinC": "#b8bec6",
-  "ankle_rs": "#9aa1a6",
-  "ring_B": "#d8c9a0",
-  "sleeve_B": "#d8c9a0",
-  "brg_C": "#b8bec6",
-  "brg_K2": "#b8bec6",
-  "spacer_D_head": "#d8c9a0",
-  "brg_K1": "#b8bec6",
-  "brg_B": "#b8bec6",
-  "pinB": "#b8bec6",
-  "screwD": "#b8bec6",
-  "brg_A2": "#b8bec6",
-  "sleeve_C": "#d8c9a0",
-  "sleeve_A": "#d8c9a0",
-  "sleeve_D": "#d8c9a0",
-  "brg_A1": "#b8bec6"
+  "pinC": "#b8bec6"
  },
  "status": "안내서(S08 다리 조립 안내서) 순서. 3D 는 원본 CAD s08_full_zero.step 의 왼다리.",
  "metal": [
@@ -131,7 +131,12 @@
      0.0,
      0.0001
     ]
-   }
+   },
+   "bolts": [
+    "bolt_13",
+    "bolt_14",
+    "bolt_15"
+   ]
   },
   {
    "title": "무릎 모터 얹기",
@@ -172,7 +177,15 @@
    },
    "bolts": [
     "bolt_1",
-    "bolt_2"
+    "bolt_2",
+    "bolt_19",
+    "bolt_20",
+    "bolt_21",
+    "bolt_22",
+    "bolt_23",
+    "bolt_24",
+    "bolt_25",
+    "bolt_26"
    ]
   },
   {
@@ -192,7 +205,12 @@
      -0.0,
      -0.0001
     ]
-   }
+   },
+   "bolts": [
+    "bolt_16",
+    "bolt_17",
+    "bolt_18"
+   ]
   },
   {
    "title": "정강이 바깥 판에 발목 모터",
@@ -212,7 +230,18 @@
      -0.0,
      -0.0001
     ]
-   }
+   },
+   "bolts": [
+    "bolt_27",
+    "bolt_28",
+    "bolt_29",
+    "bolt_30",
+    "bolt_31",
+    "bolt_32",
+    "bolt_33",
+    "bolt_34",
+    "bolt_35"
+   ]
   },
   {
    "title": "모터 크랭크와 볼 D",
@@ -243,7 +272,12 @@
      0.0,
      0.0001
     ]
-   }
+   },
+   "bolts": [
+    "bolt_36",
+    "bolt_37",
+    "bolt_38"
+   ]
   },
   {
    "title": "정강이 기둥과 안쪽 판",
@@ -870,6 +904,630 @@
    "through": [
     "ankle_spacer",
     "foot_outer_new"
+   ]
+  },
+  {
+   "id": "bolt_13",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.10099,
+    1e-05,
+    -0.015
+   ],
+   "tail": [
+    0.08899,
+    1e-05,
+    -0.015
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "hip",
+    "thigh"
+   ]
+  },
+  {
+   "id": "bolt_14",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.10099,
+    0.013,
+    0.00751
+   ],
+   "tail": [
+    0.08899,
+    0.013,
+    0.00751
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "hip",
+    "thigh"
+   ]
+  },
+  {
+   "id": "bolt_15",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.10099,
+    -0.01298,
+    0.0075
+   ],
+   "tail": [
+    0.08899,
+    -0.01298,
+    0.0075
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "hip",
+    "thigh"
+   ]
+  },
+  {
+   "id": "bolt_16",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.16099,
+    1e-05,
+    -0.01499
+   ],
+   "tail": [
+    0.15099,
+    1e-05,
+    -0.01499
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "input_crank",
+    "knee_gim"
+   ]
+  },
+  {
+   "id": "bolt_17",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.16099,
+    0.013,
+    0.00751
+   ],
+   "tail": [
+    0.15099,
+    0.013,
+    0.00751
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "input_crank",
+    "knee_gim"
+   ]
+  },
+  {
+   "id": "bolt_18",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.16099,
+    -0.01298,
+    0.00751
+   ],
+   "tail": [
+    0.15099,
+    -0.01298,
+    0.00751
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "input_crank",
+    "knee_gim"
+   ]
+  },
+  {
+   "id": "bolt_19",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15569,
+    0.0362,
+    -0.02131
+   ],
+   "tail": [
+    0.14769,
+    0.0362,
+    -0.02131
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_gim",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_20",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15569,
+    0.01053,
+    -0.04066
+   ],
+   "tail": [
+    0.14769,
+    0.01053,
+    -0.04066
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_gim",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_21",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15569,
+    0.04067,
+    0.01052
+   ],
+   "tail": [
+    0.14769,
+    0.04067,
+    0.01052
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_gim",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_22",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15569,
+    0.02132,
+    0.0362
+   ],
+   "tail": [
+    0.14769,
+    0.02132,
+    0.0362
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_gim",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_23",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15569,
+    -0.02131,
+    -0.03618
+   ],
+   "tail": [
+    0.14769,
+    -0.02131,
+    -0.03618
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_gim",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_24",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15569,
+    -0.04065,
+    -0.01051
+   ],
+   "tail": [
+    0.14769,
+    -0.04065,
+    -0.01051
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_gim",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_25",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15569,
+    -0.01051,
+    0.04067
+   ],
+   "tail": [
+    0.14769,
+    -0.01051,
+    0.04067
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_gim",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_26",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15569,
+    -0.03618,
+    0.02132
+   ],
+   "tail": [
+    0.14769,
+    -0.03618,
+    0.02132
+   ],
+   "dir": [
+    1.0,
+    0.0,
+    0.0
+   ],
+   "through": [
+    "knee_gim",
+    "thigh_front"
+   ]
+  },
+  {
+   "id": "bolt_27",
+   "size": "M3",
+   "diameter": 0.003,
+   "head": [
+    0.16649,
+    -0.13603,
+    -0.07445
+   ],
+   "tail": [
+    0.17849,
+    -0.13603,
+    -0.07445
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "shin_outer"
+   ]
+  },
+  {
+   "id": "bolt_28",
+   "size": "M3",
+   "diameter": 0.003,
+   "head": [
+    0.16649,
+    -0.11807,
+    -0.05711
+   ],
+   "tail": [
+    0.17849,
+    -0.11807,
+    -0.05711
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "shin_outer"
+   ]
+  },
+  {
+   "id": "bolt_29",
+   "size": "M3",
+   "diameter": 0.003,
+   "head": [
+    0.16649,
+    -0.11547,
+    -0.03228
+   ],
+   "tail": [
+    0.17849,
+    -0.11547,
+    -0.03228
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "shin_outer"
+   ]
+  },
+  {
+   "id": "bolt_30",
+   "size": "M3",
+   "diameter": 0.003,
+   "head": [
+    0.16649,
+    -0.12943,
+    -0.01158
+   ],
+   "tail": [
+    0.17849,
+    -0.12943,
+    -0.01158
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "shin_outer"
+   ]
+  },
+  {
+   "id": "bolt_31",
+   "size": "M3",
+   "diameter": 0.003,
+   "head": [
+    0.16649,
+    -0.16094,
+    -0.0762
+   ],
+   "tail": [
+    0.17849,
+    -0.16094,
+    -0.07619
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "shin_outer"
+   ]
+  },
+  {
+   "id": "bolt_32",
+   "size": "M3",
+   "diameter": 0.003,
+   "head": [
+    0.16649,
+    -0.18114,
+    -0.06152
+   ],
+   "tail": [
+    0.17849,
+    -0.18114,
+    -0.06152
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "shin_outer"
+   ]
+  },
+  {
+   "id": "bolt_33",
+   "size": "M3",
+   "diameter": 0.003,
+   "head": [
+    0.16649,
+    -0.18718,
+    -0.03729
+   ],
+   "tail": [
+    0.17849,
+    -0.18718,
+    -0.03729
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "shin_outer"
+   ]
+  },
+  {
+   "id": "bolt_34",
+   "size": "M3",
+   "diameter": 0.003,
+   "head": [
+    0.16649,
+    -0.15343,
+    -0.0047
+   ],
+   "tail": [
+    0.17849,
+    -0.15343,
+    -0.0047
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "shin_outer"
+   ]
+  },
+  {
+   "id": "bolt_35",
+   "size": "M3",
+   "diameter": 0.003,
+   "head": [
+    0.16649,
+    -0.17624,
+    -0.01485
+   ],
+   "tail": [
+    0.17849,
+    -0.17624,
+    -0.01485
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "shin_outer"
+   ]
+  },
+  {
+   "id": "bolt_36",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15699,
+    -0.14488,
+    -0.0515
+   ],
+   "tail": [
+    0.17299,
+    -0.14488,
+    -0.0515
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "motor_crank"
+   ]
+  },
+  {
+   "id": "bolt_37",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15699,
+    -0.14488,
+    -0.03072
+   ],
+   "tail": [
+    0.17299,
+    -0.14488,
+    -0.03072
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "motor_crank"
+   ]
+  },
+  {
+   "id": "bolt_38",
+   "size": "M4",
+   "diameter": 0.004,
+   "head": [
+    0.15699,
+    -0.16288,
+    -0.04111
+   ],
+   "tail": [
+    0.17299,
+    -0.16288,
+    -0.04111
+   ],
+   "dir": [
+    -1.0,
+    -0.0,
+    -0.0
+   ],
+   "through": [
+    "ankle_rs",
+    "motor_crank"
    ]
   }
  ]

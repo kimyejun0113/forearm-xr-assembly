@@ -87,6 +87,95 @@ def bolts_of(chain_dir, base, hs):
     ]
 
 
+NOT_TARGET = ("pin", "screw", "axle", "sleeve", "ring", "brg", "spacer")   # 볼트가 박히는 상대가 아닌 것 (축·핀·베어링 등)
+
+
+def guide_specs(assembly_path):
+    """안내서 나사 정보(지식 파일의 단계별 bolts 글자) → {단계 번호: [(규격, 길이 mm, 개수)]}. 예: 'M4 12 mm × 3'"""
+    import re
+    robot = Path(assembly_path).name.split(".")[0]
+    kb_path = Path(__file__).resolve().parents[1] / "agent/data/kb/robots" / f"{robot}.json"
+    if not kb_path.exists():
+        return {}
+    out = {}
+    for i, s in enumerate(json.loads(kb_path.read_text(encoding="utf-8"))["steps"]):
+        for b in s.get("bolts", []):
+            m = re.match(r"(M\d)\s+([\d.]+)(?:~[\d.]+)?\s*mm\s*×\s*(\d+)", b)
+            if m:
+                out.setdefault(i, []).append((m.group(1), float(m.group(2)), int(m.group(3))))
+    return out
+
+
+def motor_bolts(parts, R, t, asm, first_step, assembly_path, start, skipped, have):
+    """한 부품에만 있는 구멍인데 바로 앞에 다른 부품(주로 모터)이 붙어 있으면, 그 부품에 박는 볼트.
+    STEP 에는 모터 형상이 없어 두 부품을 꿰는 구멍으로는 못 찾는다. GLB 의 모터 표면까지 거리로 판정한다
+    (모터 메시는 닫힌 형상이 아니라 '안에 드는지'는 못 쓴다).
+    한 부품-상대 사이 구멍이 안내서 개수보다 많으면(예: 지름 4.3 mm 3개 + 4.0 mm 3개) 개수가 맞는 굵기를 고른다.
+    안내서가 있으면 그 단계에 그 규격 나사가 남아 있을 때만 넣는다 (나사 없는 단계·이미 채운 개수는 넣지 않음)."""
+    import trimesh
+    glb = Path(assembly_path).with_name(json.loads(Path(assembly_path).read_text(encoding="utf-8"))["model"].split("/")[-1])
+    sc = trimesh.load(glb, force="scene")
+    mesh = {}
+    for node in sc.graph.nodes_geometry:
+        T, g = sc.graph[node]
+        m = sc.geometry[g].copy(); m.apply_transform(T); m.apply_scale(1000)
+        mesh[node] = m
+    targets = {n: m for n, m in mesh.items() if not n.lower().startswith(NOT_TARGET) and n in first_step}
+    specs = guide_specs(assembly_path)
+    holes = [h for p in parts for h in pd.find_holes(p)]
+    groups = {}
+    for d, base, hs in chains(holes):
+        if len({h["part"] for h in hs}) != 1 or max(h["r"] for h in hs) > 2.45 or hs[0]["part"] not in first_step:
+            continue
+        part = hs[0]["part"]
+        t0, t1 = min(h["t0"] for h in hs), max(h["t1"] for h in hs)
+        ends = [(base + d * t0) @ R.T + t, (base + d * t1) @ R.T + t]
+        best = None
+        for n, m in targets.items():
+            if n == part:
+                continue
+            dist = [float(m.nearest.on_surface([e])[1][0]) for e in ends]
+            if min(dist) < 8 and (best is None or min(dist) < best[1]):
+                best = (n, min(dist), dist)
+        if best is None:
+            continue
+        n, _, dist = best
+        near_i = int(np.argmin(dist))
+        tip, head = ends[near_i], ends[1 - near_i]          # 상대 쪽 끝 / 머리 쪽 끝
+        r = max(h["r"] for h in hs)
+        groups.setdefault((part, n), []).append({"head": head, "tip": tip, "r": r, "size": "M3" if r < 1.95 else "M4"})
+    out = []
+    for (part, n), hs in groups.items():
+        step = max(first_step[part], first_step[n])
+        spec = [s for s in specs.get(step, [])]
+        by_r = {}
+        for h in hs:
+            by_r.setdefault(round(h["r"], 2), []).append(h)
+        pick = None
+        for sz, ln, cnt in spec:
+            need = cnt - have.get((step, sz), 0)        # 두 부품을 꿰는 볼트로 이미 채운 만큼 뺀다
+            pick = next((v for v in by_r.values() if need > 0 and len(v) == need and v[0]["size"] == sz), None)
+            if pick:
+                have[(step, sz)] = have.get((step, sz), 0) + len(pick)
+                break
+        if pick is None:
+            if specs:                                  # 안내서와 맞는 묶음이 없으면 넣지 않는다
+                skipped.append(f"{part}→{n}: 구멍 {len(hs)}개, {step + 1}단계 안내서 나사와 안 맞아 뺌")
+                continue
+            pick = by_r[max(by_r)]                     # 안내서가 없으면 가장 굵은(관통) 구멍들
+        length = next((ln for sz, ln, cnt in spec if sz == pick[0]["size"]), None)
+        for h in pick:
+            into = (h["tip"] - h["head"]) / np.linalg.norm(h["tip"] - h["head"])
+            L = length or (np.linalg.norm(h["tip"] - h["head"]) + 8)
+            tail = h["head"] + into * L
+            out.append({"id": f"bolt_{start + len(out)}", "size": h["size"], "diameter": round(2 * min(h["r"], 2.0 if h["size"] == "M4" else 1.5) / 1000, 5),
+                        "head": [round(float(v) / 1000, 5) for v in h["head"]], "tail": [round(float(v) / 1000, 5) for v in tail],
+                        "dir": [round(float(v), 4) for v in -into], "through": sorted({part, n}), "step": step})
+        if len(pick) != len(hs):
+            skipped.append(f"{part}→{n}: 구멍 {len(hs)}개 중 안내서와 맞는 {len(pick)}개만")
+    return out
+
+
 def main(step_path, assembly_path, parts_path):
     parts = pd.load_parts(step_path)
     glb = {p["name"]: np.array(p["center_mm"]) for p in json.loads(Path(parts_path).read_text(encoding="utf-8"))["parts"]}
@@ -124,6 +213,10 @@ def main(step_path, assembly_path, parts_path):
         bolts.append({"id": f"bolt_{len(bolts) + 1}", "size": b["size"], "diameter": round(2 * b["r"] / 1000, 5),
                       "head": [round(float(v) / 1000, 5) for v in head], "tail": [round(float(v) / 1000, 5) for v in tail],
                       "dir": [round(float(v), 4) for v in R @ b["dir"]], "through": b["through"], "step": max(steps)})
+    have = {}
+    for b in bolts:
+        have[(b["step"], b["size"])] = have.get((b["step"], b["size"]), 0) + 1
+    bolts += motor_bolts(parts, R, t, asm, first_step, assembly_path, start=len(bolts) + 1, skipped=skipped, have=have)
     for s in asm["steps"]:
         s.pop("bolts", None)
     for b in bolts:
