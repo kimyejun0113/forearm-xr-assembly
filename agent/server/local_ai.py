@@ -137,8 +137,67 @@ def _supertonic():
     return _st["tts"], _st["style"]
 
 
+# 대화형 AI 음성 (키가 있으면 먼저): Gemini TTS → OpenAI gpt-4o-mini-tts. 랩 프록시에는 음성 모델이 없어서 각자 키가 필요하다.
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_TTS_MODELS = [m for m in os.environ.get("GEMINI_TTS_MODEL", "gemini-3.8-flash-tts,gemini-3.1-flash-tts-preview,gemini-2.5-flash-preview-tts").split(",") if m]
+GEMINI_VOICE = os.environ.get("GEMINI_VOICE", "Kore")
+OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "")
+OPENAI_TTS_MODEL = os.environ.get("OPENAI_TTS_MODEL", "gpt-4o-mini-tts")
+OPENAI_VOICE = os.environ.get("OPENAI_VOICE", "marin")
+VOICE_STYLE = os.environ.get("VOICE_STYLE", "조립을 돕는 친절하고 차분한 조수처럼, 또박또박 자연스럽게, 약간 빠르게 말한다.")
+
+
+def _wav(pcm: bytes, rate: int = 24000) -> bytes:
+    """헤더 없는 16비트 모노 PCM → WAV"""
+    import struct
+    return (b"RIFF" + struct.pack("<I", 36 + len(pcm)) + b"WAVEfmt " + struct.pack("<IHHIIHH", 16, 1, 1, rate, rate * 2, 2, 16)
+            + b"data" + struct.pack("<I", len(pcm)) + pcm)
+
+
+def _gemini_tts(text: str) -> tuple[bytes, str]:
+    import base64, httpx
+    last = None
+    for model in GEMINI_TTS_MODELS:
+        r = httpx.post(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+                       headers={"x-goog-api-key": GEMINI_KEY}, timeout=30,
+                       json={"contents": [{"parts": [{"text": VOICE_STYLE + " " + text}]}],
+                             "generationConfig": {"responseModalities": ["AUDIO"],
+                                                  "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": GEMINI_VOICE}}}}})
+        if r.status_code == 404:          # 이 모델 이름이 없으면 다음 후보
+            last = r.text[:120]
+            continue
+        r.raise_for_status()
+        part = r.json()["candidates"][0]["content"]["parts"][0]["inlineData"]
+        data = base64.b64decode(part["data"])
+        if data[:4] == b"RIFF":
+            return data, "audio/wav"
+        m = re.search(r"rate=(\d+)", part.get("mimeType", ""))
+        return _wav(data, int(m.group(1)) if m else 24000), "audio/wav"
+    raise RuntimeError(f"Gemini TTS 모델을 못 찾음: {last}")
+
+
+def _openai_tts(text: str) -> tuple[bytes, str]:
+    import httpx
+    r = httpx.post("https://api.openai.com/v1/audio/speech", headers={"Authorization": f"Bearer {OPENAI_KEY}"}, timeout=30,
+                   json={"model": OPENAI_TTS_MODEL, "voice": OPENAI_VOICE, "input": text, "instructions": VOICE_STYLE,
+                         "response_format": "mp3"})
+    r.raise_for_status()
+    return r.content, "audio/mpeg"
+
+
+def tts_engine() -> str:
+    return "gemini" if GEMINI_KEY else "openai" if OPENAI_KEY else TTS_ENGINE
+
+
 def tts_audio(text: str) -> tuple[bytes, str]:
-    """글 → (소리 바이트, 형식). 숫자는 한글로 바꿔 읽힌다 ('4번'을 '세 번'으로 읽는 문제)."""
+    """글 → (소리 바이트, 형식). 키가 있으면 Gemini/GPT 음성, 없거나 실패하면 Supertonic, 그다음 Edge.
+    Supertonic은 숫자를 한글로 바꿔 읽힌다 ('4번'을 '세 번'으로 읽는 문제)."""
+    for name, fn, on in (("Gemini", _gemini_tts, bool(GEMINI_KEY)), ("OpenAI", _openai_tts, bool(OPENAI_KEY))):
+        if on:
+            try:
+                return fn(text)
+            except Exception as e:
+                print(f"{name} 음성 실패, 다음 음성으로:", str(e)[:200], flush=True)
     if TTS_ENGINE == "supertonic":
         try:
             import soundfile as sf
@@ -156,6 +215,7 @@ def tts_audio(text: str) -> tuple[bytes, str]:
 
 def warm_tts():
     """서버 켤 때 모델을 미리 올려 둔다 (첫 말이 늦지 않게)"""
+    print("음성:", tts_engine(), flush=True)
     if TTS_ENGINE == "supertonic":
         try:
             tts_audio("준비됐어요.")
