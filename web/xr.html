@@ -388,6 +388,8 @@ const panelTex = new THREE.CanvasTexture(panelCanvas);
 panelTex.colorSpace = THREE.SRGBColorSpace;
 const panel = new THREE.Mesh(new THREE.PlaneGeometry(0.36, 0.36 * PANEL_H / PANEL_W), new THREE.MeshBasicMaterial({ map: panelTex, transparent: true }));
 panel.userData.isPanel = true;
+// 로봇을 움직여 패널 앞에 와도 가리지 않게: 깊이 검사 없이 맨 나중에(위에) 그린다
+panel.material.depthTest = false; panel.material.depthWrite = false; panel.renderOrder = 1000;
 scene.add(panel);                       // 모델과 따로 움직임
 function placePanel() {
   // PC 화면용: 모델 위
@@ -816,13 +818,37 @@ function agentToast(t) { agent.toast = t; agent.toastT = 4; drawInfo(); }
 // 지금은 꺼 둠 (답은 오른쪽 패널에 글로만). 다시 켜려면 주소에 ?tts=1
 const TTS_ON = new URLSearchParams(location.search).get('tts') !== '0';   // 기본으로 말한다 (?tts=0 이면 끔)
 let agentAudio = null;
+// 목소리 만들기(서버, 한 문장 2~4초)를 기다리는 시간을 줄이려고 쉼표·마침표에서 나눠 한꺼번에 요청하고,
+// 앞 조각이 오면 바로 재생한다 (앞 조각을 듣는 동안 뒤 조각이 만들어진다). 새 말이 오면 앞 말은 끊는다.
+let sayGen = 0, saying = false;
+function sayChunks(text) {
+  const parts = text.split(/(?<=[,.?!。])\s+/).map((s) => s.trim()).filter(Boolean);
+  const out = [];
+  for (const p of parts) {
+    if (out.length && (out[out.length - 1].length < 8 || p.length < 6)) out[out.length - 1] += ' ' + p;   // 너무 짧은 조각은 붙인다
+    else out.push(p);
+  }
+  return out.slice(0, 4);
+}
 async function say(text) {
   if (!text || !TTS_ON) return;
+  const gen = ++sayGen;
+  agentAudio?.pause();
+  saying = true;
+  const reqs = sayChunks(text).map((c) => fetch('/api/tts?text=' + encodeURIComponent(c)).then((r) => (r.status === 200 ? r.blob() : null)).catch(() => null));
   try {
-    const r = await fetch('/api/tts?text=' + encodeURIComponent(text));
-    if (r.status === 200) { agentAudio?.pause(); agentAudio = new Audio(URL.createObjectURL(await r.blob())); await agentAudio.play(); return; }
-  } catch {}
-  // 서버 음성(신경망)이 안 되면 조용히 둔다: 브라우저 기본 음성은 너무 기계적이라 쓰지 않는다
+    for (const req of reqs) {
+      const blob = await req;
+      if (gen !== sayGen) return;          // 그사이 새 말이 왔다
+      if (!blob) continue;                 // 서버 음성이 안 되면 조용히 (브라우저 기본 음성은 너무 기계적이라 안 씀)
+      agentAudio = new Audio(URL.createObjectURL(blob));
+      await agentAudio.play();
+      await new Promise((ok) => { agentAudio.onended = ok; agentAudio.onpause = ok; });
+      if (gen !== sayGen) return;
+    }
+  } finally {
+    if (gen === sayGen) saying = false;
+  }
 }
 
 function agentHandle(m) {
@@ -1086,7 +1112,7 @@ const VOICE = {
   wake: new URLSearchParams(location.search).get('wake') ?? '자비스',   // ?wake= 로 바꾸기, 빈 값이면 호출어 없이
   floor: 0.01, speaking: false, frames: [], pre: [], loudT: 0, quietT: 0, len: 0, busy: 0, waitQ: 0, heard: '',
 };
-const aiTalking = () => (agentAudio && !agentAudio.paused) || (window.speechSynthesis?.speaking ?? false);
+const aiTalking = () => saying || (agentAudio && !agentAudio.paused);   // 조각 사이 틈도 말하는 중으로 (마이크가 제 목소리를 듣지 않게)
 
 const VOICE_AUDIO = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
 const CAP_AUDIO = { echoCancellation: false, noiseSuppression: false, autoGainControl: true };   // 설명 녹화: 옆 사람 말도 담기
@@ -1259,6 +1285,7 @@ function setInfoHeight(h) {   // 판 위쪽 끝은 그대로 두고 아래로 �
 }
 setInfoHeight(INFO_H);
 infoPanel.userData.isInfo = true;
+infoPanel.material.depthTest = false; infoPanel.material.depthWrite = false; infoPanel.renderOrder = 1001;   // 로봇에 가리지 않게 맨 위에
 infoPanel.position.set(0.48, 1.08, 0.05);         // PC 화면용 위치 (헤드셋은 기본 배치에서 다시 놓음)
 scene.add(infoPanel);
 

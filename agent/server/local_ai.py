@@ -125,6 +125,9 @@ def stt_segments(path, hint: str | None = None) -> list[dict]:
 TTS_ENGINE = os.environ.get("TTS_ENGINE", "supertonic")
 SUPERTONIC_VOICE = os.environ.get("SUPERTONIC_VOICE", "F1")     # F1~F5, M1~M5
 SUPERTONIC_SPEED = float(os.environ.get("SUPERTONIC_SPEED", "1.1"))
+SUPERTONIC_STEPS = int(os.environ.get("SUPERTONIC_STEPS", "5"))
+# ONNX 스레드: 기본(논리 코어 18개 전부)은 성능·효율 코어가 섞여 서로 기다려 느리다. 6개면 한 문장 2.65초 → 1.3초
+SUPERTONIC_THREADS = int(os.environ.get("SUPERTONIC_THREADS", "6"))   # 품질 단계 (기본 8). 5도 또렷하고 20% 빠름, 4 이하는 단어가 뭉개짐
 _st = {}
 import threading as _th  # noqa: E402
 _st_lock = _th.Lock()
@@ -133,7 +136,7 @@ _st_lock = _th.Lock()
 def _supertonic():
     if "tts" not in _st:
         from supertonic import TTS
-        t = TTS()
+        t = TTS(intra_op_num_threads=SUPERTONIC_THREADS)
         _st.update(tts=t, style=t.get_voice_style(SUPERTONIC_VOICE))
     return _st["tts"], _st["style"]
 
@@ -224,7 +227,7 @@ def tts_audio(text: str) -> tuple[bytes, str]:
             from .ko_num import ko_numbers
             with _st_lock:   # 한 모델을 여러 요청이 동시에 쓰지 않게
                 t, style = _supertonic()
-                wav, _ = t.synthesize(ko_numbers(text), voice_style=style, lang="ko", speed=SUPERTONIC_SPEED)
+                wav, _ = t.synthesize(ko_numbers(text), voice_style=style, lang="ko", speed=SUPERTONIC_SPEED, total_steps=SUPERTONIC_STEPS)
             buf = io.BytesIO()
             sf.write(buf, wav.squeeze(), t.sample_rate, format="WAV", subtype="PCM_16")
             return buf.getvalue(), "audio/wav"
