@@ -7,6 +7,7 @@
 """
 import asyncio, io, os, re, tempfile
 from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]
 
 WHISPER_SIZE = os.environ.get("WHISPER_SIZE", "small")
 # 조립 현장 단어를 미리 알려 주면 잘못 알아듣는 일이 줄어든다 (예: 브래킷 → 브레키든)
@@ -138,13 +139,18 @@ def _supertonic():
 
 
 # 대화형 AI 음성 (키가 있으면 먼저): Gemini TTS → OpenAI gpt-4o-mini-tts. 랩 프록시에는 음성 모델이 없어서 각자 키가 필요하다.
-GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "")
-GEMINI_TTS_MODELS = [m for m in os.environ.get("GEMINI_TTS_MODEL", "gemini-3.8-flash-tts,gemini-3.1-flash-tts-preview,gemini-2.5-flash-preview-tts").split(",") if m]
+# 무료 Gemini 키는 한 문장에 5~27초, 모델마다 1분 3번이라 대화에 못 쓴다 → TTS_USE_GEMINI=1 일 때만 (결제를 켜 빨라지면)
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "") if os.environ.get("TTS_USE_GEMINI") == "1" else ""
+# 무료 키는 모델마다 1분 3번 → 한도가 찬 모델은 잠깐 쉬고 다음 모델로 (세 모델이면 1분 9번)
+GEMINI_TTS_MODELS = [m for m in os.environ.get("GEMINI_TTS_MODEL", "gemini-3.8-flash-tts,gemini-3.8-flash-lite-tts,gemini-3.1-flash-tts-preview").split(",") if m]
 GEMINI_VOICE = os.environ.get("GEMINI_VOICE", "Kore")
 OPENAI_KEY = os.environ.get("OPENAI_API_KEY", "")
 OPENAI_TTS_MODEL = os.environ.get("OPENAI_TTS_MODEL", "gpt-4o-mini-tts")
 OPENAI_VOICE = os.environ.get("OPENAI_VOICE", "marin")
-VOICE_STYLE = os.environ.get("VOICE_STYLE", "조립을 돕는 친절하고 차분한 조수처럼, 또박또박 자연스럽게, 약간 빠르게 말한다.")
+# 말투 지시는 영어로 "Say ...:" 꼴로 앞에 붙여야 지시문을 소리 내어 읽지 않는다 (한국어로 쓰면 그대로 읽었다)
+VOICE_STYLE = os.environ.get("VOICE_STYLE", "Say in a warm, calm, natural Korean assistant voice, a little brisk")
+_cooldown = {}                          # 모델 → 다시 써도 되는 시각
+TTS_CACHE = ROOT / "data/tts_cache"     # 같은 말은 한 번만 만든다 (단계 주의 안내처럼 되풀이되는 말)
 
 
 def _wav(pcm: bytes, rate: int = 24000) -> bytes:
@@ -155,16 +161,20 @@ def _wav(pcm: bytes, rate: int = 24000) -> bytes:
 
 
 def _gemini_tts(text: str) -> tuple[bytes, str]:
-    import base64, httpx
+    import base64, httpx, time
     last = None
     for model in GEMINI_TTS_MODELS:
+        if _cooldown.get(model, 0) > time.time():
+            continue
         r = httpx.post(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-                       headers={"x-goog-api-key": GEMINI_KEY}, timeout=30,
-                       json={"contents": [{"parts": [{"text": VOICE_STYLE + " " + text}]}],
+                       headers={"x-goog-api-key": GEMINI_KEY}, timeout=float(os.environ.get("GEMINI_TTS_TIMEOUT", "8")),
+                       json={"contents": [{"parts": [{"text": f"{VOICE_STYLE}: {text}"}]}],
                              "generationConfig": {"responseModalities": ["AUDIO"],
                                                   "speechConfig": {"voiceConfig": {"prebuiltVoiceConfig": {"voiceName": GEMINI_VOICE}}}}})
-        if r.status_code == 404:          # 이 모델 이름이 없으면 다음 후보
-            last = r.text[:120]
+        if r.status_code in (404, 429, 503):   # 없는 모델·한도 참·바쁨 → 다음 모델 (한도는 1분 쉬기)
+            if r.status_code != 404:
+                _cooldown[model] = time.time() + (60 if r.status_code == 429 else 10)
+            last = f"{model} {r.status_code}"
             continue
         r.raise_for_status()
         part = r.json()["candidates"][0]["content"]["parts"][0]["inlineData"]
@@ -173,7 +183,7 @@ def _gemini_tts(text: str) -> tuple[bytes, str]:
             return data, "audio/wav"
         m = re.search(r"rate=(\d+)", part.get("mimeType", ""))
         return _wav(data, int(m.group(1)) if m else 24000), "audio/wav"
-    raise RuntimeError(f"Gemini TTS 모델을 못 찾음: {last}")
+    raise RuntimeError(f"Gemini 음성을 지금 못 씀 ({last})")
 
 
 def _openai_tts(text: str) -> tuple[bytes, str]:
@@ -190,14 +200,24 @@ def tts_engine() -> str:
 
 
 def tts_audio(text: str) -> tuple[bytes, str]:
-    """글 → (소리 바이트, 형식). 키가 있으면 Gemini/GPT 음성, 없거나 실패하면 Supertonic, 그다음 Edge.
-    Supertonic은 숫자를 한글로 바꿔 읽힌다 ('4번'을 '세 번'으로 읽는 문제)."""
-    for name, fn, on in (("Gemini", _gemini_tts, bool(GEMINI_KEY)), ("OpenAI", _openai_tts, bool(OPENAI_KEY))):
-        if on:
-            try:
-                return fn(text)
-            except Exception as e:
-                print(f"{name} 음성 실패, 다음 음성으로:", str(e)[:200], flush=True)
+    """글 → (소리 바이트, 형식). 키가 있으면 Gemini/GPT 음성(만든 것은 저장해 두고 다시 씀),
+    없거나 실패하면 Supertonic, 그다음 Edge. Supertonic은 숫자를 한글로 바꿔 읽힌다 ('4번'을 '세 번'으로 읽는 문제)."""
+    import hashlib
+    for name, fn, on, voice in (("Gemini", _gemini_tts, bool(GEMINI_KEY), GEMINI_VOICE), ("OpenAI", _openai_tts, bool(OPENAI_KEY), OPENAI_VOICE)):
+        if not on:
+            continue
+        key = hashlib.sha1(f"{name}|{voice}|{VOICE_STYLE}|{text}".encode("utf-8")).hexdigest()
+        for ext, mime in ((".wav", "audio/wav"), (".mp3", "audio/mpeg")):
+            f = TTS_CACHE / (key + ext)
+            if f.exists():
+                return f.read_bytes(), mime
+        try:
+            audio, mime = fn(text)
+            TTS_CACHE.mkdir(parents=True, exist_ok=True)
+            (TTS_CACHE / (key + (".wav" if mime == "audio/wav" else ".mp3"))).write_bytes(audio)
+            return audio, mime
+        except Exception as e:
+            print(f"{name} 음성 실패, 다음 음성으로:", str(e)[:200], flush=True)
     if TTS_ENGINE == "supertonic":
         try:
             import soundfile as sf
