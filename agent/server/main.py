@@ -207,6 +207,8 @@ async def ws(websocket: WebSocket, sid: str):
                     prompts = await asyncio.to_thread(s.enter_step, m["step_id"], m.get("by", "3d"))   # 알림 말을 줄이느라 LLM을 부를 수 있어 따로
                     await websocket.send_json(card_payload(s))
                     await send_all(prompts)
+            elif t == "ping":   # 헤드셋이 연결이 살아 있는지 확인 (반쯤 끊긴 연결을 알아채려고)
+                await websocket.send_json({"type": "pong"})
             elif t == "ask":
                 text = (m.get("text") or "").strip()
                 if not text:
