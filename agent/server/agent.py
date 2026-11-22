@@ -116,7 +116,9 @@ class Agent:
         i = order.index(step["step_id"]) if step["step_id"] in order else -1
         name = lambda sid: f"{self.kn.steps[sid]['order']}단계 {self.kn.steps[sid]['name']}"
         lines = [f"현재 단계: {step['order']} / {len(order)}단계 · {step['name']}",
-                 "부품: " + ", ".join(f"{p}({parts.get(p, {}).get('name', p)})" for p in step["parts"])]
+                 "부품: " + ", ".join(f"{p}({parts.get(p, {}).get('name', p)}"
+                                    + (f", {self.kn.part_lr[p]}" if p in self.kn.part_lr else "") + ")"
+                                    for p in step["parts"])]
         if step.get("instructions"): lines.append("할 일: " + " / ".join(step["instructions"]))
         if step.get("bolts"): lines.append("이 단계 볼트: " + " / ".join(step["bolts"]))
         if step.get("tools"): lines.append("공구: " + ", ".join(step["tools"]))

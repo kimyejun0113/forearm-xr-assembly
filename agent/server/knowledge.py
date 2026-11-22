@@ -46,6 +46,14 @@ class Knowledge:
         self.steps = {s["step_id"]: s for s in self.kb["steps"]}
         self.order = [s["step_id"] for s in sorted(self.kb["steps"], key=lambda s: s["order"])]
         self.chunks = list(self.kb["chunks"])
+        # 부품 목록 조각의 "왼·오 다른/같은 부품" → 부품 id별로 (단계 카드에 붙여서 '왼쪽 오른쪽 같아?'에 바로 답하게)
+        self.part_lr = {}
+        for c in self.chunks:
+            m = c["kind"] == "part" and re.search(r"왼·오 (다른|같은) 부품", c["text"])
+            if m:
+                for pid in self.kb["parts"]:
+                    if re.search(rf"(?<![A-Za-z0-9_]){re.escape(pid)}(?![A-Za-z0-9_])", c["text"]):
+                        self.part_lr.setdefault(pid, m.group(0))
         # 이전 작업자 지식도 같은 검색에 넣는다
         for sid, a in self.agg.get("steps", {}).items():
             if sid not in self.steps:      # 다른 로봇의 단계 기록은 섞지 않는다
