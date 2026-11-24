@@ -74,7 +74,7 @@ powershell -ExecutionPolicy Bypass -File agent\run_https.ps1
 - 노트북: http://localhost:8000/xr/xr.html (마우스로도 동작)
 - Quest 3: 같은 Wi-Fi에서 `https://<노트북 IP>:8443/xr/xr.html` → 인증서 경고에서 계속 → START AR
 
-CAD가 바뀌었을 때:
+CAD가 바뀌었을 때 (원본 CAD는 저장소에 포함하지 않음, `cad/`에 직접 넣기):
 
 ```powershell
 .venv\Scripts\python tools\step_to_glb.py cad\forearm.STEP web\assets\forearm.glb
@@ -94,7 +94,6 @@ CAD가 바뀌었을 때:
 | `agent/server/` | 질문 처리, 지식 검색, LLM, 로컬 STT/TTS, 작업 기록 집계 |
 | `agent/ingest/` | 설계자 자료 → 지식 (슬라이드 읽기, 녹음 전사, 합치기) |
 | `agent/data/kb/` | 로봇별 조립 지식 |
-| `cad/` | 원본 CAD |
 | `docs/` | 구조 문서([HANDOFF.md](docs/HANDOFF.md)), 시연 영상 구성 |
 
 ## 남은 과제
