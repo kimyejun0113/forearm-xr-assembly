@@ -5,7 +5,7 @@
 - 글자 인식: Windows 기본 OCR (한국어, 추가 다운로드 없음)
 - 인터넷 검색: DuckDuckGo (ddgs, 키 없음)
 """
-import asyncio, io, os, re, tempfile
+import asyncio, io, os, re, tempfile, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -53,12 +53,27 @@ def stt(audio: bytes, filename: str = "q.webm") -> str:
         f.write(audio); p = f.name
     try:
         wav = decode_audio(p)                                  # 16 kHz
-        size = FAST_SIZE if len(wav) / 16000 <= SHORT_SEC else WHISPER_SIZE
+        sec = len(wav) / 16000
+        size = FAST_SIZE if sec <= SHORT_SEC else WHISPER_SIZE
+        t_in = time.time()
         # 말 앞뒤는 화면 쪽에서 이미 잘라서 보내므로 VAD 는 끔 (더 빠름)
         with _stt_lock:
+            # 앞 요청에 밀려 오래 기다린 말은 헤드셋이 이미 포기했다(20초) → 돌리지 않고 넘겨서 줄이 더 밀리지 않게
+            if time.time() - t_in > 12:
+                print(f"[음성 인식] {time.time() - t_in:.0f}초 밀려서 건너뜀", flush=True)
+                return ""
+            # temperature 하나만: 기본값은 결과가 이상하면(되풀이 등) 온도를 바꿔 최대 6번 다시 받아 적어서
+            # 2초짜리 잡음에 30초가 걸렸다 ('1, 2, 3, … 20'). 글자 수도 말 길이에 맞게 묶는다.
             segs, _ = _model(size).transcribe(wav, language="ko", beam_size=1, vad_filter=False, initial_prompt=STT_HINT,
-                                              without_timestamps=True, condition_on_previous_text=False)
-            return " ".join(s.text.strip() for s in segs).strip()
+                                              without_timestamps=True, condition_on_previous_text=False,
+                                              temperature=0.0, max_new_tokens=int(20 + 15 * sec))
+            text = " ".join(s.text.strip() for s in segs).strip()
+        # 잡음을 'M5, M5, M5, …'·'전체 보기, 전체 보기, …'처럼 되풀이해 받아 적은 건 말이 아니다 (명령으로 실행되지 않게 버림)
+        words = re.findall(r"\w+", text)
+        if words and max(words.count(w) for w in set(words)) >= 4 and max(words.count(w) for w in set(words)) / len(words) >= 0.4:
+            print(f"[음성 인식] 되풀이라 버림 → {text[:60]}", flush=True)
+            return ""
+        return text
     finally:
         os.unlink(p)
 

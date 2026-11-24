@@ -898,6 +898,7 @@ async function say(text) {
 
 function agentHandle(m) {
   if (!m || !m.type) return;
+  if (m.type !== 'step_card' && m.type !== 'highlight') agent.waiting = null;   // 물어본 것에 대한 반응이 왔다
   if (m.type === 'step_card') { agent.card = m; agent.reply = null; }
   else if (m.type === 'answer') { agent.reply = { kind: 'answer', q: m.question, text: m.text || m.speech, src: m.sources || [] }; say(m.speech); }
   else if (m.type === 'prompt') { agent.reply = { kind: m.level === 'danger' ? 'danger' : 'prompt', text: m.text || m.speech }; say(m.speech); }
@@ -951,6 +952,7 @@ async function connectAgent(builder = agent.builder, retry = false) {
   agent.lastSeen = performance.now();
   ws.onclose = () => {
     if (agent.ws !== ws) return;
+    if (agent.waiting) { agent.pendingAsk = agent.waiting.text; agent.waiting = null; }   // 답 못 받은 질문은 다시 붙으면 또 보낸다
     agent.on = false; agent.status = 'AI 연결 끊김 · 다시 연결하는 중…'; drawInfo();
     agentReconnect();
   };
@@ -961,7 +963,11 @@ setInterval(() => {
   const ws = agent.ws;
   if (!ws || ws.readyState !== 1) return;
   try { ws.send(JSON.stringify({ type: 'ping' })); } catch {}
+  if (agent.waiting && performance.now() - agent.waiting.t > 45000) {   // 연결은 살아 있는데 답이 안 온다 → 조용히 있지 말고 알린다
+    agent.waiting = null; agentToast('답이 안 왔어요. 한 번 더 물어봐 주세요');
+  }
   if (performance.now() - (agent.lastSeen || 0) > 20000) {
+    if (agent.waiting) { agent.pendingAsk = agent.waiting.text; agent.waiting = null; }
     ws.onclose = null; ws.onmessage = null; try { ws.close(); } catch {}
     agent.on = false; agent.status = 'AI 연결 끊김 · 다시 연결하는 중…'; drawInfo();
     agent.tries = 0; connectAgent(agent.builder, true);
@@ -1236,14 +1242,22 @@ async function sendUtterance(frames, rate) {
   VOICE.busy++; drawInfo();
   try {
     const fd = new FormData(); fd.append('audio', toWav(frames, rate), 'q.wav');
-    const r = await fetch('/api/stt', { method: 'POST', body: fd }).then((x) => x.json());
+    // 와이파이가 잠깐 끊기면 요청이 끝나지 않고 매달려 '생각 중'에서 멈췄다 → 20초면 포기
+    const r = await fetch('/api/stt', { method: 'POST', body: fd, signal: AbortSignal.timeout(20000) }).then((x) => x.json());
     if (r.text) onHeard(r.text);
-  } catch (e) { console.warn('stt', e); }
+  } catch (e) {
+    console.warn('stt', e);
+    if (e.name === 'TimeoutError') agentToast('음성 인식이 늦어요. 한 번 더 말해 주세요');
+  }
   finally { VOICE.busy--; drawInfo(); }
 }
 // 연결이 잠깐 끊긴 사이 한 질문은 버리지 않고, 다시 붙으면 보낸다 (안 그러면 답을 끝없이 기다리게 된다)
 function agentAsk(text) {
-  if (agent.on && agent.ws?.readyState === 1) { agent.ws.send(JSON.stringify({ type: 'ask', text })); return; }
+  if (agent.on && agent.ws?.readyState === 1) {
+    agent.ws.send(JSON.stringify({ type: 'ask', text }));
+    agent.waiting = { text, t: performance.now() };       // 답이 올 때까지 기억 (그 사이 끊기면 다시 보냄)
+    return;
+  }
   agent.pendingAsk = text; agentToast('AI 다시 연결하는 중… 붙으면 바로 물어볼게요');
 }
 // 단계 명령을 에이전트가 확실히 알아듣는 모양으로 ("3단계로 가죠" → "3단계", "다섯 번째 단계" → "5단계")

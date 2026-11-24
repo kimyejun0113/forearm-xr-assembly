@@ -188,10 +188,29 @@ class Agent:
 
     def _prior(self, step_id):
         """'다들 어떻게 했어?' → 이 단계의 이전 작업자 기록을 그대로."""
-        st = self.kn.step_stats(step_id)
+        st = self.kn.step_stats(step_id) if step_id else {}
         tips, faq = st.get("tips", []), st.get("faq", [])
         if not tips and not faq:
-            return {"speech": "이 단계는 아직 이전 작업자 기록이 없어요.", "text": "", "visual": [], "sources": [],
+            # 단계 밖(시작 전·끝난 뒤)이거나 이 단계엔 한마디가 없으면 → 이 로봇 전체에서 남긴 한마디
+            allt = [(sid, t) for sid in self.kn.order for t in self.kn.step_stats(sid).get("tips", [])]
+            if allt:
+                allt = sorted(allt, key=lambda x: -x[1].get("t", 0))[:3]   # 나중에 남긴 것 먼저
+                label = lambda sid: f"{self.kn.steps[sid]['order']}단계"
+                lines = [f"{label(sid)}: {t['text']}" for sid, t in allt]
+                here = ""
+                if step_id and st.get("n_builders"):
+                    here = f"이 단계는 {st['n_builders']}명이 했는데 따로 남긴 말은 없었어요. "
+                sid, t = allt[0]
+                return {"speech": f"{here}이전 작업자 한마디예요. {label(sid)}에 대해, {t['text']}",
+                        "text": "\n".join(lines), "visual": [], "sources": ["이전 작업자 한마디"],
+                        "intent": "prior", "confident": True}
+            if step_id and st.get("n_builders"):
+                m = st.get("median_sec")
+                took = f" 보통 {max(1, round(m / 60))}분쯤 걸렸어요." if m else ""
+                return {"speech": f"이 단계는 {st['n_builders']}명이 했어요.{took} 따로 물어본 건 없었어요.",
+                        "text": "", "visual": [], "sources": [f"이전 작업자 {st['n_builders']}명 기록"],
+                        "intent": "prior", "confident": True}
+            return {"speech": "아직 이전 작업자 기록이 없어요.", "text": "", "visual": [], "sources": [],
                     "intent": "prior", "confident": False}
         lines = [f"한마디: {t['text']}" for t in tips[:2]] + [f"자주 물은 것({q['count']}명): {q['question']}" for q in faq[:2]]
         speech = ("이전 작업자 한마디예요. " + tips[0]["text"]) if tips else f"이전 작업자들은 '{faq[0]['question']}'를 많이 물어봤어요."

@@ -42,7 +42,7 @@ def run(kb_reader=None):
                 dwell[s] += 1
             elif e["type"] == "final_comment":
                 for sid in e.get("about_steps") or [e.get("about_step") or e.get("step_id")]:   # 두 튜브처럼 여러 단계에 해당할 수 있음
-                    tips.append({"text": e["text"], "step_id": sid, "builder": e["builder"]})
+                    tips.append({"text": e["text"], "step_id": sid, "builder": e["builder"], "t": e.get("t", 0)})
 
     out = {"kb_reader": kb_reader, "steps": {}}
     for s in set(dur) | set(qa):
