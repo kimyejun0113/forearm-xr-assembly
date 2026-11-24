@@ -1,0 +1,90 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html,body{margin:0;padding:0;background:#ffffff;}
+  svg{display:block;width:1600px;height:1600px;}
+  .t{font-family:'Malgun Gothic','맑은 고딕',sans-serif;font-weight:700;font-size:38px;fill:#1f2a44;}
+  .s{font-family:'Malgun Gothic','맑은 고딕',sans-serif;font-size:25px;fill:#787878;}
+  .m{font-family:Consolas,'Cascadia Mono',monospace;font-size:22px;fill:#4975e6;}
+  .tw{font-family:'Malgun Gothic','맑은 고딕',sans-serif;font-weight:700;font-size:40px;fill:#ffffff;}
+  .sw{font-family:'Malgun Gothic','맑은 고딕',sans-serif;font-size:25px;fill:#dfe6fb;}
+  .mw{font-family:Consolas,'Cascadia Mono',monospace;font-size:22px;fill:#9fb6f5;}
+  .h{font-family:Consolas,monospace;font-size:20px;letter-spacing:3px;fill:#9e9e9e;}
+  .loop{font-family:'Malgun Gothic','맑은 고딕',sans-serif;font-weight:700;font-size:24px;fill:#4975e6;}
+</style></head><body>
+<svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#4975e6"/>
+    </marker>
+    <marker id="g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b4c2e6"/>
+    </marker>
+  </defs>
+
+  <!-- column labels -->
+  <text class="h" x="285" y="40" text-anchor="middle">KNOWLEDGE</text>
+  <text class="h" x="745" y="40" text-anchor="middle">GEOMETRY</text>
+
+  <!-- row 1 -->
+  <rect x="80" y="58" width="410" height="128" rx="18" fill="#fff" stroke="#d6def5" stroke-width="2.5"/>
+  <text class="m" x="104" y="94">capture</text>
+  <text class="t" x="104" y="139">선배 설명 녹화</text>
+  <text class="s" x="104" y="172">Quest 카메라 · 마이크</text>
+
+  <rect x="540" y="58" width="410" height="128" rx="18" fill="#fff" stroke="#d6def5" stroke-width="2.5"/>
+  <text class="m" x="564" y="94">cad/*.STEP</text>
+  <text class="t" x="564" y="139">CAD 원본</text>
+  <text class="s" x="564" y="172">부품 · 볼트 구멍</text>
+
+  <line x1="285" y1="190" x2="285" y2="232" stroke="#b4c2e6" stroke-width="4" marker-end="url(#g)"/>
+  <line x1="745" y1="190" x2="745" y2="232" stroke="#b4c2e6" stroke-width="4" marker-end="url(#g)"/>
+
+  <!-- row 2 -->
+  <rect x="80" y="238" width="410" height="128" rx="18" fill="#fff" stroke="#d6def5" stroke-width="2.5"/>
+  <text class="m" x="104" y="274">ingest/</text>
+  <text class="t" x="104" y="319">말 · 슬라이드 인식</text>
+  <text class="s" x="104" y="352">Whisper · Vision LLM</text>
+
+  <rect x="540" y="238" width="410" height="128" rx="18" fill="#fff" stroke="#d6def5" stroke-width="2.5"/>
+  <text class="m" x="564" y="274">tools/plan_disassembly</text>
+  <text class="t" x="564" y="319">조립 순서 계산</text>
+  <text class="s" x="564" y="352">충돌 검사 · 볼트 추출</text>
+
+  <line x1="285" y1="370" x2="285" y2="412" stroke="#b4c2e6" stroke-width="4" marker-end="url(#g)"/>
+  <line x1="745" y1="370" x2="745" y2="412" stroke="#b4c2e6" stroke-width="4" marker-end="url(#g)"/>
+
+  <!-- row 3 -->
+  <rect x="80" y="418" width="410" height="128" rx="18" fill="#eef2fd" stroke="#4975e6" stroke-width="2.5"/>
+  <text class="m" x="104" y="454">kb.json</text>
+  <text class="t" x="104" y="499">조립 지식</text>
+  <text class="s" x="104" y="532">단계 카드 · 선배의 말</text>
+
+  <rect x="540" y="418" width="410" height="128" rx="18" fill="#eef2fd" stroke="#4975e6" stroke-width="2.5"/>
+  <text class="m" x="564" y="454">assembly.json · .glb</text>
+  <text class="t" x="564" y="499">조립 단계 3D</text>
+  <text class="s" x="564" y="532">부품 · 볼트 · 순서</text>
+
+  <line x1="285" y1="550" x2="285" y2="600" stroke="#4975e6" stroke-width="4" marker-end="url(#a)"/>
+  <line x1="745" y1="550" x2="745" y2="600" stroke="#4975e6" stroke-width="4" marker-end="url(#a)"/>
+
+  <!-- row 4: server -->
+  <rect x="80" y="606" width="870" height="136" rx="20" fill="#00074e"/>
+  <text class="mw" x="108" y="644">server/  ·  FastAPI</text>
+  <text class="tw" x="108" y="692">AI 에이전트 서버</text>
+  <text class="sw" x="108" y="726">자료 검색 → 근거로 답변 → 음성 합성</text>
+
+  <line x1="515" y1="746" x2="515" y2="796" stroke="#4975e6" stroke-width="4" marker-start="url(#a)" marker-end="url(#a)"/>
+  <text class="s" x="535" y="780">음성 질문 · 답변</text>
+
+  <!-- row 5: quest -->
+  <rect x="80" y="802" width="870" height="136" rx="20" fill="#4975e6"/>
+  <text class="mw" x="108" y="840" style="fill:#d5e0ff">web/xr.html  ·  WebXR</text>
+  <text class="tw" x="108" y="888">Quest 3 작업자 화면</text>
+  <text class="sw" x="108" y="922" style="fill:#e8eeff">실물 크기 3D · 단계 안내 · 음성 Q&amp;A</text>
+
+  <!-- feedback loop: 작업 기록 -> KB -->
+  <path d="M80,870 L40,870 L40,482 L72,482" fill="none" stroke="#4975e6" stroke-width="4" stroke-dasharray="10 8" marker-end="url(#a)"/>
+  <text class="loop" x="26" y="676" text-anchor="middle" transform="rotate(-90 26 676)">작업 기록 → 다음 사람</text>
+</svg>
+</body></html>

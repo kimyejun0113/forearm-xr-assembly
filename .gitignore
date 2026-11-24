@@ -15,3 +15,7 @@ agent/data/sessions_backup/
 tools/quest_ip.txt
 agent/data/tts_cache/
 tts_samples/
+# 시연 영상·헤드셋 원본 캡처 (용량이 크고 사람 얼굴이 찍힘)
+영상/
+docs/quest_captures/
+docs/xr_sim.png

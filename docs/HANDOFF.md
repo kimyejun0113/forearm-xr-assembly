@@ -59,7 +59,7 @@ powershell -ExecutionPolicy Bypass -File agent\run_https.ps1
 - 노트북: `http://localhost:8000/xr/xr.html`
 - Quest: 같은 Wi-Fi에서 `https://<노트북 IP>:8443/xr/xr.html` → 인증서 경고 "고급 → 계속". 막히면 서버 창에 찍힌 헤드셋 IP를 `tools/quest_ip.txt`에 적는다.
 - 미리보기용 설정은 `.claude/launch.json` (`agent-test`는 8002 포트).
-- 루트 `README.md`의 `http.server` 실행법은 예전 방식이다. 지금은 위 서버 하나로 3D와 AI가 같이 돈다.
+- 예전 `http.server` 실행법은 쓰지 않는다. 지금은 위 서버 하나로 3D와 AI가 같이 돈다.
 
 `.gitignore`로 빠진 것 (저장소에 없음): `.venv/`, `agent/.env`, `agent/certs/`, `agent/data/sessions*/`, `agent/data/briefings/`, `agent/data/kb/aggregate.json`, `agent/data/kb/history/`, `tools/android/`(adb), `tools/quest_ip.txt`, `tts_samples/`.
 
